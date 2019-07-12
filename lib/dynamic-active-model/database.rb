@@ -5,7 +5,8 @@ module DynamicActiveModel
   #  database and create ActiveRecord models
   class Database
     attr_reader :table_class_names,
-                :factory
+                :factory,
+                :models
 
     def initialize(base_module, connection_options, base_class_name = nil)
       @factory = Factory.new(base_module, connection_options, base_class_name)
