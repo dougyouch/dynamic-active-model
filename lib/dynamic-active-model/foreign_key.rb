@@ -8,12 +8,12 @@ module DynamicActiveModel
 
     def initialize(model)
       @model = model
-      @keys = []
-      add(generate_foreign_key(model.table_name))
+      @keys = {}
+      add(generate_foreign_key(model.table_name), model.table_name)
     end
 
-    def add(key)
-      @keys << key
+    def add(key, relationship_name)
+      @keys[key] = relationship_name
     end
 
     def generate_foreign_key(table_name)
