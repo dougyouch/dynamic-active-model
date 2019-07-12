@@ -28,7 +28,7 @@ module DynamicActiveModel
           foreign_key_to_models[column_name].each do |foreign_model|
             next if foreign_model == model
 
-            add_relationships(model, foreign_model, column_name)
+            add_relationships(model.table_name, model, foreign_model, column_name)
           end
         end
       end
@@ -36,23 +36,23 @@ module DynamicActiveModel
 
     private
 
-    def add_relationships(model, belongs_to_model, foreign_key)
-      add_belongs_to(model, belongs_to_model, foreign_key)
-      add_has_many(belongs_to_model, model, foreign_key)
+    def add_relationships(relationship_name, model, belongs_to_model, foreign_key)
+      add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
+      add_has_many(relationship_name, belongs_to_model, model, foreign_key)
     end
 
-    def add_belongs_to(model, belongs_to_model, foreign_key)
+    def add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
       model.belongs_to(
-        belongs_to_model.table_name.singularize.to_sym,
+        relationship_name.singularize.to_sym,
         class_name: belongs_to_model.name,
         foreign_key: foreign_key,
         primary_key: belongs_to_model.primary_key
       )
     end
 
-    def add_has_many(model, has_many_model, foreign_key)
+    def add_has_many(relationship_name, model, has_many_model, foreign_key)
       model.has_many(
-        has_many_model.table_name.pluralize.to_sym,
+        relationship_name.pluralize.to_sym,
         class_name: has_many_model.name,
         foreign_key: foreign_key,
         primary_key: has_many_model.primary_key
