@@ -8,9 +8,8 @@ module DynamicActiveModel
 
     def initialize(database)
       @database = database
-      @foreign_keys = database.models.inject({}) do |memo, model|
-        memo[model.table_name] = ForeignKey.new(model)
-        memo
+      @foreign_keys = database.models.each_with_object({}) do |model, hsh|
+        hsh[model.table_name] = ForeignKey.new(model)
       end
     end
 
@@ -20,32 +19,51 @@ module DynamicActiveModel
 
     # iterates over the models and adds relationships
     def build!
-      foreign_key_to_models = {}
-      @foreign_keys.each do |_, foreign_key|
-        foreign_key.keys.each do |key|
-          foreign_key_to_models[key] ||= []
-          foreign_key_to_models[key] << foreign_key.model
-        end
-      end
+      foreign_key_to_models = create_foreign_key_to_model_map
 
       @database.models.each do |model|
         model.column_names.each do |column_name|
           next unless foreign_key_to_models[column_name]
+
           foreign_key_to_models[column_name].each do |foreign_model|
             next if foreign_model == model
-            model.belongs_to(
-              foreign_model.table_name.singularize.to_sym,
-              class_name: foreign_model.name,
-              foreign_key: column_name,
-              primary_key: foreign_model.primary_key
-            )
-            foreign_model.has_many(
-              model.table_name.pluralize.to_sym,
-              class_name: model.name,
-              foreign_key: column_name,
-              primary_key: model.primary_key
-            )
+
+            add_relationships(model, foreign_model, column_name)
           end
+        end
+      end
+    end
+
+    private
+
+    def add_relationships(model, belongs_to_model, foreign_key)
+      add_belongs_to(model, belongs_to_model, foreign_key)
+      add_has_many(belongs_to_model, model, foreign_key)
+    end
+
+    def add_belongs_to(model, belongs_to_model, foreign_key)
+      model.belongs_to(
+        belongs_to_model.table_name.singularize.to_sym,
+        class_name: belongs_to_model.name,
+        foreign_key: foreign_key,
+        primary_key: belongs_to_model.primary_key
+      )
+    end
+
+    def add_has_many(model, has_many_model, foreign_key)
+      model.has_many(
+        has_many_model.table_name.pluralize.to_sym,
+        class_name: has_many_model.name,
+        foreign_key: foreign_key,
+        primary_key: has_many_model.primary_key
+      )
+    end
+
+    def create_foreign_key_to_model_map
+      @foreign_keys.values.each_with_object({}) do |foreign_key, hsh|
+        foreign_key.keys.each do |key|
+          hsh[key] ||= []
+          hsh[key] << foreign_key.model
         end
       end
     end
