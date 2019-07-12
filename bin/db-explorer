@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require 'dynamic-active-model'
+
+options = {
+  connection_options: {
+    username: 'root',
+    adapter: 'mysql2',
+    database: 'test'
+  },
+  skip_tables: [],
+  relationsips: {}
+}
+
+module DB
+end
+
+DynamicActiveModel::Exploer.explore(
+  DB,
+  options[:connection_options],
+  options[:skip_tables],
+  options[:relationsips]
+)
+
+require 'irb'
+IRB.start(__FILE__)

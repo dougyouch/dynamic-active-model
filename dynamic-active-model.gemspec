@@ -8,7 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ['Doug Youch']
   s.email       = 'dougyouch@gmail.com'
   s.homepage    = 'https://github.com/dougyouch/dynamic-active-model'
-  s.files       = Dir.glob('lib/**/*.rb')
+  s.files       = Dir.glob('lib/**/*.rb') + Dir.glob('bin/*')
+  s.bindir      = 'bin'
 
   s.add_runtime_dependency 'activerecord'
 end
