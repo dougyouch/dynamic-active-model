@@ -4,7 +4,7 @@ module DynamicActiveModel
   # DynamicActiveModel::EWplorer creates models and relationsips
   module Explorer
     def self.explore(base_module, connection_options, skip_tables = [], relationships = {})
-      create_models!(base_module, connection_options, skip_tables)
+      database = create_models!(base_module, connection_options, skip_tables)
       build_relationships!(database, relationships)
     end
 
@@ -15,6 +15,7 @@ module DynamicActiveModel
         database.skip_table(table_name)
       end
       database.create_models!
+      database
     end
 
     def self.build_relationships!(database, relationships)

@@ -18,7 +18,7 @@ module DB
 end
 # rubocop:enable Style/Documentation
 
-DynamicActiveModel::Exploer.explore(
+DynamicActiveModel::Explorer.explore(
   DB,
   options[:connection_options],
   options[:skip_tables],

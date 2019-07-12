@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/dougyouch/dynamic-active-model'
   s.files       = Dir.glob('lib/**/*.rb') + Dir.glob('bin/*')
   s.bindir      = 'bin'
+  s.executables << 'dynamic-db-explorer'
 
   s.add_runtime_dependency 'activerecord'
 end
