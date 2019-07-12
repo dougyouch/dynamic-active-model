@@ -1,5 +1,7 @@
 Naming/FileName:
   Enabled: false
+Metrics/LineLength:
+  Max: 120
 AllCops:
   Exclude:
     - 'spec/support/db/schema.rb'
