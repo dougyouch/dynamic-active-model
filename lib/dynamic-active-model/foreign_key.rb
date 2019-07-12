@@ -8,19 +8,20 @@ module DynamicActiveModel
 
     DEFAULT_ID_SUFFIX = '_id'
 
-    @@id_suffix = nil
     def self.id_suffix
-      @@id_suffix || DEFAULT_ID_SUFFIX
+      @id_suffix || DEFAULT_ID_SUFFIX
     end
 
+    # rubocop:disable Style/TrivialAccessors
     def self.id_suffix=(val)
-      @@id_suffix = val
+      @id_suffix = val
     end
+    # rubocop:enable Style/TrivialAccessors
 
     def initialize(model)
       @model = model
       @keys = {}
-      add(generate_foreign_key(model.table_name), model.table_name)
+      add(generate_foreign_key(model.table_name), model.table_name.underscore)
     end
 
     def add(key, relationship_name)

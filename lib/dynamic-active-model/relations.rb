@@ -52,7 +52,7 @@ module DynamicActiveModel
 
     def add_has_many(model, has_many_model, foreign_key)
       model.has_many(
-        has_many_model.table_name.pluralize.to_sym,
+        has_many_model.table_name.underscore.pluralize.to_sym,
         class_name: has_many_model.name,
         foreign_key: foreign_key,
         primary_key: has_many_model.primary_key

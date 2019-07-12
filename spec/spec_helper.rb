@@ -69,5 +69,5 @@ def get_association(model, name)
 end
 
 def has_association?(model, name)
-  !! get_association(model, name)
+  get_association(model, name) != nil
 end
