@@ -7,6 +7,7 @@ ActiveRecord::Schema.define(version: 20190712000000) do
   create_table "companies", force: true do |t|
     t.string "name"
     t.integer "website_id"
+    t.integer "company_website_id"
   end
 
   create_table "jobs", force: true do |t|
