@@ -6,6 +6,17 @@ module DynamicActiveModel
     attr_reader :model,
                 :keys
 
+    DEFAULT_ID_SUFFIX = '_id'
+
+    @@id_suffix = nil
+    def self.id_suffix
+      @@id_suffix || DEFAULT_ID_SUFFIX
+    end
+
+    def self.id_suffix=(val)
+      @@id_suffix = val
+    end
+
     def initialize(model)
       @model = model
       @keys = {}
@@ -17,7 +28,7 @@ module DynamicActiveModel
     end
 
     def generate_foreign_key(table_name)
-      table_name.singularize + '_id'
+      table_name.singularize + self.class.id_suffix
     end
   end
 end
