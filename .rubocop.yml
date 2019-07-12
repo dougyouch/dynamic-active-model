@@ -1,2 +1,6 @@
 Naming/FileName:
   Enabled: false
+AllCops:
+  Exclude:
+    - 'spec/support/db/schema.rb'
+    - 'spec/**/*_spec.rb'

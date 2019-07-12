@@ -3,10 +3,12 @@
 module DynamicActiveModel
   # DynamicActiveModel::Factory creates ActiveRecord class for tables
   class Factory
+    attr_writer :base_class
+
     def initialize(base_module, connection_options, base_class_name = nil)
       @base_module = base_module
       @connection_options = connection_options
-      @base_class_name = base_class_name || :AbstractBase
+      @base_class_name = base_class_name || :DynamicAbstractBase
     end
 
     def create(table_name, class_name = nil)
@@ -27,7 +29,7 @@ module DynamicActiveModel
           kls = Class.new(ActiveRecord::Base) do
             self.abstract_class = true
           end
-          @base_module.const_set(:AbstractBase, kls)
+          @base_module.const_set(@base_class_name, kls)
 
           kls = @base_module.const_get(@base_class_name)
           kls.establish_connection @connection_options
