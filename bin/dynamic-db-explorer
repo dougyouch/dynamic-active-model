@@ -16,8 +16,14 @@ options = {
   config_section: nil
 }
 
+# rubocop:disable Metrics/BlockLength
 OptionParser.new do |opts|
   opts.banner = 'Usage: dynamic-db-explorer'
+
+  opts.on('-h', '--help', 'Prints this help') do
+    puts opts
+    exit
+  end
 
   opts.on('--username USERMNAME', 'DB username') do |v|
     options[:connection_options][:username] = v
@@ -48,24 +54,24 @@ OptionParser.new do |opts|
     options[:base_module] = Object.const_get(v)
   end
 
-  opts.on('-c', '--config FILE', 'config file') do |v|
+  opts.on('-c', '--config FILE', "config file, default #{DEFAULT_CONFIG_FILE}") do |v|
     options[:config_file] = v
   end
 
   opts.on('-s', '--section SECTION', 'config file section') do |v|
-    if !options[:config_file] && File.exist?(DEFAULT_CONFIG_FILE)
-      options[:config_file] = DEFAULT_CONFIG_FILE
-    end
+    options[:config_file] = DEFAULT_CONFIG_FILE if !options[:config_file] && File.exist?(DEFAULT_CONFIG_FILE)
     options[:config_section] = v
   end
 end.parse!
+# rubocop:enable Metrics/BlockLength
 
 if options[:config_file]
   raise('must specify a section') unless options[:config_section]
+
   config = YAML.load_file(options[:config_file])[options[:config_section]]
   options[:skip_tables] = config.delete('skip_tables') || []
   options[:relationships] = config.delete('relationships') || {}
-  if module_name = config.delete('module')
+  if (module_name = config.delete('module'))
     Object.const_set(module_name, Module.new)
     options[:base_module] = Object.const_get(module_name)
   end
