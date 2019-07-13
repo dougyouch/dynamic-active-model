@@ -29,7 +29,7 @@ module DynamicActiveModel
     end
 
     def generate_foreign_key(table_name)
-      table_name.singularize + self.class.id_suffix
+      table_name.underscore.singularize + self.class.id_suffix
     end
   end
 end

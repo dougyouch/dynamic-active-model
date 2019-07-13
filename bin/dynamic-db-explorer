@@ -13,7 +13,8 @@ options = {
   skip_tables: [],
   relationships: {},
   config_file: nil,
-  config_section: nil
+  config_section: nil,
+  class_files_dir: nil
 }
 
 # rubocop:disable Metrics/BlockLength
@@ -62,6 +63,12 @@ OptionParser.new do |opts|
     options[:config_file] = DEFAULT_CONFIG_FILE if !options[:config_file] && File.exist?(DEFAULT_CONFIG_FILE)
     options[:config_section] = v
   end
+
+  opts.on('--create-class-files DIR', 'Create ActiveRecord class files') do |v|
+    raise("#{v} not found") unless File.exist?(v)
+
+    options[:class_files_dir] = v
+  end
 end.parse!
 # rubocop:enable Metrics/BlockLength
 
@@ -78,12 +85,18 @@ if options[:config_file]
   options[:connection_options] = config.each_with_object({}) { |(name, value), hsh| hsh[name.to_sym] = value }
 end
 
-DynamicActiveModel::Explorer.explore(
+database = DynamicActiveModel::Explorer.explore(
   options[:base_module],
   options[:connection_options],
   options[:skip_tables],
   options[:relationships]
 )
 
-require 'irb'
-IRB.start(__FILE__)
+if options[:class_files_dir]
+  database.models.each do |model|
+    DynamicActiveModel::TemplateClassFile.new(model).create_template!(options[:class_files_dir])
+  end
+else
+  require 'irb'
+  IRB.start(__FILE__)
+end

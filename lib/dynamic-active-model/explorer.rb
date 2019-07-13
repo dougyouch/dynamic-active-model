@@ -6,6 +6,7 @@ module DynamicActiveModel
     def self.explore(base_module, connection_options, skip_tables = [], relationships = {})
       database = create_models!(base_module, connection_options, skip_tables)
       build_relationships!(database, relationships)
+      database
     end
 
     def self.create_models!(base_module, connection_options, skip_tables)

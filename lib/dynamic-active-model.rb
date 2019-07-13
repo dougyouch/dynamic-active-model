@@ -7,4 +7,5 @@ module DynamicActiveModel
   autoload :Factory, 'dynamic-active-model/factory'
   autoload :ForeignKey, 'dynamic-active-model/foreign_key'
   autoload :Relations, 'dynamic-active-model/relations'
+  autoload :TemplateClassFile, 'dynamic-active-model/template_class_file'
 end

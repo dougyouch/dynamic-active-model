@@ -4,5 +4,6 @@ Metrics/LineLength:
   Max: 120
 AllCops:
   Exclude:
+    - 'lib/dynamic-active-model/template_class_file.rb'
     - 'spec/support/db/schema.rb'
     - 'spec/**/*_spec.rb'
