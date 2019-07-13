@@ -14,7 +14,8 @@ options = {
   relationships: {},
   config_file: nil,
   config_section: nil,
-  class_files_dir: nil
+  class_files_dir: nil,
+  id_suffix: nil
 }
 
 # rubocop:disable Metrics/BlockLength
@@ -55,6 +56,10 @@ OptionParser.new do |opts|
     options[:base_module] = Object.const_get(v)
   end
 
+  opts.on('--id-suffix ID_SUFFIX', 'foreign key ID pattern') do |v|
+    options[:id_suffix] = v
+  end
+
   opts.on('-c', '--config FILE', "config file, default #{DEFAULT_CONFIG_FILE}") do |v|
     options[:config_file] = v
   end
@@ -71,6 +76,8 @@ OptionParser.new do |opts|
   end
 end.parse!
 # rubocop:enable Metrics/BlockLength
+
+DynamicActiveModel::ForeignKey.id_suffix = options[:id_suffix] if options[:id_suffix]
 
 if options[:config_file]
   raise('must specify a section') unless options[:config_section]
