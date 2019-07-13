@@ -23,9 +23,9 @@ module DynamicActiveModel
 
       @database.models.each do |model|
         model.column_names.each do |column_name|
-          next unless foreign_key_to_models[column_name]
+          next unless foreign_key_to_models[column_name.downcase]
 
-          foreign_key_to_models[column_name].each do |foreign_model, relationship_name|
+          foreign_key_to_models[column_name.downcase].each do |foreign_model, relationship_name|
             next if foreign_model == model
 
             add_relationships(relationship_name, model, foreign_model, column_name)
@@ -62,8 +62,8 @@ module DynamicActiveModel
     def create_foreign_key_to_model_map
       @foreign_keys.values.each_with_object({}) do |foreign_key, hsh|
         foreign_key.keys.each do |key, relationship_name|
-          hsh[key] ||= []
-          hsh[key] << [foreign_key.model, relationship_name]
+          hsh[key.downcase] ||= []
+          hsh[key.downcase] << [foreign_key.model, relationship_name]
         end
       end
     end
