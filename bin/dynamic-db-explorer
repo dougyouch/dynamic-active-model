@@ -2,27 +2,81 @@
 # frozen_string_literal: true
 
 require 'dynamic-active-model'
+require 'optparse'
+require 'yaml'
+
+DEFAULT_CONFIG_FILE = "#{ENV['HOME']}/.dynamic-db-explorer.yml"
 
 options = {
-  connection_options: {
-    username: 'root',
-    adapter: 'mysql2',
-    database: 'test'
-  },
+  base_module: Object,
+  connection_options: {},
   skip_tables: [],
-  relationsips: {}
+  relationships: {},
+  config_file: nil,
+  config_section: nil
 }
 
-# rubocop:disable Style/Documentation
-module DB
+OptionParser.new do |opts|
+  opts.banner = 'Usage: dynamic-db-explorer'
+
+  opts.on('--username USERMNAME', 'DB username') do |v|
+    options[:connection_options][:username] = v
+  end
+
+  opts.on('--host HOST', 'DB host') do |v|
+    options[:connection_options][:host] = v
+  end
+
+  opts.on('--port PORT', 'DB port') do |v|
+    options[:connection_options][:port] = v
+  end
+
+  opts.on('--password PASSWORD', 'DB password') do |v|
+    options[:connection_options][:password] = v
+  end
+
+  opts.on('--adapter ADAPTER', 'DB adapter') do |v|
+    options[:connection_options][:adapter] = v
+  end
+
+  opts.on('--database DATABASE', 'DB name') do |v|
+    options[:connection_options][:database] = v
+  end
+
+  opts.on('--module MODULE_NAME', 'module name') do |v|
+    Object.const_set(v, Module.new)
+    options[:base_module] = Object.const_get(v)
+  end
+
+  opts.on('-c', '--config FILE', 'config file') do |v|
+    options[:config_file] = v
+  end
+
+  opts.on('-s', '--section SECTION', 'config file section') do |v|
+    if !options[:config_file] && File.exist?(DEFAULT_CONFIG_FILE)
+      options[:config_file] = DEFAULT_CONFIG_FILE
+    end
+    options[:config_section] = v
+  end
+end.parse!
+
+if options[:config_file]
+  raise('must specify a section') unless options[:config_section]
+  config = YAML.load_file(options[:config_file])[options[:config_section]]
+  options[:skip_tables] = config.delete('skip_tables') || []
+  options[:relationships] = config.delete('relationships') || {}
+  if module_name = config.delete('module')
+    Object.const_set(module_name, Module.new)
+    options[:base_module] = Object.const_get(module_name)
+  end
+  options[:connection_options] = config.each_with_object({}) { |(name, value), hsh| hsh[name.to_sym] = value }
 end
-# rubocop:enable Style/Documentation
 
 DynamicActiveModel::Explorer.explore(
-  DB,
+  options[:base_module],
   options[:connection_options],
   options[:skip_tables],
-  options[:relationsips]
+  options[:relationships]
 )
 
 require 'irb'
