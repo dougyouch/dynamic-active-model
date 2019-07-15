@@ -13,7 +13,7 @@ module DynamicActiveModel
       end
     end
 
-    def add_foreign_key(table_name, foreign_key, relationship_name)
+    def add_foreign_key(table_name, foreign_key, relationship_name = nil)
       @foreign_keys[table_name].add(foreign_key, relationship_name)
     end
 
@@ -25,10 +25,10 @@ module DynamicActiveModel
         model.column_names.each do |column_name|
           next unless foreign_key_to_models[column_name.downcase]
 
-          foreign_key_to_models[column_name.downcase].each do |foreign_model, relationship_name, additional|
+          foreign_key_to_models[column_name.downcase].each do |foreign_model, relationship_name|
             next if foreign_model == model
 
-            add_relationships(relationship_name, model, foreign_model, column_name, additional)
+            add_relationships(relationship_name, model, foreign_model, column_name)
           end
         end
       end
@@ -36,14 +36,9 @@ module DynamicActiveModel
 
     private
 
-    def add_relationships(relationship_name, model, belongs_to_model, foreign_key, additional)
+    def add_relationships(relationship_name, model, belongs_to_model, foreign_key)
       add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
-      add_has_many(
-        additional ? relationship_name : nil,
-        belongs_to_model,
-        model,
-        foreign_key
-      )
+      add_has_many(relationship_name, belongs_to_model, model, foreign_key)
     end
 
     def add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
@@ -56,10 +51,8 @@ module DynamicActiveModel
     end
 
     def add_has_many(relationship_name, model, has_many_model, foreign_key)
-      relationship_name = relationship_name ? (relationship_name + '_') : ''
-      relationship_name += has_many_model.table_name
       model.has_many(
-        relationship_name.underscore.pluralize.to_sym,
+        generate_has_many_association_name(relationship_name, model, has_many_model),
         class_name: has_many_model.name,
         foreign_key: foreign_key,
         primary_key: has_many_model.primary_key
@@ -68,13 +61,21 @@ module DynamicActiveModel
 
     def create_foreign_key_to_model_map
       @foreign_keys.values.each_with_object({}) do |foreign_key, hsh|
-        additional = false
         foreign_key.keys.each do |key, relationship_name|
           hsh[key.downcase] ||= []
-          hsh[key.downcase] << [foreign_key.model, relationship_name, additional]
-          additional = true
+          hsh[key.downcase] << [foreign_key.model, relationship_name]
         end
       end
+    end
+
+    def generate_has_many_association_name(relationship_name, model, has_many_model)
+      name =
+        if relationship_name == model.table_name.underscore
+          has_many_model.table_name
+        else
+          relationship_name + '_' + has_many_model.table_name
+        end
+      name.underscore.pluralize.to_sym
     end
   end
 end
