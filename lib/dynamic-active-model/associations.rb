@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module DynamicActiveModel
-  # DynamicActiveModel::Relations iterates over the models of a
+  # DynamicActiveModel::Associations iterates over the models of a
   #  database and adds has_many and belongs_to based on foreign keys
-  class Relations
+  class Associations
     attr_reader :database
 
     def initialize(database)

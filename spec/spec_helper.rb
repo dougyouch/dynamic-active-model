@@ -59,7 +59,7 @@ RSpec.shared_context 'database' do
   let(:foreign_key) { DynamicActiveModel::ForeignKey.new(factory.create('users')) }
   let(:relations) do
     database.create_models! if database.models.empty?
-    DynamicActiveModel::Relations.new(database)
+    DynamicActiveModel::Associations.new(database)
   end
 end
 # rubocop:enable Metrics/BlockLength

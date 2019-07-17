@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe DynamicActiveModel::Relations do
+describe DynamicActiveModel::Associations do
   include_context 'database'
 
   context '#build!' do

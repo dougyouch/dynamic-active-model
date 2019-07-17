@@ -20,7 +20,7 @@ module DynamicActiveModel
     end
 
     def self.build_relationships!(database, relationships)
-      relations = Relations.new(database)
+      relations = Associations.new(database)
       relationships.each do |table_name, foreign_keys|
         foreign_keys.each do |foreign_key, relationship_name|
           relations.add_foreign_key(table_name, foreign_key, relationship_name)

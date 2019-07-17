@@ -6,6 +6,6 @@ module DynamicActiveModel
   autoload :Explorer, 'dynamic-active-model/explorer'
   autoload :Factory, 'dynamic-active-model/factory'
   autoload :ForeignKey, 'dynamic-active-model/foreign_key'
-  autoload :Relations, 'dynamic-active-model/relations'
+  autoload :Associations, 'dynamic-active-model/associations'
   autoload :TemplateClassFile, 'dynamic-active-model/template_class_file'
 end
