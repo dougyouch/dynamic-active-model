@@ -4,7 +4,6 @@ require 'rubygems'
 require 'bundler'
 require 'securerandom'
 require 'active_record'
-require 'securerandom'
 
 begin
   Bundler.require(:default, :spec)
