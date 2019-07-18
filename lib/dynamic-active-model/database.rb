@@ -13,6 +13,8 @@ module DynamicActiveModel
       @table_class_names = {}
       @skip_tables = []
       @skip_table_matchers = []
+      @include_tables = []
+      @include_table_matchers = []
       @models = []
     end
 
@@ -24,6 +26,14 @@ module DynamicActiveModel
       end
     end
 
+    def include_table(table)
+      if table.is_a?(Regexp)
+        @include_table_matchers << table
+      else
+        @include_tables << table
+      end
+    end
+
     def table_class_name(table_name, class_name)
       @table_class_names[table_name.to_s] = class_name
     end
@@ -31,6 +41,7 @@ module DynamicActiveModel
     def create_models!
       @factory.base_class.connection.tables.each do |table_name|
         next if skip_table?(table_name)
+        next unless include_table?(table_name)
 
         @models << @factory.create(table_name, @table_class_names[table_name])
       end
@@ -40,11 +51,21 @@ module DynamicActiveModel
       @skip_tables + @skip_table_matchers
     end
 
+    def include_tables
+      @include_tables + @include_table_matchers
+    end
+
     private
 
     def skip_table?(table_name)
       @skip_tables.include?(table_name) ||
         @skip_table_matchers.any? { |r| r.match(table_name) }
+    end
+
+    def include_table?(table_name)
+      (@include_tables.empty? && @include_table_matchers.empty?) ||
+        @include_tables.include?(table_name) ||
+        @include_table_matchers.any? { |r| r.match(table_name) }
     end
   end
 end

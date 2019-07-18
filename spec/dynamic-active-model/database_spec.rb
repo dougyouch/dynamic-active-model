@@ -47,6 +47,45 @@ describe DynamicActiveModel::Database do
     end
   end
 
+  context '#include_table?' do
+    describe 'table names' do
+      before(:each) do
+        database.include_table skip_table_name
+      end
+
+      it 'includes table' do
+        expect(database.send(:include_table?, skip_table_name)).to eq(true)
+      end
+
+      it 'does not include the table' do
+        expect(database.send(:include_table?, 'users')).to eq(false)
+      end
+
+      it 'returns tables to include' do
+        expect(database.include_tables).to eq([skip_table_name])
+      end
+    end
+
+    describe 'table names' do
+      before(:each) do
+        database.include_table skip_table_regex
+      end
+
+      it 'includes table' do
+        expect(database.send(:include_table?, 'stats_employment_durations')).to eq(true)
+        expect(database.send(:include_table?, 'stats_company_employments')).to eq(true)
+      end
+
+      it 'does not include the table' do
+        expect(database.send(:include_table?, 'users')).to eq(false)
+      end
+
+      it 'returns tables to include' do
+        expect(database.include_tables).to eq([skip_table_regex])
+      end
+    end
+  end
+
   context '#create_models!' do
     before(:each) do
       database.skip_table skip_table_name
@@ -92,6 +131,36 @@ describe DynamicActiveModel::Database do
       it 'table_name' do
         expect(subject.table_name).to eq('users')
       end
+    end
+  end
+
+  context '#create_models!' do
+    before(:each) do
+      database.include_table 'users'
+    end
+
+    let(:expected_classes) do
+      [
+        :User
+      ]
+    end
+    let(:undefined_classes) do
+      [
+        :Company,
+        :Job,
+        :Employment,
+        :Website,
+        :StatsEmploymentDuration,
+        :StatsCompanyEmployment,
+        :TmpLoadDataTable
+      ]
+    end
+    subject { database.create_models! }
+
+    it 'creates ActiveRecord models for database' do
+      subject
+      expect(expected_classes.all? { |name| base_module.const_defined?(name) }).to eq(true)
+      expect(undefined_classes.all? { |name| ! base_module.const_defined?(name) }).to eq(true)
     end
   end
 end
