@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DynamicActiveModel
-  # DynamicActiveModel::EWplorer creates models and relationships
+  # DynamicActiveModel::Explorer creates models and relationships
   module Explorer
     def self.explore(base_module, connection_options, skip_tables = [], relationships = {})
       database = create_models!(base_module, connection_options, skip_tables)
