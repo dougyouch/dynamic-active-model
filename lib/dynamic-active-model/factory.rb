@@ -13,14 +13,15 @@ module DynamicActiveModel
 
     def create(table_name, class_name = nil)
       class_name ||= generate_class_name(table_name)
+      create!(table_name, class_name) unless @base_module.const_defined?(class_name)
+      @base_module.const_get(class_name)
+    end
 
-      # don't recreate the class if it already exists -- maybe add a create! method or force option in the future if really needed
-      unless @base_module.const_defined?(class_name)
-        kls = Class.new(base_class) do
-          self.table_name = table_name
-        end
-        @base_module.const_set(class_name, kls)
+    def create!(table_name, class_name)
+      kls = Class.new(base_class) do
+        self.table_name = table_name
       end
+      @base_module.const_set(class_name, kls)
       @base_module.const_get(class_name)
     end
 
@@ -30,12 +31,14 @@ module DynamicActiveModel
         begin
           require 'active_record'
 
-          unless @base_module.const_defined?(@base_class_name) && kls = @base_module.const_get(@base_class_name)
-            kls = Class.new(ActiveRecord::Base) do
+          unless @base_module.const_defined?(@base_class_name)
+            new_base_class = Class.new(ActiveRecord::Base) do
               self.abstract_class = true
             end
-            @base_module.const_set(@base_class_name, kls)
-          end.tap do |kls|
+            @base_module.const_set(@base_class_name, new_base_class)
+          end
+
+          @base_module.const_get(@base_class_name).tap do |kls|
             kls.establish_connection @connection_options
           end
         end
