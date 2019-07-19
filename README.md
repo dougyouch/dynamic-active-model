@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/dougyouch/dynamic-active-model.svg?branch=master)](https://travis-ci.org/dougyouch/dynamic-active-model)
+[![Build Status](https://travis-ci.com/dougyouch/dynamic-active-model.svg?branch=master)](https://travis-ci.com/dougyouch/dynamic-active-model)
+[![Maintainability](https://api.codeclimate.com/v1/badges/76f5bdfc2d2ca28514c6/maintainability)](https://codeclimate.com/github/dougyouch/dynamic-active-model/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/76f5bdfc2d2ca28514c6/test_coverage)](https://codeclimate.com/github/dougyouch/dynamic-active-model/test_coverage)
 
 # Dynamic Active Model - Automatic Database Discovery, Model Creation, and Relationship Mapping for Rails
 
