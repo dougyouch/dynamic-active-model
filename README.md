@@ -40,6 +40,44 @@ movie.name
 movie.actors
 ```
 
+### Blacklist (Skip) Tables to Create Models For
+You can blacklist tables to create models for, to ignore certain specific tables
+
+```ruby
+# initialize the database
+db = DynamicActiveModel::Database.new(DB, username: 'root', adapter: 'postgresql', database: 'rails_development', password: 'password')
+
+# skip a single table
+db.skip_table 'actors'
+
+# skip tables by regex
+db.skip_table /^temp/
+
+# skip multiple tables
+db.skip_tables ['2018-01-01_temp', /^daily/]
+
+db.create_models!
+```
+
+### Whitelist Tables to Create Models For
+If you'd like to whitelist instead, that's also available.
+
+```ruby
+# initialize the database
+db = DynamicActiveModel::Database.new(DB, username: 'root', adapter: 'postgresql', database: 'rails_development', password: 'password')
+
+# include a single table
+db.include_table 'actors'
+
+# include tables by regex
+db.include_table /^special/
+
+# include multiple tables
+db.include_tables ['movies', 'salaries']
+
+db.create_models!
+```
+
 ## Create Model Files
 If you'd like to actually create the files for models, you can do so through
 
