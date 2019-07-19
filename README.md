@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dougyouch/dynamic-active-model.svg?branch=master)](https://travis-ci.org/dougyouch/dynamic-active-model)
+
 # Dynamic Active Model - Automatic Database Discovery, Model Creation, and Relationship Mapping for Rails
 
 Dynamic Active Model automatically reads a database, and maps the database classes to Active Record models. This includes defining relationships based on foreign keys. Currently, `has_many` and `belongs_to` relationships are supported. By default, Dynamic Active Model is best used for creating missing Active Record models, or exploring a database without having to create the models.
