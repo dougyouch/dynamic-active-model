@@ -1,4 +1,3 @@
-# dynamic-active-model
 [![Build Status](https://travis-ci.org/dougyouch/dynamic-active-model.svg?branch=master)](https://travis-ci.org/dougyouch/dynamic-active-model)
 
 # Dynamic Active Model - Automatic Database Discovery, Model Creation, and Relationship Mapping for Rails
