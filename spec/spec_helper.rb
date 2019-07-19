@@ -4,6 +4,9 @@ require 'rubygems'
 require 'bundler'
 require 'securerandom'
 require 'active_record'
+require 'simplecov'
+
+SimpleCov.start
 
 begin
   Bundler.require(:default, :spec)

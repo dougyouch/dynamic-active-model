@@ -9,6 +9,7 @@ end
 group :spec do
   gem 'activerecord'
   gem 'rspec'
+  gem 'simplecov', require: false
   gem 'sqlite3'
 end
 
