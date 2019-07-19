@@ -11,3 +11,7 @@ group :spec do
   gem 'rspec'
   gem 'sqlite3'
 end
+
+group :travis do
+  gem 'rake'
+end
