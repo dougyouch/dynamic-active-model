@@ -8,6 +8,7 @@ ActiveRecord::Schema.define(version: 20190712000000) do
     t.string "name"
     t.integer "website_id"
     t.integer "company_website_id"
+    t.text "hash" # dangerous column name
   end
 
   create_table "jobs", force: true do |t|
