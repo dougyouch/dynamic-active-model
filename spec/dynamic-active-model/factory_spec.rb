@@ -38,10 +38,8 @@ describe DynamicActiveModel::Factory do
     let(:new_base_class) do
       Class.new do
         def self.table_name
-          @table_name
         end
         def self.table_name=(name)
-          @table_name = name
         end
       end
     end
@@ -71,10 +69,10 @@ describe DynamicActiveModel::Factory do
       let(:new_base_class) do
         Class.new do
           def self.table_name
-            @table_name
           end
           def self.table_name=(name)
-            @table_name = name
+          end
+          def self.attribute_names
           end
         end
       end
