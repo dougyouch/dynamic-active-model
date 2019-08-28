@@ -26,12 +26,20 @@ module DynamicActiveModel
       end
     end
 
+    def skip_tables(tables)
+      tables.each { |table| skip_table(table) }
+    end
+
     def include_table(table)
       if table.is_a?(Regexp)
         @include_table_matchers << table
       else
-        @include_tables << table
+        @include_tables << table.to_s
       end
+    end
+
+    def include_tables(tables)
+      tables.each { |table| include_table(table) }
     end
 
     def table_class_name(table_name, class_name)
@@ -47,18 +55,18 @@ module DynamicActiveModel
       end
     end
 
-    def skip_tables
+    def skipped_tables
       @skip_tables + @skip_table_matchers
     end
 
-    def include_tables
+    def included_tables
       @include_tables + @include_table_matchers
     end
 
     private
 
     def skip_table?(table_name)
-      @skip_tables.include?(table_name) ||
+      @skip_tables.include?(table_name.to_s) ||
         @skip_table_matchers.any? { |r| r.match(table_name) }
     end
 

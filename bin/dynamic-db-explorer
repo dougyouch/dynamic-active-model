@@ -51,6 +51,10 @@ OptionParser.new do |opts|
     options[:connection_options][:database] = v
   end
 
+  opts.on('--url CONNECTION_URL', 'DB connection url') do |v|
+    options[:connection_options]['url'] = v
+  end
+
   opts.on('--module MODULE_NAME', 'module name') do |v|
     Object.const_set(v, Module.new)
     options[:base_module] = Object.const_get(v)

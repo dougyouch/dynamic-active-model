@@ -20,6 +20,7 @@ module DynamicActiveModel
     def create!(table_name, class_name)
       kls = Class.new(base_class) do
         self.table_name = table_name
+        include DynamicActiveModel::DangerousAttributesPatch
       end
       @base_module.const_set(class_name, kls)
       @base_module.const_get(class_name)

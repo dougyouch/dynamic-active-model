@@ -5,17 +5,24 @@ require 'spec_helper'
 describe DynamicActiveModel::Database do
   include_context 'database'
 
-  let(:skip_table_name) { 'tmp_load_data_table' }
-  let(:skip_table_regex) { /^stats_/ }
+  let(:example_table_name) { 'tmp_load_data_table' }
+  let(:example_table_names) { ['foo', 'bar'] }
+  let(:all_example_table_names) { example_table_names.push(example_table_name).sort }
+  let(:example_table_regex) { /^stats_/ }
 
   context '#skip_table?' do
     describe 'table names' do
       before(:each) do
-        database.skip_table skip_table_name
+        database.skip_table example_table_name
+        database.skip_tables example_table_names
       end
 
       it 'skips table' do
-        expect(database.send(:skip_table?, skip_table_name)).to eq(true)
+        expect(database.send(:skip_table?, example_table_name)).to eq(true)
+      end
+
+      it 'skips tables from an array' do
+        expect(database.send(:skip_table?, example_table_names.first)).to eq(true)
       end
 
       it 'does not skip the table' do
@@ -23,13 +30,13 @@ describe DynamicActiveModel::Database do
       end
 
       it 'returns tables to skip' do
-        expect(database.skip_tables).to eq([skip_table_name])
+        expect(database.skipped_tables.sort).to eq(all_example_table_names)
       end
     end
 
     describe 'table names' do
       before(:each) do
-        database.skip_table skip_table_regex
+        database.skip_table example_table_regex
       end
 
       it 'skips table' do
@@ -42,7 +49,7 @@ describe DynamicActiveModel::Database do
       end
 
       it 'returns tables to skip' do
-        expect(database.skip_tables).to eq([skip_table_regex])
+        expect(database.skipped_tables).to eq([example_table_regex])
       end
     end
   end
@@ -50,11 +57,16 @@ describe DynamicActiveModel::Database do
   context '#include_table?' do
     describe 'table names' do
       before(:each) do
-        database.include_table skip_table_name
+        database.include_table example_table_name
+        database.include_tables example_table_names
       end
 
       it 'includes table' do
-        expect(database.send(:include_table?, skip_table_name)).to eq(true)
+        expect(database.send(:include_table?, example_table_name)).to eq(true)
+      end
+
+      it 'includes tables from an array' do
+        expect(database.send(:include_table?, example_table_names.first)).to eq(true)
       end
 
       it 'does not include the table' do
@@ -62,13 +74,13 @@ describe DynamicActiveModel::Database do
       end
 
       it 'returns tables to include' do
-        expect(database.include_tables).to eq([skip_table_name])
+        expect(database.included_tables.sort).to eq(all_example_table_names)
       end
     end
 
     describe 'table names' do
       before(:each) do
-        database.include_table skip_table_regex
+        database.include_table example_table_regex
       end
 
       it 'includes table' do
@@ -81,15 +93,15 @@ describe DynamicActiveModel::Database do
       end
 
       it 'returns tables to include' do
-        expect(database.include_tables).to eq([skip_table_regex])
+        expect(database.included_tables).to eq([example_table_regex])
       end
     end
   end
 
   context '#create_models!' do
     before(:each) do
-      database.skip_table skip_table_name
-      database.skip_table skip_table_regex
+      database.skip_table example_table_name
+      database.skip_table example_table_regex
       database.table_class_name 'websites', 'CompanyWebsite'
     end
 
