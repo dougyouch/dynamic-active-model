@@ -5,7 +5,7 @@ module DynamicActiveModel
   # from attribute_names method in ActiveRecord
   module DangerousAttributesPatch
     def self.included(base)
-      base.singleton_class.alias_method :original_attribute_names, :attribute_names
+      base.singleton_class.send(:alias_method, :original_attribute_names, :attribute_names)
       base.extend ClassMethods
     end
 
