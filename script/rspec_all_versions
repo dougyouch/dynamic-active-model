@@ -1,0 +1,7 @@
+#!/bin/bash
+
+gemset=$(cat .ruby-gemset)
+
+for ruby_version in 1.9.3 2.1.9 2.6.3; do
+  rvm $ruby_version@$gemset do bundle exec --gemfile=gemfiles/ruby_${ruby_version}.gemfile rspec
+done

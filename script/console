@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-$LOAD_PATH << File.expand_path('../lib', __dir__)
-require File.basename(File.expand_path('..', __dir__))
+$LOAD_PATH.unshift(File.join(__FILE__, '../..', 'lib'))
+require File.basename(File.expand_path('../..', __FILE__))
 require 'irb'
 IRB.start(__FILE__)

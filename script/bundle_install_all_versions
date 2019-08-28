@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cp Gemfile gemfiles/travis.gemfile
+
+gemset=$(cat .ruby-gemset)
+
+for ruby_version in 1.9.3 2.1.9 2.6.3; do
+  cp Gemfile gemfiles/ruby_${ruby_version}.gemfile
+  rvm $ruby_version@$gemset do bundle install --gemfile=gemfiles/ruby_${ruby_version}.gemfile
+done

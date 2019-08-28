@@ -16,8 +16,8 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-$LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
-$LOAD_PATH.unshift(__dir__)
+$LOAD_PATH.unshift(File.join(__FILE__, '../..', 'lib'))
+$LOAD_PATH.unshift(File.expand_path('..', __FILE__))
 require 'dynamic-active-model'
 
 DB_FILE = 'spec/test.db'
