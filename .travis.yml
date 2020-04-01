@@ -4,7 +4,6 @@ env:
 rvm:
   - 2.6.3
   - 2.1.9
-  - 1.9.3
 gemfile: gemfiles/travis.gemfile
 language: ruby
 before_script:
