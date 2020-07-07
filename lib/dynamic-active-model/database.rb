@@ -63,6 +63,13 @@ module DynamicActiveModel
       @include_tables + @include_table_matchers
     end
 
+    def disable_standard_table_inheritance!
+      models.each do |model|
+        model.inheritance_column = :_type_disabled if model.attribute_names.include?('type')
+      end
+    end
+    alias disable_sti! disable_standard_table_inheritance!
+
     private
 
     def skip_table?(table_name)

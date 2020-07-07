@@ -175,4 +175,16 @@ describe DynamicActiveModel::Database do
       expect(undefined_classes.all? { |name| ! base_module.const_defined?(name) }).to eq(true)
     end
   end
+
+  context 'disable_standard_table_inheritance!' do
+    subject { database.disable_standard_table_inheritance! }
+    let(:company_model) { database.models.detect { |model| model.table_name == 'companies' } }
+
+    before do
+      database.create_models!
+      subject
+    end
+
+    it { expect(company_model.inheritance_column).to eq('_type_disabled') }
+  end
 end
