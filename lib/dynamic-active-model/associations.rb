@@ -2,13 +2,13 @@
 
 module DynamicActiveModel
   # DynamicActiveModel::Associations iterates over the models of a
-  #  database and adds has_many and belongs_to based on foreign keys
+  #  databases and adds has_many and belongs_to based on foreign keys
   class Associations
-    attr_reader :database
+    attr_reader :databases
 
-    def initialize(database)
-      @database = database
-      @foreign_keys = database.models.each_with_object({}) do |model, hsh|
+    def initialize(databases)
+      @databases = Array(databases)
+      @foreign_keys = models.flatten.each_with_object({}) do |model, hsh|
         hsh[model.table_name] = ForeignKey.new(model)
       end
     end
@@ -21,7 +21,7 @@ module DynamicActiveModel
     def build!
       foreign_key_to_models = create_foreign_key_to_model_map
 
-      @database.models.each do |model|
+      models.each do |model|
         model.column_names.each do |column_name|
           next unless foreign_key_to_models[column_name.downcase]
 
@@ -35,6 +35,10 @@ module DynamicActiveModel
     end
 
     private
+
+    def models
+      databases.map(&:models).flatten
+    end
 
     def add_relationships(relationship_name, model, belongs_to_model, foreign_key)
       add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
