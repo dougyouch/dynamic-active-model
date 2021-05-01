@@ -12,7 +12,7 @@ module DynamicActiveModel
     # no-doc
     module ClassMethods
       def attribute_names
-        names = original_attribute_names
+        names = original_attribute_names.dup
         names.reject! { |name| dangerous_attribute_method?(name) }
         names
       end

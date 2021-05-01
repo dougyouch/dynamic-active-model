@@ -9,7 +9,7 @@ describe DynamicActiveModel::DangerousAttributesPatch do
     database.create_models!
   end
 
-  let(:dangerous_attribute_name) { 'hash' }
+  let(:dangerous_attribute_name) { 'reload' }
   let(:company_model) { database.models.detect { |m| m.table_name == 'companies' } }
   let(:column_names) { company_model.columns.map(&:name) }
 
@@ -33,7 +33,7 @@ describe DynamicActiveModel::DangerousAttributesPatch do
     end
 
     it 'excludes dangerous column names' do
-      expect(column_names - subject).to eq(['hash'])
+      expect(column_names - subject).to eq(['reload'])
     end
   end
 end
