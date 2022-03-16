@@ -5,16 +5,9 @@ module DynamicActiveModel
   # from attribute_names method in ActiveRecord
   module DangerousAttributesPatch
     def self.included(base)
-      base.singleton_class.send(:alias_method, :original_attribute_names, :attribute_names)
-      base.extend ClassMethods
-    end
-
-    # no-doc
-    module ClassMethods
-      def attribute_names
-        names = original_attribute_names.dup
-        names.reject! { |name| dangerous_attribute_method?(name) }
-        names
+      if base.attribute_names
+        columns_to_ignore = base.attribute_names.select { |name| base.dangerous_attribute_method?(name) }
+        base.ignored_columns = columns_to_ignore
       end
     end
   end

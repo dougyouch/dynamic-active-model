@@ -10,6 +10,8 @@ ActiveRecord::Schema.define(version: 20190712000000) do
     t.integer "website_id"
     t.integer "company_website_id"
     t.text "reload" # dangerous column name
+    t.text "save"
+    t.text "hash"
   end
 
   create_table "jobs", force: true do |t|
