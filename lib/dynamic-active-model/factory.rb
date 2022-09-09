@@ -47,7 +47,10 @@ module DynamicActiveModel
     # rubocop:enable MethodLength
 
     def generate_class_name(table_name)
-      table_name.classify
+      class_name = table_name.classify
+      return ('N' + class_name) if class_name =~ /\A\d/
+
+      class_name  
     end
   end
 end
