@@ -96,7 +96,7 @@ if options[:config_file]
   options[:connection_options] = config.each_with_object({}) { |(name, value), hsh| hsh[name.to_sym] = value }
 end
 
-database = DynamicActiveModel::Explorer.explore(
+DYNAMIC_DATABASE = DynamicActiveModel::Explorer.explore(
   options[:base_module],
   options[:connection_options],
   options[:skip_tables],
@@ -104,7 +104,7 @@ database = DynamicActiveModel::Explorer.explore(
 )
 
 if options[:class_files_dir]
-  database.models.each do |model|
+  DYNAMIC_DATABASE.models.each do |model|
     DynamicActiveModel::TemplateClassFile.new(model).create_template!(options[:class_files_dir])
   end
 else

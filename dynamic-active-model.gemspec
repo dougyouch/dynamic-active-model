@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dynamic-active-model'
-  s.version     = '0.4.2'
+  s.version     = '0.4.3'
   s.summary     = 'Dynamic ActiveRecord Models'
   s.description = 'Dynamically create ActiveRecord models for tables'
   s.licenses    = ['MIT']
