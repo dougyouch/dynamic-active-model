@@ -8,8 +8,8 @@ module DynamicActiveModel
       if base.attribute_names
         columns_to_ignore = base.columns.select do |column|
           if column.type == :boolean
-            base.dangerous_attribute_method?(column.name)
-            base.dangerous_attribute_method?(column.name + '?')
+            base.dangerous_attribute_method?(column.name) ||
+              base.dangerous_attribute_method?(column.name + '?')
           else
             base.dangerous_attribute_method?(column.name)
           end
