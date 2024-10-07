@@ -23,7 +23,6 @@ module DynamicActiveModel
         include DynamicActiveModel::DangerousAttributesPatch
       end
       @base_module.const_set(class_name, kls)
-      require_extension(class_name)
       @base_module.const_get(class_name)
     end
 
@@ -52,13 +51,6 @@ module DynamicActiveModel
       return ('N' + class_name) if class_name =~ /\A\d/
 
       class_name  
-    end
-
-    def require_extension(class_name)
-      file = File.expand_path(DynamicActiveModel.base_models_path + '/' + class_name.underscore + '.rb')
-      return unless File.exist?(file)
-
-      require file
     end
   end
 end

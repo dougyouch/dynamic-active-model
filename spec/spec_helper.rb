@@ -30,8 +30,6 @@ ActiveRecord::Base.establish_connection(DB_CONFIG)
 ActiveRecord::Schema.verbose = false
 require 'support/db/schema'
 
-DynamicActiveModel.base_models_path = 'spec/support/app/models'
-
 # rubocop:disable Metrics/BlockLength
 RSpec.shared_context 'database' do
   let(:base_module_name) { 'Module' + SecureRandom.hex(8) }

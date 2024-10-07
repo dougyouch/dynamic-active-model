@@ -70,6 +70,25 @@ module DynamicActiveModel
     end
     alias disable_sti! disable_standard_table_inheritance!
 
+    def get_model(table_name)
+      table_name = table_name.to_s
+      models.detect { |model| model.table_name == table_name }
+    end
+
+    def get_model!(table_name)
+      model = get_model(table_name)
+      return model if model
+
+      raise ::DynamicActiveModel::ModelNotFound.new("no model found for table #{table_name}")
+    end
+
+    def update_model(table_name, file = nil, &block)
+      model = get_model!(table_name)
+      model.instance_eval(File.read(file)) if file
+      model.class_eval(&block) if block
+      model
+    end
+
     private
 
     def skip_table?(table_name)

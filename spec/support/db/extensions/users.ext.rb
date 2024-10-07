@@ -1,0 +1,1 @@
+attr_accessor :my_middle_name
