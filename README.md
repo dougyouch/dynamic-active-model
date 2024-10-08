@@ -84,3 +84,35 @@ If you'd like to actually create the files for models, you can do so through
 ```bash
  dynamic-db-explorer --username root --adapter postgresql --host localhost --database rails_development --password password --create-class-files /path/to/folder/for/model/files
  ```
+
+## Extend Model
+Add additional functionality to any model by using the update_model method.
+
+```ruby
+# Specify the model by the table name
+db.update_model(:movies) do
+  attr_accessor :imdb_id
+
+  def first_actor
+    actors.first
+  end
+end
+```
+Additional functionality can be added through files as well.
+```ruby
+# file: lib/db/movies.ext.rb
+attr_accessor :imdb_id
+
+def first_actor
+  actors.first
+end
+```
+Then call update_model with
+```ruby
+db.update_model(:movies, 'lib/db/movies.ext.rb')
+```
+
+Mass apply updates to multiple models with update_all_models.  The base_dir is the path to model extension files.  The files are expected to use the .ext.rb extension.
+```ruby
+db.update_all_models('lib/db')
+```

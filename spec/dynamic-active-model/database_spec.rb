@@ -240,4 +240,19 @@ describe DynamicActiveModel::Database do
     it { expect(subject.method_defined?(:method_does_not_exist)).to eq(false) }
     it { expect(subject.method_defined?(:my_middle_name)).to eq(true) }
   end
+
+  context '#update_all_models' do
+    before(:each) do
+      database.create_models!
+    end
+
+    subject do
+      database.update_all_models('spec/support/db/extensions')
+      database.get_model!(:users)
+    end
+
+    it { expect(subject.method_defined?(:display_name)).to eq(false) }
+    it { expect(subject.method_defined?(:method_does_not_exist)).to eq(false) }
+    it { expect(subject.method_defined?(:my_middle_name)).to eq(true) }
+  end
 end

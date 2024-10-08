@@ -89,6 +89,15 @@ module DynamicActiveModel
       model
     end
 
+    def update_all_models(base_dir, ext='.ext.rb')
+      Dir.glob("#{base_dir}/*#{ext}") do |file|
+        next unless File.file?(file)
+
+        table_name = File.basename(file).split('.', 2).first
+        update_model(table_name, file)
+      end
+    end
+
     private
 
     def skip_table?(table_name)
