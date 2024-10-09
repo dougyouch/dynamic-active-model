@@ -84,7 +84,7 @@ module DynamicActiveModel
 
     def update_model(table_name, file = nil, &block)
       model = get_model!(table_name)
-      model.instance_eval(File.read(file)) if file
+      model.class_eval(File.read(file)) if file
       model.class_eval(&block) if block
       model
     end
