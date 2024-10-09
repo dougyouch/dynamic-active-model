@@ -8,6 +8,12 @@ module DynamicActiveModel
                 :factory,
                 :models
 
+    class ModelUpdater < Struct.new(:model)
+      def update_model(&block)
+        model.class_eval(&block)
+      end
+    end
+
     def initialize(base_module, connection_options, base_class_name = nil)
       @factory = Factory.new(base_module, connection_options, base_class_name)
       @table_class_names = {}
@@ -84,7 +90,7 @@ module DynamicActiveModel
 
     def update_model(table_name, file = nil, &block)
       model = get_model!(table_name)
-      model.class_eval(File.read(file)) if file
+      ModelUpdater.new(model).instance_eval(File.read(file)) if file
       model.class_eval(&block) if block
       model
     end
