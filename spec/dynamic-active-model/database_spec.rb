@@ -187,4 +187,72 @@ describe DynamicActiveModel::Database do
 
     it { expect(company_model.inheritance_column).to eq('_type_disabled') }
   end
+
+  context '#get_model' do
+    before(:each) do
+      database.create_models!
+    end
+
+    let(:table_name) { :users }
+
+    subject { database.get_model(table_name) }
+
+    it { expect(subject.nil?).to eq(false) }
+
+    describe 'invalid table' do
+      let(:table_name) { :not_a_valid_table_name }
+
+      it { expect(subject.nil?).to eq(true) }
+    end
+  end
+
+  context '#get_model!' do
+    before(:each) do
+      database.create_models!
+    end
+
+    let(:table_name) { :users }
+
+    subject { database.get_model!(table_name) }
+
+    it { expect(subject.nil?).to eq(false) }
+
+    describe 'invalid table' do
+      let(:table_name) { :not_a_valid_table_name }
+
+      it { expect { subject }.to raise_error(DynamicActiveModel::ModelNotFound) }
+    end
+  end
+
+  context '#update_model' do
+    before(:each) do
+      database.create_models!
+    end
+
+    subject do
+      database.update_model(:users, 'spec/support/db/extensions/users.ext.rb') do
+        attr_accessor :display_name
+      end
+      database.get_model!(:users)
+    end
+
+    it { expect(subject.method_defined?(:display_name)).to eq(true) }
+    it { expect(subject.method_defined?(:method_does_not_exist)).to eq(false) }
+    it { expect(subject.method_defined?(:my_middle_name)).to eq(true) }
+  end
+
+  context '#update_all_models' do
+    before(:each) do
+      database.create_models!
+    end
+
+    subject do
+      database.update_all_models('spec/support/db/extensions')
+      database.get_model!(:users)
+    end
+
+    it { expect(subject.method_defined?(:display_name)).to eq(false) }
+    it { expect(subject.method_defined?(:method_does_not_exist)).to eq(false) }
+    it { expect(subject.method_defined?(:my_middle_name)).to eq(true) }
+  end
 end

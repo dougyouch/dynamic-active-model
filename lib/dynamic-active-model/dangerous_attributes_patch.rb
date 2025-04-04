@@ -6,8 +6,15 @@ module DynamicActiveModel
   module DangerousAttributesPatch
     def self.included(base)
       if base.attribute_names
-        columns_to_ignore = base.attribute_names.select { |name| base.dangerous_attribute_method?(name) }
-        base.ignored_columns = columns_to_ignore
+        columns_to_ignore = base.columns.select do |column|
+          if column.type == :boolean
+            base.dangerous_attribute_method?(column.name) ||
+              base.dangerous_attribute_method?(column.name + '?')
+          else
+            base.dangerous_attribute_method?(column.name)
+          end
+        end
+        base.ignored_columns = columns_to_ignore.map(&:name)
       end
     end
   end
