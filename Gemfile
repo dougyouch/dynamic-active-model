@@ -8,6 +8,7 @@ end
 
 group :spec do
   gem 'activerecord'
+  gem 'inheritance-helper'
   gem 'rspec'
   gem 'simplecov', require: false
   gem 'sqlite3'

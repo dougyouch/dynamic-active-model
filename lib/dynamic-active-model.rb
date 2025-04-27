@@ -9,6 +9,7 @@ module DynamicActiveModel
   autoload :ForeignKey, 'dynamic-active-model/foreign_key'
   autoload :Associations, 'dynamic-active-model/associations'
   autoload :TemplateClassFile, 'dynamic-active-model/template_class_file'
+  autoload :Setup, 'dynamic-active-model/setup'
 
   class ModelNotFound < Exception; end
 end
