@@ -27,11 +27,23 @@ module DynamicActiveModel
       end
 
       def connection_options(options = nil)
+        if options.is_a?(String)
+          name = options
+          options = ActiveRecord::Base
+                      .configurations
+                      .configs_for(
+                        env_name: Rails.env,
+                        name: name
+                      )
+                      .configuration_hash
+        end
+
         if options
           config = dynamic_active_model_config
           config[:connection_options] = options
           redefine_class_method(:dynamic_active_model_config, config)
         end
+
         dynamic_active_model_config[:connection_options]
       end
 
