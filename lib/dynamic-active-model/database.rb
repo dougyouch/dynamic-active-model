@@ -8,7 +8,7 @@ module DynamicActiveModel
                 :factory,
                 :models
 
-    class ModelUpdater < Struct.new(:model)
+    ModelUpdater = Struct.new(:model) do
       def update_model(&block)
         model.class_eval(&block)
       end
@@ -85,7 +85,7 @@ module DynamicActiveModel
       model = get_model(table_name)
       return model if model
 
-      raise ::DynamicActiveModel::ModelNotFound.new("no model found for table #{table_name}")
+      raise ::DynamicActiveModel::ModelNotFound, "no model found for table #{table_name}"
     end
 
     def update_model(table_name, file = nil, &block)

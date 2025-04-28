@@ -5,7 +5,7 @@ require 'dynamic-active-model'
 require 'optparse'
 require 'yaml'
 
-DEFAULT_CONFIG_FILE = "#{ENV['HOME']}/.dynamic-db-explorer.yml"
+DEFAULT_CONFIG_FILE = "#{ENV['HOME']}/.dynamic-db-explorer.yml".freeze
 
 options = {
   base_module: Object,
@@ -93,7 +93,7 @@ if options[:config_file]
     Object.const_set(module_name, Module.new)
     options[:base_module] = Object.const_get(module_name)
   end
-  options[:connection_options] = config.each_with_object({}) { |(name, value), hsh| hsh[name.to_sym] = value }
+  options[:connection_options] = config.transform_keys(&:to_sym)
 end
 
 DYNAMIC_DATABASE = DynamicActiveModel::Explorer.explore(

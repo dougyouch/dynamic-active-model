@@ -10,6 +10,7 @@ module DynamicActiveModel
       base.extend ClassMethods
     end
 
+    # ClassMethods various class methods for configuring a module
     module ClassMethods
       def database
         nil

@@ -48,7 +48,7 @@ module DynamicActiveModel
 
     def generate_class_name(table_name)
       class_name = table_name.classify
-      return ('N' + class_name) if class_name =~ /\A\d/
+      return "N#{class_name}" if class_name =~ /\A\d/
 
       class_name
     end

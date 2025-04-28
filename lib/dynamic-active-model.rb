@@ -11,5 +11,5 @@ module DynamicActiveModel
   autoload :TemplateClassFile, 'dynamic-active-model/template_class_file'
   autoload :Setup, 'dynamic-active-model/setup'
 
-  class ModelNotFound < Exception; end
+  class ModelNotFound < StandardError; end
 end
