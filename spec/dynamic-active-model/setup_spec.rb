@@ -47,6 +47,25 @@ describe DynamicActiveModel::Setup do
     end
   end
 
+  context '#extensions_suffix' do
+    subject { db_module.extensions_suffix }
+
+    it 'default is .ext.rb' do
+      expect(subject).to eq('.ext.rb')
+    end
+
+    describe 'with #extensions_suffix=' do
+      let(:new_extensions_suffix) { '.db.rb' }
+      before(:each) do
+        db_module.extensions_suffix(new_extensions_suffix)
+      end
+
+      it 'set to new suffix' do
+        expect(subject).to eq(new_extensions_suffix)
+      end
+    end
+  end
+
   context '#skip_tables' do
     subject { db_module.skip_tables }
 

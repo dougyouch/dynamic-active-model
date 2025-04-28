@@ -21,7 +21,8 @@ module DynamicActiveModel
           connection_options: nil,
           skip_tables: [],
           relationships: {},
-          extensions_path: nil
+          extensions_path: nil,
+          extensions_suffix: '.ext.rb'
         }
       end
 
@@ -75,6 +76,15 @@ module DynamicActiveModel
         dynamic_active_model_config[:extensions_path]
       end
 
+      def extensions_suffix(suffix = nil)
+        if suffix
+          config = dynamic_active_model_config
+          config[:extensions_suffix] = suffix
+          redefine_class_method(:dynamic_active_model_config, config)
+        end
+        dynamic_active_model_config[:extensions_suffix]
+      end
+
       def create_models!
         redefine_class_method(
           :database,
@@ -85,7 +95,7 @@ module DynamicActiveModel
             relationships
           )
         )
-        database.update_all_models(extensions_path) if extensions_path
+        database.update_all_models(extensions_path, extensions_suffix) if extensions_path
         database
       end
     end
