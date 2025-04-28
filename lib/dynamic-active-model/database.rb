@@ -95,7 +95,7 @@ module DynamicActiveModel
       model
     end
 
-    def update_all_models(base_dir, ext='.ext.rb')
+    def update_all_models(base_dir, ext = '.ext.rb')
       Dir.glob("#{base_dir}/*#{ext}") do |file|
         next unless File.file?(file)
 

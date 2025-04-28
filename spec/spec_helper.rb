@@ -16,8 +16,8 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-$LOAD_PATH.unshift(File.join(__FILE__, '../..', 'lib'))
-$LOAD_PATH.unshift(File.expand_path('..', __FILE__))
+$LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
+$LOAD_PATH.unshift(__dir__)
 require 'dynamic-active-model'
 
 DB_FILE = 'spec/test.db'
@@ -32,7 +32,7 @@ require 'support/db/schema'
 
 # rubocop:disable Metrics/BlockLength
 RSpec.shared_context 'database' do
-  let(:base_module_name) { 'Module' + SecureRandom.hex(8) }
+  let(:base_module_name) { "Module#{SecureRandom.hex(8)}" }
   let(:base_module) do
     Object.const_set(base_module_name, Module.new)
     Object.const_get(base_module_name)

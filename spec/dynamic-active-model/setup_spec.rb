@@ -19,17 +19,7 @@ describe DynamicActiveModel::Setup do
 
     describe 'with #connection_options=' do
       before(:each) do
-        db_module.connection_options = DB_CONFIG
-      end
-
-      it 'set to DB_CONFIG' do
-        expect(subject).to eq(DB_CONFIG)
-      end
-    end
-
-    describe 'with #set_connection_options' do
-      before(:each) do
-        db_module.set_connection_options DB_CONFIG
+        db_module.connection_options(DB_CONFIG)
       end
 
       it 'set to DB_CONFIG' do
@@ -48,18 +38,7 @@ describe DynamicActiveModel::Setup do
     describe 'with #extensions_path=' do
       let(:new_extensions_path) { 'lib/db/extensions' }
       before(:each) do
-        db_module.extensions_path = new_extensions_path
-      end
-
-      it 'set to new path' do
-        expect(subject).to eq(new_extensions_path)
-      end
-    end
-
-    describe 'with #set_extensions_path=' do
-      let(:new_extensions_path) { 'lib/db/extensions' }
-      before(:each) do
-        db_module.set_extensions_path new_extensions_path
+        db_module.extensions_path(new_extensions_path)
       end
 
       it 'set to new path' do
@@ -78,18 +57,7 @@ describe DynamicActiveModel::Setup do
     describe 'with #skip_tables=' do
       let(:tables_to_skip) { ['foo', 'bar'] }
       before(:each) do
-        db_module.skip_tables = tables_to_skip
-      end
-
-      it 'equal to tables to skip' do
-        expect(subject).to  eq(tables_to_skip)
-      end
-    end
-
-    describe 'with #set_skip_tables' do
-      let(:tables_to_skip) { ['foo', 'bar'] }
-      before(:each) do
-        db_module.set_skip_tables tables_to_skip
+        db_module.skip_tables(tables_to_skip)
       end
 
       it 'equal to tables to skip' do
@@ -128,25 +96,7 @@ describe DynamicActiveModel::Setup do
         }
       end
       before(:each) do
-        db_module.relationships = new_relationships
-      end
-
-      it 'equal to new relationships' do
-        expect(subject).to eq(new_relationships)
-      end
-    end
-
-    describe 'with #set_relationships' do
-      let(:new_relationships) do
-        {
-          'users' => {
-            'current_user_id' => 'current_user',
-            'super_user_id' => 'super_user'
-          }
-        }
-      end
-      before(:each) do
-        db_module.set_relationships new_relationships
+        db_module.relationships(new_relationships)
       end
 
       it 'equal to new relationships' do
@@ -188,8 +138,8 @@ describe DynamicActiveModel::Setup do
   context '#create_models!' do
     subject { db_module.create_models! }
     before(:each) do
-      db_module.connection_options = DB_CONFIG
-      db_module.extensions_path = 'spec/support/db/extensions'
+      db_module.connection_options DB_CONFIG
+      db_module.extensions_path 'spec/support/db/extensions'
       db_module.foreign_key('websites', 'company_website_id', 'company_website')
       db_module.skip_table 'tmp_load_data_table'
       subject()

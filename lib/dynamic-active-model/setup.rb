@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'inheritance-helper'
 
 module DynamicActiveModel
@@ -14,62 +15,63 @@ module DynamicActiveModel
         nil
       end
 
-      def connection_options
+      def dynamic_active_model_config
+        {
+          connection_options: nil,
+          skip_tables: [],
+          relationships: {},
+          extensions_path: nil
+        }
       end
 
-      def connection_options=(options)
-        redefine_class_method(:connection_options, options)
+      def connection_options(options = nil)
+        if options
+          config = dynamic_active_model_config
+          config[:connection_options] = options
+          redefine_class_method(:dynamic_active_model_config, config)
+        end
+        dynamic_active_model_config[:connection_options]
       end
 
-      def set_connection_options(options)
-        redefine_class_method(:connection_options, options)
-      end
-
-      def skip_tables
-        []
-      end
-
-      def skip_tables=(tables)
-        redefine_class_method(:skip_tables, tables)
-      end
-
-      def set_skip_tables(tables)
-        redefine_class_method(:skip_tables, tables)
+      def skip_tables(tables = nil)
+        if tables
+          config = dynamic_active_model_config
+          config[:skip_tables] = tables
+          redefine_class_method(:dynamic_active_model_config, config)
+        end
+        dynamic_active_model_config[:skip_tables]
       end
 
       def skip_table(table)
-        append_value_to_class_method(:skip_tables, table)
+        config = dynamic_active_model_config
+        config[:skip_tables] << table
+        redefine_class_method(:dynamic_active_model_config, config)
       end
 
-      def relationships
-        {}
-      end
-
-      def relationships=(all_relationships)
-        redefine_class_method(:relationships, all_relationships)
-      end
-
-      def set_relationships(all_relationships)
-        redefine_class_method(:relationships, all_relationships)
+      def relationships(all_relationships = nil)
+        if all_relationships
+          config = dynamic_active_model_config
+          config[:relationships] = all_relationships
+          redefine_class_method(:dynamic_active_model_config, config)
+        end
+        dynamic_active_model_config[:relationships]
       end
 
       def foreign_key(table_name, foreign_key, relationship_name)
-        current_relationships = relationships
+        config = dynamic_active_model_config
+        current_relationships = config[:relationships]
         current_relationships[table_name] ||= {}
         current_relationships[table_name][foreign_key] = relationship_name
-        redefine_class_method(:relationships, current_relationships)
+        redefine_class_method(:dynamic_active_model_config, config)
       end
 
-      def extensions_path
-        nil
-      end
-
-      def extensions_path=(path)
-        redefine_class_method(:extensions_path, path)
-      end
-
-      def set_extensions_path(path)
-        redefine_class_method(:extensions_path, path)
+      def extensions_path(path = nil)
+        if path
+          config = dynamic_active_model_config
+          config[:extensions_path] = path
+          redefine_class_method(:dynamic_active_model_config, config)
+        end
+        dynamic_active_model_config[:extensions_path]
       end
 
       def create_models!

@@ -26,7 +26,7 @@ module DynamicActiveModel
       @base_module.const_get(class_name)
     end
 
-    # rubocop:disable MethodLength
+    # rubocop:disable Metrics/MethodLength
     def base_class
       @base_class ||=
         begin
@@ -44,13 +44,13 @@ module DynamicActiveModel
           end
         end
     end
-    # rubocop:enable MethodLength
+    # rubocop:enable Metrics/MethodLength
 
     def generate_class_name(table_name)
       class_name = table_name.classify
       return ('N' + class_name) if class_name =~ /\A\d/
 
-      class_name  
+      class_name
     end
   end
 end
