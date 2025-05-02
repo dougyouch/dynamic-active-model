@@ -7,8 +7,9 @@ ActiveRecord::Schema.define(version: 20190712000000) do
   create_table "companies", force: true do |t|
     t.string "name"
     t.string "type"
-    t.integer "website_id"
-    t.integer "company_website_id"
+    t.references :website, foreign_key: true
+    t.integer :company_website_id
+    t.foreign_key :website, column: :company_website_id
     t.text "reload" # dangerous column name
     t.text "save"
     t.text "hash"
@@ -23,20 +24,20 @@ ActiveRecord::Schema.define(version: 20190712000000) do
   end
 
   create_table "employments", force: true do |t|
-    t.integer "user_id"
-    t.integer "job_id"
-    t.integer "company_id"
+    t.references :user, foreign_key: true
+    t.references :job, foreign_key: true
+    t.references :company, foreign_key: true
     t.datetime "started_at"
     t.datetime "ended_at"
   end
 
   create_table "stats_employment_durations", force: true do |t|
-    t.integer "employment_id"
+    t.references :employment, foreign_key: true
     t.integer "duration"
   end
 
   create_table "stats_company_employments", force: true do |t|
-    t.integer "company_id"
+    t.references :company, foreign_key: true
     t.integer "average_duration"
     t.integer "num_jobs"
     t.integer "total_employees_lifetime"

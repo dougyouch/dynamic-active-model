@@ -4,12 +4,15 @@ module DynamicActiveModel
   # DynamicActiveModel::Associations iterates over the models of a
   #  database and adds has_many and belongs_to based on foreign keys
   class Associations
-    attr_reader :database
+    attr_reader :database,
+                :table_indexes
 
     def initialize(database)
       @database = database
+      @table_indexes = {}
       @foreign_keys = database.models.each_with_object({}) do |model, hsh|
         hsh[model.table_name] = ForeignKey.new(model)
+        @table_indexes[model.table_name] = ActiveRecord::Base.connection.indexes(model.table_name)
       end
     end
 
@@ -102,7 +105,7 @@ module DynamicActiveModel
     end
 
     def unique_index?(model, foreign_key)
-      indexes = ActiveRecord::Base.connection.indexes(model.table_name)
+      indexes = table_indexes[model.table_name]
       indexes.any? do |index|
         index.unique &&
           index.columns.size == 1 &&
