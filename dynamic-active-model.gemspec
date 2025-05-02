@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dynamic-active-model'
-  s.version     = '0.5.2'
+  s.version     = '0.6.0'
   s.summary     = 'Dynamic ActiveRecord Models'
   s.description = 'Dynamically create ActiveRecord models for tables'
   s.licenses    = ['MIT']
@@ -12,7 +12,8 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob('lib/**/*.rb') + Dir.glob('bin/*')
   s.bindir      = 'bin'
   s.executables << 'dynamic-db-explorer'
+  s.required_ruby_version = '>= 3.0'
 
-  s.add_runtime_dependency 'activerecord'
-  s.add_runtime_dependency 'inheritance-helper'
+  s.add_runtime_dependency 'activerecord', '>= 4'
+  s.add_runtime_dependency 'inheritance-helper', '~> 0.2'
 end
