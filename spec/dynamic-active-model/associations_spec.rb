@@ -23,5 +23,10 @@ describe DynamicActiveModel::Associations do
       expect(has_association?(base_module.const_get('Company'), :company_website)).to eq(true)
       expect(has_association?(base_module.const_get('Website'), :companies)).to eq(true)
     end
+
+    it 'creates has one relationships' do
+      subject
+      expect(has_association?(base_module.const_get('User'), :user_rollup)).to eq(true)
+    end
   end
 end

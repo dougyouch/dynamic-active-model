@@ -38,7 +38,11 @@ module DynamicActiveModel
 
     def add_relationships(relationship_name, model, belongs_to_model, foreign_key)
       add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
-      add_has_many(relationship_name, belongs_to_model, model, foreign_key)
+      if unique_index?(model, foreign_key)
+        add_has_one(relationship_name, belongs_to_model, model, foreign_key)
+      else
+        add_has_many(relationship_name, belongs_to_model, model, foreign_key)
+      end
     end
 
     def add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
@@ -59,6 +63,15 @@ module DynamicActiveModel
       )
     end
 
+    def add_has_one(relationship_name, model, has_one_model, foreign_key)
+      model.has_one(
+        generate_has_one_association_name(relationship_name, model, has_one_model),
+        class_name: has_one_model.name,
+        foreign_key: foreign_key,
+        primary_key: has_one_model.primary_key
+      )
+    end
+
     def create_foreign_key_to_model_map
       @foreign_keys.values.each_with_object({}) do |foreign_key, hsh|
         foreign_key.keys.each do |key, relationship_name|
@@ -76,6 +89,24 @@ module DynamicActiveModel
           "#{relationship_name}_#{has_many_model.table_name}"
         end
       name.underscore.pluralize.to_sym
+    end
+
+    def generate_has_one_association_name(relationship_name, model, has_one_model)
+      name =
+        if relationship_name == model.table_name.underscore
+          has_one_model.table_name
+        else
+          "#{relationship_name}_#{has_one_model.table_name}"
+        end
+      name.underscore.singularize.to_sym
+    end
+
+    def unique_index?(model, foreign_key)
+      indexes = ActiveRecord::Base.connection.indexes(model.table_name)
+      indexes.any? do |index|
+        index.columns.size == 1 &&
+          index.columns.first == foreign_key
+      end
     end
   end
 end

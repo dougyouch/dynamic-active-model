@@ -47,4 +47,9 @@ ActiveRecord::Schema.define(version: 20190712000000) do
   create_table "tmp_load_data_table", force: true do |t|
     t.string "junk"
   end
+
+  create_table "user_rollups" do |t|
+    t.references :user, null: false, foreign_key: true, index: { unique: true }
+    t.integer :total_websites
+  end
 end
