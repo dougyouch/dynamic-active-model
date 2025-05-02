@@ -8,6 +8,7 @@ describe DynamicActiveModel::Associations do
   context '#build!' do
     before(:each) do
       relations.add_foreign_key('websites', 'company_website_id', 'company_website')
+      relations.add_foreign_key('users', 'employee_user_id', 'employee_user')
     end
     subject { relations.build! }
 
@@ -22,11 +23,17 @@ describe DynamicActiveModel::Associations do
       expect(has_association?(base_module.const_get('Company'), :website)).to eq(true)
       expect(has_association?(base_module.const_get('Company'), :company_website)).to eq(true)
       expect(has_association?(base_module.const_get('Website'), :companies)).to eq(true)
+      expect(has_association?(base_module.const_get('Website'), :company_websites)).to eq(true)
     end
 
     it 'creates has one relationships' do
       subject
       expect(has_association?(base_module.const_get('User'), :user_rollup)).to eq(true)
+    end
+
+    it 'creates has one relationships for additional foreign keys' do
+      subject
+      expect(has_association?(base_module.const_get('User'), :employee_user)).to eq(true)
     end
   end
 end

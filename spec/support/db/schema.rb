@@ -52,4 +52,11 @@ ActiveRecord::Schema.define(version: 20190712000000) do
     t.references :user, null: false, foreign_key: true, index: { unique: true }
     t.integer :total_websites
   end
+
+  create_table "employee_users" do |t|
+    t.integer :employee_user_id, null: false
+    t.foreign_key :users, column: :employee_user_id
+    t.index :employee_user_id, unique: true
+    t.boolean :super_user
+  end
 end

@@ -86,7 +86,7 @@ module DynamicActiveModel
         if relationship_name == model.table_name.underscore
           has_many_model.table_name
         else
-          "#{relationship_name}_#{has_many_model.table_name}"
+          relationship_name
         end
       name.underscore.pluralize.to_sym
     end
@@ -96,7 +96,7 @@ module DynamicActiveModel
         if relationship_name == model.table_name.underscore
           has_one_model.table_name
         else
-          "#{relationship_name}_#{has_one_model.table_name}"
+          relationship_name
         end
       name.underscore.singularize.to_sym
     end
@@ -104,7 +104,8 @@ module DynamicActiveModel
     def unique_index?(model, foreign_key)
       indexes = ActiveRecord::Base.connection.indexes(model.table_name)
       indexes.any? do |index|
-        index.columns.size == 1 &&
+        index.unique &&
+          index.columns.size == 1 &&
           index.columns.first == foreign_key
       end
     end
