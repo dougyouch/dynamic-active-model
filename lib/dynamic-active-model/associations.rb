@@ -12,7 +12,7 @@ module DynamicActiveModel
       @table_indexes = {}
       @foreign_keys = database.models.each_with_object({}) do |model, hsh|
         hsh[model.table_name] = ForeignKey.new(model)
-        @table_indexes[model.table_name] = ActiveRecord::Base.connection.indexes(model.table_name)
+        @table_indexes[model.table_name] = model.connection.indexes(model.table_name)
       end
     end
 
