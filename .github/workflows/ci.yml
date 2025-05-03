@@ -20,14 +20,12 @@ jobs:
     - name: Install dependencies
       run: bundle install
     - name: Run tests
-      env:
-        RAILS_ENV: test
       run: bundle exec rspec
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: ./coverage/
+        files: ./coverage/.resultset.json
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: true 

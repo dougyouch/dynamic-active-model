@@ -5,8 +5,15 @@ require 'bundler'
 require 'securerandom'
 require 'active_record'
 require 'simplecov'
+require 'simplecov_json_formatter'
 
-SimpleCov.start
+SimpleCov.start do
+  enable_coverage :branch
+  formatter SimpleCov::Formatter::MultiFormatter.new([
+    SimpleCov::Formatter::HTMLFormatter,
+    SimpleCov::Formatter::JSONFormatter
+  ])
+end
 
 begin
   Bundler.require(:default, :spec)
