@@ -16,8 +16,51 @@ The Database class is responsible for:
 ### 2. Associations (`DynamicActiveModel::Associations`)
 Handles the automatic discovery and setup of model relationships:
 - Analyzes foreign key constraints
-- Sets up `has_many` and `belongs_to` relationships
+- Sets up `has_many`, `belongs_to`, and `has_one` relationships
 - Maps database relationships to ActiveRecord associations
+- Detects unique constraints for `has_one` relationship inference
+- Supports composite unique keys for relationship detection
+
+The relationship detection process works as follows:
+
+1. **Foreign Key Analysis**
+   - Scans all tables for foreign key constraints
+   - Identifies the referenced tables and columns
+   - Determines relationship cardinality based on constraints
+
+2. **Unique Constraint Detection**
+   - Identifies columns with unique constraints
+   - Detects composite unique keys
+   - Maps unique constraints to potential `has_one` relationships
+
+3. **Relationship Type Inference**
+   - `belongs_to`: Created when a table has a foreign key column
+   - `has_many`: Created when another table has a foreign key pointing to this table
+   - `has_one`: Created when:
+     - A foreign key has a unique constraint
+     - A unique key is referenced by another table's foreign key
+     - Composite unique keys are properly handled
+
+Example of unique constraint detection:
+```ruby
+# Table: users
+#   - email (unique constraint)
+#   - username (unique constraint)
+#   - (id, type) (composite unique constraint)
+
+# Table: profiles
+#   - user_email (foreign key to users.email)
+#   - user_username (foreign key to users.username)
+#   - user_id (foreign key to users.id)
+#   - user_type (foreign key to users.type)
+
+# Results in:
+class User < ActiveRecord::Base
+  has_one :profile_by_email, foreign_key: :user_email
+  has_one :profile_by_username, foreign_key: :user_username
+  has_one :profile_by_id_type, foreign_key: [:user_id, :user_type]
+end
+```
 
 ### 3. Explorer (`DynamicActiveModel::Explorer`)
 A high-level interface that combines Database and Associations functionality:

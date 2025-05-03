@@ -10,12 +10,13 @@ Dynamic Active Model is a powerful Ruby gem that automatically discovers your da
 
 - 🔍 Automatic database schema discovery
 - 🏗️ Dynamic creation of ActiveRecord models
-- 🔗 Automatic relationship mapping (`has_many` and `belongs_to`)
+- 🔗 Automatic relationship mapping (`has_many`, `belongs_to`, and `has_one`)
 - ⚡ In-memory model creation for quick exploration
 - 📁 Physical model file generation
 - 🛠️ Customizable model extensions
 - ⚙️ Flexible table filtering (blacklist/whitelist)
 - 🔒 Safe handling of dangerous attribute names
+- 🔑 Automatic `has_one` detection based on unique constraints
 
 ## Installation
 
@@ -69,6 +70,32 @@ dynamic-db-explorer \
 ```
 
 ## Advanced Usage
+
+### Relationship Types
+
+Dynamic Active Model automatically detects and creates three types of relationships:
+
+1. **`belongs_to`** - Created when a table has a foreign key column
+2. **`has_many`** - Created when another table has a foreign key pointing to this table
+3. **`has_one`** - Automatically detected when:
+   - A table has a foreign key with a unique constraint
+   - A table has a unique key constraint that another table references
+
+Example of automatic `has_one` detection:
+
+```ruby
+# If users table has a unique constraint on email
+# And profiles table has a foreign key to users.email
+# Then the following relationships are automatically created:
+
+class User < ActiveRecord::Base
+  has_one :profile  # Automatically detected due to unique constraint
+end
+
+class Profile < ActiveRecord::Base
+  belongs_to :user
+end
+```
 
 ### Table Filtering
 
