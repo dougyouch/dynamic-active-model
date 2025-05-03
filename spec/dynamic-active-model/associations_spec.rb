@@ -35,5 +35,11 @@ describe DynamicActiveModel::Associations do
       subject
       expect(has_association?(base_module.const_get('User'), :employee_user)).to eq(true)
     end
+
+    it 'creates has_and_belongs_to_many relationships' do
+      subject
+      expect(has_association?(base_module.const_get('Job'), :websites)).to eq(true)
+      expect(has_association?(base_module.const_get('Website'), :jobs)).to eq(true)
+    end
   end
 end

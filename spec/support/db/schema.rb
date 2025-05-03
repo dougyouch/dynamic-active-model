@@ -23,6 +23,11 @@ ActiveRecord::Schema.define(version: 20190712000000) do
     t.string "url"
   end
 
+  create_table :jobs_websites, force: true, id: false do |t|
+    t.belongs_to :job
+    t.belongs_to :website
+  end
+
   create_table "employments", force: true do |t|
     t.references :user, foreign_key: true
     t.references :job, foreign_key: true

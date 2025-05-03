@@ -5,14 +5,18 @@ module DynamicActiveModel
   #  database and adds has_many and belongs_to based on foreign keys
   class Associations
     attr_reader :database,
-                :table_indexes
+                :table_indexes,
+                :join_tables
 
     def initialize(database)
       @database = database
       @table_indexes = {}
-      @foreign_keys = database.models.each_with_object({}) do |model, hsh|
-        hsh[model.table_name] = ForeignKey.new(model)
+      @join_tables = []
+      @foreign_keys = {}
+      database.models.each do |model|
+        @foreign_keys[model.table_name] = ForeignKey.new(model)
         @table_indexes[model.table_name] = model.connection.indexes(model.table_name)
+        @join_tables << model if join_table?(model)
       end
     end
 
@@ -35,9 +39,22 @@ module DynamicActiveModel
           end
         end
       end
+
+      @join_tables.each do |join_table_model|
+        models = join_table_model.column_names.map { |column_name| foreign_key_to_models[column_name.downcase]&.first&.first }.compact
+        if models.size == 2
+          add_has_and_belongs_to_many(join_table_model, models)
+        end
+      end
     end
 
     private
+
+    def add_has_and_belongs_to_many(join_table_model, models)
+      model1, model2 = *models
+      model1.has_and_belongs_to_many model2.table_name.pluralize.to_sym, join_table: join_table_model.table_name
+      model2.has_and_belongs_to_many model1.table_name.pluralize.to_sym, join_table: join_table_model.table_name
+    end
 
     def add_relationships(relationship_name, model, belongs_to_model, foreign_key)
       add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
@@ -111,6 +128,13 @@ module DynamicActiveModel
           index.columns.size == 1 &&
           index.columns.first == foreign_key
       end
+    end
+
+    # detect tables that are used for has_and_belongs_to_many
+    def join_table?(model)
+      model.primary_key.nil? &&
+        model.columns.size == 2 &&
+        model.columns.all? { |column| column.name =~ /#{ForeignKey.id_suffix}$/ }
     end
   end
 end
