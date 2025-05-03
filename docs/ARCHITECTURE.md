@@ -16,10 +16,11 @@ The Database class is responsible for:
 ### 2. Associations (`DynamicActiveModel::Associations`)
 Handles the automatic discovery and setup of model relationships:
 - Analyzes foreign key constraints
-- Sets up `has_many`, `belongs_to`, and `has_one` relationships
+- Sets up `has_many`, `belongs_to`, `has_one`, and `has_and_belongs_to_many` relationships
 - Maps database relationships to ActiveRecord associations
 - Detects unique constraints for `has_one` relationship inference
 - Supports composite unique keys for relationship detection
+- Identifies join tables for `has_and_belongs_to_many` relationships
 
 The relationship detection process works as follows:
 
@@ -28,37 +29,67 @@ The relationship detection process works as follows:
    - Identifies the referenced tables and columns
    - Determines relationship cardinality based on constraints
 
-2. **Unique Constraint Detection**
+2. **Join Table Detection**
+   - Identifies potential join tables based on:
+     - Table having exactly two columns
+     - Both columns being foreign keys
+     - No primary key present
+     - Table name following Rails conventions (alphabetically ordered plural model names)
+   - Validates join table structure:
+     - Ensures no additional columns exist
+     - Confirms foreign keys point to different tables
+     - Verifies table naming convention compliance
+
+3. **Unique Constraint Detection**
    - Identifies columns with unique constraints
    - Detects composite unique keys
    - Maps unique constraints to potential `has_one` relationships
 
-3. **Relationship Type Inference**
+4. **Relationship Type Inference**
    - `belongs_to`: Created when a table has a foreign key column
    - `has_many`: Created when another table has a foreign key pointing to this table
    - `has_one`: Created when:
      - A foreign key has a unique constraint
      - A unique key is referenced by another table's foreign key
      - Composite unique keys are properly handled
+   - `has_and_belongs_to_many`: Created when:
+     - A join table meets all strict criteria
+     - Table name follows Rails naming conventions
+     - No additional columns or primary key present
 
-Example of unique constraint detection:
+Example of join table detection:
 ```ruby
-# Table: users
-#   - email (unique constraint)
-#   - username (unique constraint)
-#   - (id, type) (composite unique constraint)
+# Table: actors
+#   - id (primary key)
+#   - name
 
-# Table: profiles
-#   - user_email (foreign key to users.email)
-#   - user_username (foreign key to users.username)
-#   - user_id (foreign key to users.id)
-#   - user_type (foreign key to users.type)
+# Table: movies
+#   - id (primary key)
+#   - title
+
+# Table: actors_movies (valid join table)
+#   - actor_id (foreign key to actors.id)
+#   - movie_id (foreign key to movies.id)
+#   - No primary key
+
+# Table: movies_actors (invalid join table - wrong naming order)
+#   - movie_id (foreign key to movies.id)
+#   - actor_id (foreign key to actors.id)
+#   - No primary key
+
+# Table: actor_movie_roles (invalid join table - additional columns)
+#   - actor_id (foreign key to actors.id)
+#   - movie_id (foreign key to movies.id)
+#   - role (additional column)
+#   - No primary key
 
 # Results in:
-class User < ActiveRecord::Base
-  has_one :profile_by_email, foreign_key: :user_email
-  has_one :profile_by_username, foreign_key: :user_username
-  has_one :profile_by_id_type, foreign_key: [:user_id, :user_type]
+class Actor < ActiveRecord::Base
+  has_and_belongs_to_many :movies  # Only this relationship is created
+end
+
+class Movie < ActiveRecord::Base
+  has_and_belongs_to_many :actors  # Only this relationship is created
 end
 ```
 
