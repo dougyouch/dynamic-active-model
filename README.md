@@ -2,117 +2,179 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/76f5bdfc2d2ca28514c6/maintainability)](https://codeclimate.com/github/dougyouch/dynamic-active-model/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/76f5bdfc2d2ca28514c6/test_coverage)](https://codeclimate.com/github/dougyouch/dynamic-active-model/test_coverage)
 
-# Dynamic Active Model - Automatic Database Discovery, Model Creation, and Relationship Mapping for Rails
+# Dynamic Active Model
 
-Dynamic Active Model automatically reads a database, and maps the database classes to Active Record models. This includes defining relationships based on foreign keys. Currently, `has_many` and `belongs_to` relationships are supported. By default, Dynamic Active Model is best used for creating missing Active Record models, or exploring a database without having to create the models.
+Dynamic Active Model is a powerful Ruby gem that automatically discovers your database schema and creates corresponding ActiveRecord models with proper relationships. It's perfect for rapid prototyping, database exploration, and working with legacy databases.
 
-# Basic Usage
+## Features
 
-## Explore Database Models
-This allows you to create Active Record models in memory.
+- 🔍 Automatic database schema discovery
+- 🏗️ Dynamic creation of ActiveRecord models
+- 🔗 Automatic relationship mapping (`has_many` and `belongs_to`)
+- ⚡ In-memory model creation for quick exploration
+- 📁 Physical model file generation
+- 🛠️ Customizable model extensions
+- ⚙️ Flexible table filtering (blacklist/whitelist)
+- 🔒 Safe handling of dangerous attribute names
+
+## Installation
+
+Add this line to your application's Gemfile:
 
 ```ruby
-# Define your database model scope. This is neccesary to prevent conflicts.
+gem 'dynamic-active-model'
+```
+
+And then execute:
+```bash
+$ bundle install
+```
+
+Or install it yourself as:
+```bash
+$ gem install dynamic-active-model
+```
+
+## Quick Start
+
+### In-Memory Model Creation
+
+```ruby
+# Define your database model namespace
 module DB; end
 
-# Intiialize models and relationships. This can be broken apart into separate calls if you'd like.
-#
-# Create the actual class models
-#
-#   db = DynamicActiveModel::Database.new(DB, username: 'root', adapter: 'postgresql', database: 'rails_development', password: 'password')
-#   db.create_models!
-#
-# Create the relationships
-#
-#   relations = DynamicActiveModel::Associations.new(db)
-#   relations.build!
-#
-# Instead, this combines both those methods into one
-DynamicActiveModel::Explorer.explore(DB, username: 'root', adapter: 'postgresql', database: 'rails_development', password: 'password')
+# Create models and relationships in one step
+DynamicActiveModel::Explorer.explore(DB,
+  username: 'root',
+  adapter: 'postgresql',
+  database: 'your_database',
+  password: 'your_password'
+)
 
-# find some model
+# Start using your models
 movie = DB::Movies.first
-
-# some attribute
 movie.name
-
-# some relationships
-movie.actors
+movie.actors  # Automatically mapped relationship
 ```
 
-### Blacklist (Skip) Tables to Create Models For
-You can blacklist tables to create models for, to ignore certain specific tables
-
-```ruby
-# initialize the database
-db = DynamicActiveModel::Database.new(DB, username: 'root', adapter: 'postgresql', database: 'rails_development', password: 'password')
-
-# skip a single table
-db.skip_table 'actors'
-
-# skip tables by regex
-db.skip_table /^temp/
-
-# skip multiple tables
-db.skip_tables ['2018-01-01_temp', /^daily/]
-
-db.create_models!
-```
-
-### Whitelist Tables to Create Models For
-If you'd like to whitelist instead, that's also available.
-
-```ruby
-# initialize the database
-db = DynamicActiveModel::Database.new(DB, username: 'root', adapter: 'postgresql', database: 'rails_development', password: 'password')
-
-# include a single table
-db.include_table 'actors'
-
-# include tables by regex
-db.include_table /^special/
-
-# include multiple tables
-db.include_tables ['movies', 'salaries']
-
-db.create_models!
-```
-
-## Create Model Files
-If you'd like to actually create the files for models, you can do so through
+### Generate Model Files
 
 ```bash
- dynamic-db-explorer --username root --adapter postgresql --host localhost --database rails_development --password password --create-class-files /path/to/folder/for/model/files
- ```
+dynamic-db-explorer \
+  --username root \
+  --adapter postgresql \
+  --database your_database \
+  --password your_password \
+  --create-class-files /path/to/models
+```
 
-## Extend Model
-Add additional functionality to any model by using the update_model method.
+## Advanced Usage
+
+### Table Filtering
+
+#### Blacklist (Skip) Tables
 
 ```ruby
-# Specify the model by the table name
-db.update_model(:movies) do
-  attr_accessor :imdb_id
+db = DynamicActiveModel::Database.new(DB, database_config)
 
-  def first_actor
-    actors.first
+# Skip specific tables
+db.skip_table 'temporary_data'
+db.skip_table /^temp_/
+db.skip_tables ['old_data', /^backup_/]
+
+db.create_models!
+```
+
+#### Whitelist Tables
+
+```ruby
+db = DynamicActiveModel::Database.new(DB, database_config)
+
+# Include only specific tables
+db.include_table 'users'
+db.include_table /^customer_/
+db.include_tables ['orders', 'products']
+
+db.create_models!
+```
+
+### Extending Models
+
+#### Inline Extensions
+
+```ruby
+db.update_model(:users) do
+  attr_accessor :temp_password
+
+  def full_name
+    "#{first_name} #{last_name}"
   end
 end
 ```
-Additional functionality can be added through files as well.
-```ruby
-# file: lib/db/movies.ext.rb
-attr_accessor :imdb_id
 
-def first_actor
-  actors.first
+#### File-based Extensions
+
+```ruby
+# lib/db/users.ext.rb
+attr_accessor :temp_password
+
+def full_name
+  "#{first_name} #{last_name}"
 end
-```
-Then call update_model with
-```ruby
-db.update_model(:movies, 'lib/db/movies.ext.rb')
+
+# Apply the extension
+db.update_model(:users, 'lib/db/users.ext.rb')
 ```
 
-Mass apply updates to multiple models with update_all_models.  The base_dir is the path to model extension files.  The files are expected to use the .ext.rb extension.
+#### Mass Update All Models
+
 ```ruby
+# Apply all .ext.rb files from a directory
 db.update_all_models('lib/db')
 ```
+
+## Configuration
+
+### Database Connection
+
+The gem supports all ActiveRecord database adapters. Here's a typical configuration:
+
+```ruby
+{
+  adapter: 'postgresql',  # or 'mysql2', 'sqlite3', etc.
+  host: 'localhost',
+  database: 'your_database',
+  username: 'your_username',
+  password: 'your_password',
+  port: 5432            # optional
+}
+```
+
+## Best Practices
+
+1. Always use a dedicated namespace for dynamic models to avoid conflicts
+2. Use table filtering for large databases to improve performance
+3. Keep model extensions modular and focused
+4. Follow Ruby naming conventions in your extensions
+5. Consider using whitelisting in production environments
+
+## Documentation
+
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [API Documentation](https://www.rubydoc.info/gems/dynamic-active-model)
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+## Support
+
+If you discover any issues or have questions, please [create an issue](https://github.com/dougyouch/dynamic-active-model/issues).
