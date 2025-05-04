@@ -63,7 +63,32 @@ movie.actors  # Automatically mapped relationship
 
 To use Dynamic Active Model in a Rails application, follow these steps:
 
-1. Create a base module file in `app/models/db.rb`:
+1. First, configure Rails to handle the `DB` namespace correctly. Add this to `config/initializers/inflections.rb`:
+
+```ruby
+# config/initializers/inflections.rb
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.acronym 'DB'
+end
+```
+
+2. To avoid eager loading issues, add this to `config/application.rb`:
+
+```ruby
+# config/application.rb
+module YourApp
+  class Application < Rails::Application
+    # ... other configuration ...
+
+    # Ignore the DB namespace for eager loading
+    Rails.autoloaders.main.ignore(
+      "#{config.root}/app/models/db"
+    )
+  end
+end
+```
+
+3. Create a base module file in `app/models/db.rb`:
 
 ```ruby
 # app/models/db.rb
@@ -87,7 +112,7 @@ module DB
 end
 ```
 
-2. To extend specific models, create extension files in `app/models/db/` with the `.ext.rb` suffix:
+4. To extend specific models, create extension files in `app/models/db/` with the `.ext.rb` suffix:
 
 ```ruby
 # app/models/db/users.ext.rb
@@ -102,9 +127,9 @@ update_model do
 end
 ```
 
-3. The extension files will be automatically loaded and applied to their respective models. For example, `users.ext.rb` will extend the `DB::User` model.
+5. The extension files will be automatically loaded and applied to their respective models. For example, `users.ext.rb` will extend the `DB::User` model.
 
-4. You can now use your models throughout your Rails application:
+6. You can now use your models throughout your Rails application:
 
 ```ruby
 # In a controller
