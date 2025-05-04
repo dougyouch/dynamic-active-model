@@ -246,10 +246,12 @@ end
 
 ```ruby
 # lib/db/users.ext.rb
-attr_accessor :temp_password
+update_model do
+  attr_accessor :temp_password
 
-def full_name
-  "#{first_name} #{last_name}"
+  def full_name
+    "#{first_name} #{last_name}"
+  end
 end
 
 # Apply the extension
