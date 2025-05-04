@@ -1,9 +1,68 @@
-Naming/FileName:
-  Enabled: false
-Layout/LineLength:
-  Max: 120
+require: rubocop-rspec
+
 AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
   Exclude:
-    - 'lib/dynamic-active-model/template_class_file.rb'
-    - 'spec/support/db/schema.rb'
-    - 'spec/**/*_spec.rb'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'script/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'spec/fixtures/**/*'
+    - 'tmp/**/*'
+    - 'Gemfile.lock'
+    - 'Rakefile'
+
+Metrics/LineLength:
+  Max: 120
+  Exclude:
+    - 'spec/**/*'
+
+Style/Documentation:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/BlockComments:
+  Enabled: false
+
+Style/Encoding:
+  Enabled: false
+
+Style/FileName:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Next:
+  Enabled: false
+
+Style/OneLineConditional:
+  Enabled: false
+
+Style/SingleLineMethods:
+  Enabled: false
+
+Style/SpaceBeforeFirstArg:
+  Enabled: false
+
+Style/TrivialAccessors:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 20
+
+RSpec/MultipleExpectations:
+  Max: 8
+
+RSpec/NestedGroups:
+  Max: 4

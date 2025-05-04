@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
-group :development do
-  gem 'rubocop'
-end
+# Specify your gem's dependencies in dynamic-active-model.gemspec
+gemspec
 
-group :spec do
-  gem 'activerecord'
-  gem 'inheritance-helper'
+group :development, :test do
+  gem 'pry'
+  gem 'pry-byebug'
+  gem 'pry-doc'
+  gem 'pry-rescue'
+  gem 'pry-stack_explorer'
   gem 'rspec'
+  gem 'rubocop', '~> 1.60.0'
+  gem 'rubocop-rspec', '~> 2.26.0'
   gem 'simplecov', require: false
   gem 'sqlite3'
 end
