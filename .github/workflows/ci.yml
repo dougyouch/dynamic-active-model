@@ -28,5 +28,4 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
-        max_attempts: 3
-        retry_wait: 10000
+        verbose: true
