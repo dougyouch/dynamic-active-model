@@ -1,9 +1,29 @@
 # frozen_string_literal: true
 
 module DynamicActiveModel
-  # DynamicActiveModel::DangerousAttributesPatch is used to remove dangerous attribute names
-  # from attribute_names method in ActiveRecord
+  # The DangerousAttributesPatch module is a safety feature that prevents conflicts
+  # between database column names and Ruby reserved words or ActiveRecord methods.
+  # It automatically detects and ignores columns that could cause conflicts,
+  # particularly focusing on boolean columns that might conflict with Ruby's
+  # question mark methods.
+  #
+  # @example Basic Usage
+  #   class User < ActiveRecord::Base
+  #     include DynamicActiveModel::DangerousAttributesPatch
+  #   end
+  #
+  # @example With Boolean Column
+  #   # If a table has a boolean column named 'class',
+  #   # it will be automatically ignored to prevent conflicts
+  #   # with Ruby's Object#class method
   module DangerousAttributesPatch
+    # Extends the including class with dangerous attribute protection
+    # This method:
+    # 1. Checks if the class has any attributes
+    # 2. Identifies columns that could cause conflicts
+    # 3. Adds those columns to the ignored_columns list
+    #
+    # @param base [Class] The ActiveRecord model class
     def self.included(base)
       return unless base.attribute_names
 
