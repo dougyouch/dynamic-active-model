@@ -24,8 +24,9 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage/.resultset.json
         flags: unittests
         name: codecov-umbrella
-        fail_ci_if_error: true 
+        fail_ci_if_error: false
+        max_attempts: 3
+        retry_wait: 10000
