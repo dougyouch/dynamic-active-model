@@ -1,11 +1,9 @@
 PATH
   remote: .
   specs:
-    dynamic-active-model (0.6.2)
+    dynamic-active-model (0.6.3)
       activerecord (>= 4)
       inheritance-helper (~> 0.2)
-      irb
-      rdoc
 
 GEM
   remote: https://rubygems.org/
