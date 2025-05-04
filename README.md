@@ -95,14 +95,11 @@ end
 module DB
   include DynamicActiveModel::Setup
 
-  # Configure your database connection
-  configure_database(
-    adapter: 'postgresql',
-    host: 'localhost',
-    database: 'your_database',
-    username: 'your_username',
-    password: 'your_password'
-  )
+  # Use the primary database connection from database.yml
+  connection_options 'primary'
+
+  # Set the path for auto-loading extension files
+  extensions_path 'app/models/db'
 
   # Optionally skip tables you don't want to model
   skip_tables ['schema_migrations', 'ar_internal_metadata']
