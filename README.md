@@ -59,6 +59,67 @@ movie.name
 movie.actors  # Automatically mapped relationship
 ```
 
+### Using in a Rails Application
+
+To use Dynamic Active Model in a Rails application, follow these steps:
+
+1. Create a base module file in `app/models/db.rb`:
+
+```ruby
+# app/models/db.rb
+module DB
+  include DynamicActiveModel::Setup
+
+  # Configure your database connection
+  configure_database(
+    adapter: 'postgresql',
+    host: 'localhost',
+    database: 'your_database',
+    username: 'your_username',
+    password: 'your_password'
+  )
+
+  # Optionally skip tables you don't want to model
+  skip_tables ['schema_migrations', 'ar_internal_metadata']
+
+  # Create all models
+  create_models!
+end
+```
+
+2. To extend specific models, create extension files in `app/models/db/` with the `.ext.rb` suffix:
+
+```ruby
+# app/models/db/users.ext.rb
+update_model do
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+
+  def active?
+    status == 'active'
+  end
+end
+```
+
+3. The extension files will be automatically loaded and applied to their respective models. For example, `users.ext.rb` will extend the `DB::User` model.
+
+4. You can now use your models throughout your Rails application:
+
+```ruby
+# In a controller
+class UsersController < ApplicationController
+  def index
+    @users = DB::User.all
+  end
+
+  def show
+    @user = DB::User.find(params[:id])
+    @full_name = @user.full_name  # Using the extended method
+  end
+end
+```
+
 ### Generate Model Files
 
 ```bash
