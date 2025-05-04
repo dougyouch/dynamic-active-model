@@ -6,6 +6,8 @@ module DynamicActiveModel
   # - Table name configuration
   # - Has many relationships
   # - Belongs to relationships
+  # - Has one relationships
+  # - Has and belongs to many relationships
   # - Custom association options
   #
   # @example Basic Usage
@@ -43,6 +45,12 @@ module DynamicActiveModel
       all_belongs_to_relationships.each do |assoc|
         append_association!(str, assoc)
       end
+      all_has_one_relationships.each do |assoc|
+        append_association!(str, assoc)
+      end
+      all_has_and_belongs_to_many_relationships.each do |assoc|
+        append_association!(str, assoc)
+      end
       str << "end\n"
       str
     end
@@ -65,12 +73,48 @@ module DynamicActiveModel
       end
     end
 
+    # Gets all has_one relationships for the model
+    # @return [Array<ActiveRecord::Reflection::HasOneReflection>]
+    def all_has_one_relationships
+      @model.reflect_on_all_associations.select do |assoc|
+        assoc.is_a?(ActiveRecord::Reflection::HasOneReflection)
+      end
+    end
+
+    # Gets all has_and_belongs_to_many relationships for the model
+    # @return [Array<ActiveRecord::Reflection::HasAndBelongsToManyReflection>]
+    def all_has_and_belongs_to_many_relationships
+      @model.reflect_on_all_associations.select do |assoc|
+        assoc.is_a?(ActiveRecord::Reflection::HasAndBelongsToManyReflection)
+      end
+    end
+
     # Appends an association definition to the source string
     # @param str [String] The source string being built
     # @param assoc [ActiveRecord::Reflection::AssociationReflection] The association to add
     def append_association!(str, assoc)
-      assoc_type = assoc.is_a?(ActiveRecord::Reflection::HasManyReflection) ? 'has_many' : 'belongs_to'
-      association_options = assoc_type == 'has_many' ? has_many_association_options(assoc) : belongs_to_association_options(assoc)
+      assoc_type = case assoc
+                   when ActiveRecord::Reflection::HasManyReflection
+                     'has_many'
+                   when ActiveRecord::Reflection::BelongsToReflection
+                     'belongs_to'
+                   when ActiveRecord::Reflection::HasOneReflection
+                     'has_one'
+                   when ActiveRecord::Reflection::HasAndBelongsToManyReflection
+                     'has_and_belongs_to_many'
+                   end
+
+      association_options = case assoc_type
+                           when 'has_many'
+                             has_many_association_options(assoc)
+                           when 'belongs_to'
+                             belongs_to_association_options(assoc)
+                           when 'has_one'
+                             has_one_association_options(assoc)
+                           when 'has_and_belongs_to_many'
+                             has_and_belongs_to_many_association_options(assoc)
+                           end
+
       str << "  #{assoc_type} #{assoc.name.inspect}"
       unless association_options.empty?
         association_options.each do |name, value|
@@ -102,10 +146,38 @@ module DynamicActiveModel
       options
     end
 
+    # Gets the options for a has_one association
+    # @param assoc [ActiveRecord::Reflection::HasOneReflection] The association
+    # @return [Hash] The association options
+    def has_one_association_options(assoc)
+      options = {}
+      options[:class_name] = assoc.options[:class_name] unless assoc.options[:class_name].underscore.singularize == assoc.name.to_s
+      options[:foreign_key] = assoc.options[:foreign_key] unless assoc.options[:foreign_key] == default_foreign_key_name
+      options[:primary_key] = assoc.options[:primary_key] unless assoc.options[:primary_key] == 'id'
+      options
+    end
+
+    # Gets the options for a has_and_belongs_to_many association
+    # @param assoc [ActiveRecord::Reflection::HasAndBelongsToManyReflection] The association
+    # @return [Hash] The association options
+    def has_and_belongs_to_many_association_options(assoc)
+      options = {}
+      options[:join_table] = assoc.options[:join_table] if assoc.options[:join_table]
+      options[:class_name] = assoc.options[:class_name] unless assoc.options[:class_name].underscore.singularize == assoc.name.to_s
+      options
+    end
+
     # Gets the default foreign key name for the model
     # @return [String] The default foreign key name
     def default_foreign_key_name
       @model.table_name.underscore.singularize + '_id'
+    end
+
+    # Generates the default foreign key for the associated model
+    # @param assoc [ActiveRecord::Reflection::HasAndBelongsToManyReflection] The association
+    # @return [String] The generated foreign key name
+    def generate_association_foreign_key(assoc)
+      assoc.options[:class_name].underscore.singularize + '_id'
     end
 
     # Gets a constant by its fully qualified name

@@ -86,8 +86,8 @@ module DynamicActiveModel
     # @param models [Array<Class>] The two models to be related
     def add_has_and_belongs_to_many(join_table_model, models)
       model1, model2 = *models
-      model1.has_and_belongs_to_many model2.table_name.pluralize.to_sym, join_table: join_table_model.table_name
-      model2.has_and_belongs_to_many model1.table_name.pluralize.to_sym, join_table: join_table_model.table_name
+      model1.has_and_belongs_to_many model2.table_name.pluralize.to_sym, join_table: join_table_model.table_name, class_name: model2.name
+      model2.has_and_belongs_to_many model1.table_name.pluralize.to_sym, join_table: join_table_model.table_name, class_name: model1.name
     end
 
     # Adds appropriate relationships between two models
