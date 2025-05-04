@@ -16,6 +16,8 @@ group :development, :test do
   gem 'rubocop-rspec', '~> 2.26.0'
   gem 'simplecov', require: false
   gem 'sqlite3'
+  gem 'irb'
+  gem 'rdoc'
 end
 
 group :travis do

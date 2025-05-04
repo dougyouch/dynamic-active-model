@@ -16,4 +16,6 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'activerecord', '>= 4'
   s.add_runtime_dependency 'inheritance-helper', '~> 0.2'
+  s.add_runtime_dependency 'irb'
+  s.add_runtime_dependency 'rdoc'
 end
