@@ -124,6 +124,8 @@ update_model do
 end
 ```
 
+> **Note:** Extension files are based on the table name, not the model name. For example, if you have a table named `user_profiles`, the extension file should be named `user_profiles.ext.rb`, even if the model is named `UserProfile`.
+
 5. The extension files will be automatically loaded and applied to their respective models. For example, `users.ext.rb` will extend the `DB::User` model.
 
 6. You can now use your models throughout your Rails application:
