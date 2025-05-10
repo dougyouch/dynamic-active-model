@@ -167,7 +167,7 @@ module DynamicActiveModel
         if relationship_name == model.table_name.underscore
           has_many_model.table_name
         else
-          relationship_name
+          "#{relationship_name}_#{has_many_model.table_name}"
         end
       name.underscore.pluralize.to_sym
     end

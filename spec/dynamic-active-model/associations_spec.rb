@@ -23,7 +23,7 @@ describe DynamicActiveModel::Associations do
       expect(has_association?(base_module.const_get('Company'), :website)).to eq(true)
       expect(has_association?(base_module.const_get('Company'), :company_website)).to eq(true)
       expect(has_association?(base_module.const_get('Website'), :companies)).to eq(true)
-      expect(has_association?(base_module.const_get('Website'), :company_websites)).to eq(true)
+      expect(has_association?(base_module.const_get('Website'), :company_website_companies)).to eq(true)
     end
 
     it 'creates has one relationships' do
