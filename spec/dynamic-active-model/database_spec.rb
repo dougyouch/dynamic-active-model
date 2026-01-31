@@ -18,15 +18,15 @@ describe DynamicActiveModel::Database do
       end
 
       it 'skips table' do
-        expect(database.send(:skip_table?, example_table_name)).to eq(true)
+        expect(database.send(:skip_table?, example_table_name)).to be(true)
       end
 
       it 'skips tables from an array' do
-        expect(database.send(:skip_table?, example_table_names.first)).to eq(true)
+        expect(database.send(:skip_table?, example_table_names.first)).to be(true)
       end
 
       it 'does not skip the table' do
-        expect(database.send(:skip_table?, 'users')).to eq(false)
+        expect(database.send(:skip_table?, 'users')).to be(false)
       end
 
       it 'returns tables to skip' do
@@ -40,12 +40,12 @@ describe DynamicActiveModel::Database do
       end
 
       it 'skips table' do
-        expect(database.send(:skip_table?, 'stats_employment_durations')).to eq(true)
-        expect(database.send(:skip_table?, 'stats_company_employments')).to eq(true)
+        expect(database.send(:skip_table?, 'stats_employment_durations')).to be(true)
+        expect(database.send(:skip_table?, 'stats_company_employments')).to be(true)
       end
 
       it 'does not skip the table' do
-        expect(database.send(:skip_table?, 'users')).to eq(false)
+        expect(database.send(:skip_table?, 'users')).to be(false)
       end
 
       it 'returns tables to skip' do
@@ -62,15 +62,15 @@ describe DynamicActiveModel::Database do
       end
 
       it 'includes table' do
-        expect(database.send(:include_table?, example_table_name)).to eq(true)
+        expect(database.send(:include_table?, example_table_name)).to be(true)
       end
 
       it 'includes tables from an array' do
-        expect(database.send(:include_table?, example_table_names.first)).to eq(true)
+        expect(database.send(:include_table?, example_table_names.first)).to be(true)
       end
 
       it 'does not include the table' do
-        expect(database.send(:include_table?, 'users')).to eq(false)
+        expect(database.send(:include_table?, 'users')).to be(false)
       end
 
       it 'returns tables to include' do
@@ -84,12 +84,12 @@ describe DynamicActiveModel::Database do
       end
 
       it 'includes table' do
-        expect(database.send(:include_table?, 'stats_employment_durations')).to eq(true)
-        expect(database.send(:include_table?, 'stats_company_employments')).to eq(true)
+        expect(database.send(:include_table?, 'stats_employment_durations')).to be(true)
+        expect(database.send(:include_table?, 'stats_company_employments')).to be(true)
       end
 
       it 'does not include the table' do
-        expect(database.send(:include_table?, 'users')).to eq(false)
+        expect(database.send(:include_table?, 'users')).to be(false)
       end
 
       it 'returns tables to include' do
@@ -127,8 +127,8 @@ describe DynamicActiveModel::Database do
 
     it 'creates ActiveRecord models for database' do
       subject
-      expect(expected_classes.all? { |name| base_module.const_defined?(name) }).to eq(true)
-      expect(undefined_classes.all? { |name| !base_module.const_defined?(name) }).to eq(true)
+      expect(expected_classes.all? { |name| base_module.const_defined?(name) }).to be(true)
+      expect(undefined_classes.all? { |name| !base_module.const_defined?(name) }).to be(true)
     end
 
     describe 'classes have active record functionality' do
@@ -174,8 +174,8 @@ describe DynamicActiveModel::Database do
 
     it 'creates ActiveRecord models for database' do
       subject
-      expect(expected_classes.all? { |name| base_module.const_defined?(name) }).to eq(true)
-      expect(undefined_classes.all? { |name| !base_module.const_defined?(name) }).to eq(true)
+      expect(expected_classes.all? { |name| base_module.const_defined?(name) }).to be(true)
+      expect(undefined_classes.all? { |name| !base_module.const_defined?(name) }).to be(true)
     end
   end
 
@@ -201,12 +201,12 @@ describe DynamicActiveModel::Database do
 
     let(:table_name) { :users }
 
-    it { expect(subject.nil?).to eq(false) }
+    it { expect(subject.nil?).to be(false) }
 
     describe 'invalid table' do
       let(:table_name) { :not_a_valid_table_name }
 
-      it { expect(subject.nil?).to eq(true) }
+      it { expect(subject.nil?).to be(true) }
     end
   end
 
@@ -219,7 +219,7 @@ describe DynamicActiveModel::Database do
 
     let(:table_name) { :users }
 
-    it { expect(subject.nil?).to eq(false) }
+    it { expect(subject.nil?).to be(false) }
 
     describe 'invalid table' do
       let(:table_name) { :not_a_valid_table_name }
@@ -240,9 +240,9 @@ describe DynamicActiveModel::Database do
       database.create_models!
     end
 
-    it { expect(subject.method_defined?(:display_name)).to eq(true) }
-    it { expect(subject.method_defined?(:method_does_not_exist)).to eq(false) }
-    it { expect(subject.method_defined?(:my_middle_name)).to eq(true) }
+    it { expect(subject.method_defined?(:display_name)).to be(true) }
+    it { expect(subject.method_defined?(:method_does_not_exist)).to be(false) }
+    it { expect(subject.method_defined?(:my_middle_name)).to be(true) }
   end
 
   describe '#update_all_models' do
@@ -255,8 +255,8 @@ describe DynamicActiveModel::Database do
       database.create_models!
     end
 
-    it { expect(subject.method_defined?(:display_name)).to eq(false) }
-    it { expect(subject.method_defined?(:method_does_not_exist)).to eq(false) }
-    it { expect(subject.method_defined?(:my_middle_name)).to eq(true) }
+    it { expect(subject.method_defined?(:display_name)).to be(false) }
+    it { expect(subject.method_defined?(:method_does_not_exist)).to be(false) }
+    it { expect(subject.method_defined?(:my_middle_name)).to be(true) }
   end
 end

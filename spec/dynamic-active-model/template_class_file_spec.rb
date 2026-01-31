@@ -12,14 +12,14 @@ describe DynamicActiveModel::TemplateClassFile do
 
   let(:model_name) { :User }
   let(:model) { base_module.const_get(model_name) }
-  let(:template_class_file) { DynamicActiveModel::TemplateClassFile.new(model) }
+  let(:template_class_file) { described_class.new(model) }
 
   context 'User' do
     subject { template_class_file.to_s }
 
     it 'verify User relationships' do
-      expect(subject.include?('has_many :employments')).to eq(true)
-      expect(subject.include?('has_one :user_rollup')).to eq(true)
+      expect(subject.include?('has_many :employments')).to be(true)
+      expect(subject.include?('has_one :user_rollup')).to be(true)
     end
   end
 
@@ -29,8 +29,8 @@ describe DynamicActiveModel::TemplateClassFile do
     let(:model_name) { :Website }
 
     it 'verify Website relationships' do
-      expect(subject.include?('has_many :companies')).to eq(true)
-      expect(subject.include?("has_and_belongs_to_many :jobs, join_table: 'jobs_websites'")).to eq(true)
+      expect(subject.include?('has_many :companies')).to be(true)
+      expect(subject.include?("has_and_belongs_to_many :jobs, join_table: 'jobs_websites'")).to be(true)
     end
   end
 
@@ -40,10 +40,10 @@ describe DynamicActiveModel::TemplateClassFile do
     let(:model_name) { :Employment }
 
     it 'verify Employment relationships' do
-      expect(subject.include?('has_many :stats_employment_durations')).to eq(true)
-      expect(subject.include?('belongs_to :user')).to eq(true)
-      expect(subject.include?('belongs_to :job')).to eq(true)
-      expect(subject.include?('belongs_to :company')).to eq(true)
+      expect(subject.include?('has_many :stats_employment_durations')).to be(true)
+      expect(subject.include?('belongs_to :user')).to be(true)
+      expect(subject.include?('belongs_to :job')).to be(true)
+      expect(subject.include?('belongs_to :company')).to be(true)
     end
   end
 end

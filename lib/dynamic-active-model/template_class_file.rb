@@ -30,7 +30,7 @@ module DynamicActiveModel
     # @param dir [String] Directory to create the file in
     # @return [void]
     def create_template!(dir)
-      file = dir + '/' + @model.name.underscore + '.rb'
+      file = "#{dir}/#{@model.name.underscore}.rb"
       File.binwrite(file, to_s)
     end
 
@@ -146,7 +146,7 @@ module DynamicActiveModel
     def belongs_to_association_options(assoc)
       options = {}
       options[:class_name] = assoc.options[:class_name] unless assoc.options[:class_name] == assoc.name.to_s.classify
-      unless assoc.options[:foreign_key] == (assoc.options[:class_name].underscore + '_id')
+      unless assoc.options[:foreign_key] == "#{assoc.options[:class_name].underscore}_id"
         options[:foreign_key] =
           assoc.options[:foreign_key]
       end
@@ -184,14 +184,14 @@ module DynamicActiveModel
     # Gets the default foreign key name for the model
     # @return [String] The default foreign key name
     def default_foreign_key_name
-      @model.table_name.underscore.singularize + '_id'
+      "#{@model.table_name.underscore.singularize}_id"
     end
 
     # Generates the default foreign key for the associated model
     # @param assoc [ActiveRecord::Reflection::HasAndBelongsToManyReflection] The association
     # @return [String] The generated foreign key name
     def generate_association_foreign_key(assoc)
-      assoc.options[:class_name].underscore.singularize + '_id'
+      "#{assoc.options[:class_name].underscore.singularize}_id"
     end
 
     # Gets a constant by its fully qualified name

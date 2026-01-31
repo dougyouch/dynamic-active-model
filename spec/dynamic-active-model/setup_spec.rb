@@ -6,7 +6,7 @@ describe DynamicActiveModel::Setup do
   include_context 'database'
 
   let(:db_module) do
-    base_module.include DynamicActiveModel::Setup
+    base_module.include described_class
     base_module
   end
 
@@ -14,7 +14,7 @@ describe DynamicActiveModel::Setup do
     subject { db_module.connection_options }
 
     it 'default is nil' do
-      expect(subject).to eq(nil)
+      expect(subject).to be_nil
     end
 
     describe 'with #connection_options=' do
@@ -32,7 +32,7 @@ describe DynamicActiveModel::Setup do
     subject { db_module.extensions_path }
 
     it 'default is nil' do
-      expect(subject).to eq(nil)
+      expect(subject).to be_nil
     end
 
     describe 'with #extensions_path=' do
@@ -156,7 +156,7 @@ describe DynamicActiveModel::Setup do
     subject { db_module.database }
 
     it 'defaults to nil' do
-      expect(subject).to eq(nil)
+      expect(subject).to be_nil
     end
   end
 
@@ -172,15 +172,15 @@ describe DynamicActiveModel::Setup do
     end
 
     it 'user model exists' do
-      expect(base_module.const_defined?('User')).to eq(true)
+      expect(base_module.const_defined?('User')).to be(true)
     end
 
     it 'user model is extended' do
-      expect(base_module.const_get('User').method_defined?(:my_middle_name)).to eq(true)
+      expect(base_module.const_get('User').method_defined?(:my_middle_name)).to be(true)
     end
 
     it 'expects #database to be set' do
-      expect(base_module.database.nil?).to eq(false)
+      expect(base_module.database.nil?).to be(false)
     end
   end
 end

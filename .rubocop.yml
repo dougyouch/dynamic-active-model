@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 plugins:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.0
   NewCops: enable
   SuggestExtensions: false
   Exclude:
@@ -13,13 +15,19 @@ AllCops:
     - 'Gemfile.lock'
 
 Metrics/MethodLength:
-  Max: 25
+  Max: 30
 
 Metrics/AbcSize:
-  Max: 30
+  Max: 35
 
 Metrics/ClassLength:
   Max: 200
+
+Metrics/CyclomaticComplexity:
+  Max: 12
+
+Metrics/PerceivedComplexity:
+  Max: 12
 
 Metrics/BlockLength:
   Exclude:
@@ -41,6 +49,14 @@ Naming/FileName:
   Exclude:
     - 'lib/dynamic-active-model.rb'
 
+# These methods return option hashes, not predicates
+Naming/PredicateName:
+  AllowedMethods:
+    - has_many_association_options
+    - has_one_association_options
+    - has_and_belongs_to_many_association_options
+
+# RSpec configuration
 RSpec/ExampleLength:
   Max: 20
 
@@ -49,3 +65,22 @@ RSpec/MultipleExpectations:
 
 RSpec/NestedGroups:
   Max: 4
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+# Allow unnamed subject references
+RSpec/NamedSubject:
+  Enabled: false
+
+# Spec directory uses hyphens to match gem name
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+# Allow descriptive context names
+RSpec/ContextWording:
+  Enabled: false
+
+# Allow repeated describe blocks for different scenarios
+RSpec/RepeatedExampleGroupDescription:
+  Enabled: false

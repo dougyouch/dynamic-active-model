@@ -21,7 +21,7 @@ describe DynamicActiveModel::Factory do
 
     it 'use default name' do
       subject
-      expect(base_module.const_defined?(:DynamicAbstractBase)).to eq(true)
+      expect(base_module.const_defined?(:DynamicAbstractBase)).to be(true)
     end
 
     describe 'change name' do
@@ -29,8 +29,8 @@ describe DynamicActiveModel::Factory do
 
       it 'use specified name' do
         subject
-        expect(base_module.const_defined?(:Foo)).to eq(true)
-        expect(base_module.const_defined?(:DynamicAbstractBase)).to eq(false)
+        expect(base_module.const_defined?(:Foo)).to be(true)
+        expect(base_module.const_defined?(:DynamicAbstractBase)).to be(false)
       end
     end
   end
@@ -51,8 +51,8 @@ describe DynamicActiveModel::Factory do
     end
 
     it 'expects base class to be the specified class' do
-      expect(base_module.const_defined?(:DynamicAbstractBase)).to eq(false)
-      expect(subject == new_base_class).to eq(true)
+      expect(base_module.const_defined?(:DynamicAbstractBase)).to be(false)
+      expect(subject == new_base_class).to be(true)
     end
   end
 
@@ -63,9 +63,9 @@ describe DynamicActiveModel::Factory do
     let(:class_name) { nil }
 
     it 'creates a class based on the table name' do
-      expect(base_module.const_defined?(:User)).to eq(false)
+      expect(base_module.const_defined?(:User)).to be(false)
       subject
-      expect(base_module.const_defined?(:User)).to eq(true)
+      expect(base_module.const_defined?(:User)).to be(true)
     end
 
     describe 'change base class' do
@@ -84,10 +84,10 @@ describe DynamicActiveModel::Factory do
       end
 
       it 'creates a class for the table and use the new base class' do
-        expect(base_module.const_defined?(:User)).to eq(false)
+        expect(base_module.const_defined?(:User)).to be(false)
         subject
-        expect(base_module.const_defined?(:User)).to eq(true)
-        expect(base_module.const_get(:User).new.is_a?(new_base_class)).to eq(true)
+        expect(base_module.const_defined?(:User)).to be(true)
+        expect(base_module.const_get(:User).new.is_a?(new_base_class)).to be(true)
       end
     end
   end

@@ -152,7 +152,7 @@ module DynamicActiveModel
     # @return [Hash] Mapping of foreign key names to model and relationship name pairs
     def create_foreign_key_to_model_map
       @foreign_keys.values.each_with_object({}) do |foreign_key, hsh|
-        foreign_key.keys.each do |key, relationship_name|
+        foreign_key.keys.each do |key, relationship_name| # rubocop:disable Style/HashEachMethods
           hsh[key.downcase] ||= []
           hsh[key.downcase] << [foreign_key.model, relationship_name]
         end

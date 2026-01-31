@@ -17,7 +17,7 @@ describe DynamicActiveModel::DangerousAttributesPatch do
     subject { company_model.attribute_names }
 
     it 'excludes the dangerous attribue name' do
-      expect(subject.include?(dangerous_attribute_name)).to eq(false)
+      expect(subject.include?(dangerous_attribute_name)).to be(false)
     end
   end
 end

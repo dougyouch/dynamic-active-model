@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'bundler'
+require 'fileutils'
 require 'securerandom'
 require 'active_record'
 require 'simplecov'
@@ -38,7 +39,7 @@ DB_CONFIG = {
   adapter: 'sqlite3',
   database: DB_FILE
 }.freeze
-File.unlink(DB_FILE) if File.exist?(DB_FILE)
+FileUtils.rm_f(DB_FILE)
 ActiveRecord::Base.establish_connection(DB_CONFIG)
 ActiveRecord::Schema.verbose = false
 require 'support/db/schema'
