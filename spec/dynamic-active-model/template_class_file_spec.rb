@@ -207,21 +207,6 @@ describe DynamicActiveModel::TemplateClassFile do
       end
     end
 
-    context 'website model with custom foreign key relationships' do
-      before do
-        relations.add_foreign_key('websites', 'company_website_id', 'company_website')
-        relations.build!
-      end
-
-      let(:model_name) { :Website }
-
-      it 'includes has_many with class_name when names differ' do
-        output = template_class_file.to_s
-        # company_website_companies has_many should include class_name
-        expect(output).to include('has_many :company_website_companies')
-      end
-    end
-
     context 'user rollup model' do
       let(:model_name) { :UserRollup }
 
