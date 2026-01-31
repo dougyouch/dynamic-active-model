@@ -2,9 +2,13 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dynamic-active-model'
-  s.version     = '0.6.4'
-  s.summary     = 'Dynamic ActiveRecord Models'
-  s.description = 'Dynamically create ActiveRecord models for tables'
+  s.version     = '0.7.0'
+  s.summary     = 'Automatically discover database schemas and create ActiveRecord models with relationships'
+  s.description = 'Dynamic Active Model automatically discovers database schemas and creates ActiveRecord ' \
+                  'models without manual class definitions. It detects and configures relationships ' \
+                  '(belongs_to, has_many, has_one, has_and_belongs_to_many) based on foreign keys and ' \
+                  'constraints, handles dangerous attribute names, supports model extensions, and includes ' \
+                  'a CLI tool for interactive database exploration.'
   s.licenses    = ['MIT']
   s.authors     = ['Doug Youch']
   s.email       = 'dougyouch@gmail.com'

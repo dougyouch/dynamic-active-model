@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynamic-active-model (0.6.4)
+    dynamic-active-model (0.7.0)
       activerecord (>= 4)
       inheritance-helper (~> 0.2)
 
