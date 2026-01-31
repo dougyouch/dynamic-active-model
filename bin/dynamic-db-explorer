@@ -5,7 +5,7 @@ require 'dynamic-active-model'
 require 'optparse'
 require 'yaml'
 
-DEFAULT_CONFIG_FILE = "#{ENV['HOME']}/.dynamic-db-explorer.yml".freeze
+DEFAULT_CONFIG_FILE = "#{Dir.home}/.dynamic-db-explorer.yml".freeze
 
 options = {
   base_module: Object,
@@ -56,6 +56,8 @@ OptionParser.new do |opts|
   end
 
   opts.on('--module MODULE_NAME', 'module name') do |v|
+    raise ArgumentError, "Invalid module name: #{v}" unless v.match?(/\A[A-Z][A-Za-z0-9_]*\z/)
+
     Object.const_set(v, Module.new)
     options[:base_module] = Object.const_get(v)
   end
@@ -86,10 +88,12 @@ DynamicActiveModel::ForeignKey.id_suffix = options[:id_suffix] if options[:id_su
 if options[:config_file]
   raise('must specify a section') unless options[:config_section]
 
-  config = YAML.load_file(options[:config_file])[options[:config_section]]
+  config = YAML.safe_load_file(options[:config_file], permitted_classes: [Symbol])[options[:config_section]]
   options[:skip_tables] = config.delete('skip_tables') || []
   options[:relationships] = config.delete('relationships') || {}
   if (module_name = config.delete('module'))
+    raise ArgumentError, "Invalid module name: #{module_name}" unless module_name.match?(/\A[A-Z][A-Za-z0-9_]*\z/)
+
     Object.const_set(module_name, Module.new)
     options[:base_module] = Object.const_get(module_name)
   end
