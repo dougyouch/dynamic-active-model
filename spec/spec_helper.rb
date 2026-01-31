@@ -5,14 +5,20 @@ require 'bundler'
 require 'securerandom'
 require 'active_record'
 require 'simplecov'
-require 'simplecov_json_formatter'
+require 'simplecov-cobertura'
 
 SimpleCov.start do
   enable_coverage :branch
-  formatter SimpleCov::Formatter::MultiFormatter.new([
-    SimpleCov::Formatter::HTMLFormatter,
-    SimpleCov::Formatter::JSONFormatter
-  ])
+
+  add_filter '/spec/'
+
+  track_files 'lib/**/*.rb'
+
+  if ENV['CI']
+    formatter SimpleCov::Formatter::CoberturaFormatter
+  else
+    formatter SimpleCov::Formatter::HTMLFormatter
+  end
 end
 
 begin

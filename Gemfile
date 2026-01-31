@@ -15,6 +15,7 @@ group :development, :test do
   gem 'rubocop', '~> 1.60.0'
   gem 'rubocop-rspec', '~> 2.26.0'
   gem 'simplecov', require: false
+  gem 'simplecov-cobertura'
   gem 'sqlite3'
   gem 'irb'
   gem 'rdoc'

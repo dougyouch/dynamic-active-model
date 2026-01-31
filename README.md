@@ -1,6 +1,5 @@
-[![Build Status](https://github.com/dougyouch/dynamic-active-model/workflows/CI/badge.svg)](https://github.com/dougyouch/dynamic-active-model/actions)
-[![Code Coverage](https://codecov.io/gh/dougyouch/dynamic-active-model/branch/master/graph/badge.svg)](https://codecov.io/gh/dougyouch/dynamic-active-model)
-[![Maintainability](https://api.codeclimate.com/v1/badges/76f5bdfc2d2ca28514c6/maintainability)](https://codeclimate.com/github/dougyouch/dynamic-active-model/maintainability)
+[![CI](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml/badge.svg)](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/dougyouch/dynamic-active-model/graph/badge.svg)](https://codecov.io/gh/dougyouch/dynamic-active-model)
 
 # Dynamic Active Model
 

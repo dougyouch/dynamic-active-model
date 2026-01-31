@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynamic-active-model (0.6.3)
+    dynamic-active-model (0.6.4)
       activerecord (>= 4)
       inheritance-helper (~> 0.2)
 
@@ -132,6 +132,9 @@ GEM
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
+    simplecov-cobertura (3.1.0)
+      rexml
+      simplecov (~> 0.19)
     simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
     sqlite3 (2.6.0-aarch64-linux-gnu)
@@ -178,6 +181,7 @@ DEPENDENCIES
   rubocop (~> 1.60.0)
   rubocop-rspec (~> 2.26.0)
   simplecov
+  simplecov-cobertura
   sqlite3
 
 BUNDLED WITH
