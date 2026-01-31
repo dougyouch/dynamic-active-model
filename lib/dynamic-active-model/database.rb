@@ -25,10 +25,10 @@ module DynamicActiveModel
   class Database
     # @return [Hash] Mapping of table names to custom class names
     attr_reader :table_class_names
-    
+
     # @return [Factory] Factory instance used for model creation
     attr_reader :factory
-    
+
     # @return [Array] List of created model classes
     attr_reader :models
 

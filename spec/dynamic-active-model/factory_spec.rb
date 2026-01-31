@@ -5,17 +5,18 @@ require 'spec_helper'
 describe DynamicActiveModel::Factory do
   include_context 'database'
 
-  context '#generate_class_name' do
+  describe '#generate_class_name' do
+    subject { factory.generate_class_name(table_name) }
+
     let(:table_name) { 'users' }
     let(:expected_class_name) { 'User' }
-    subject { factory.generate_class_name(table_name) }
 
     it 'converts table name to class name' do
       expect(subject).to eq(expected_class_name)
     end
   end
 
-  context '#base_class' do
+  describe '#base_class' do
     subject { factory.base_class }
 
     it 'use default name' do
@@ -34,19 +35,20 @@ describe DynamicActiveModel::Factory do
     end
   end
 
-  context '#base_class=' do
+  describe '#base_class=' do
+    subject { factory.base_class }
+
     let(:new_base_class) do
       Class.new do
-        def self.table_name
-        end
-        def self.table_name=(name)
-        end
+        def self.table_name; end
+
+        def self.table_name=(name); end
       end
     end
-    before(:each) do
+
+    before do
       factory.base_class = new_base_class
     end
-    subject { factory.base_class }
 
     it 'expects base class to be the specified class' do
       expect(base_module.const_defined?(:DynamicAbstractBase)).to eq(false)
@@ -54,10 +56,11 @@ describe DynamicActiveModel::Factory do
     end
   end
 
-  context '#creates' do
+  describe '#creates' do
+    subject { factory.create(table_name, class_name) }
+
     let(:table_name) { 'users' }
     let(:class_name) { nil }
-    subject { factory.create(table_name, class_name) }
 
     it 'creates a class based on the table name' do
       expect(base_module.const_defined?(:User)).to eq(false)
@@ -68,15 +71,15 @@ describe DynamicActiveModel::Factory do
     describe 'change base class' do
       let(:new_base_class) do
         Class.new do
-          def self.table_name
-          end
-          def self.table_name=(name)
-          end
-          def self.attribute_names
-          end
+          def self.table_name; end
+
+          def self.table_name=(name); end
+
+          def self.attribute_names; end
         end
       end
-      before(:each) do
+
+      before do
         factory.base_class = new_base_class
       end
 

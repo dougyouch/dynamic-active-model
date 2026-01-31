@@ -6,13 +6,13 @@ describe DynamicActiveModel::Database do
   include_context 'database'
 
   let(:example_table_name) { 'tmp_load_data_table' }
-  let(:example_table_names) { ['foo', 'bar'] }
+  let(:example_table_names) { %w[foo bar] }
   let(:all_example_table_names) { example_table_names.push(example_table_name).sort }
   let(:example_table_regex) { /^stats_/ }
 
-  context '#skip_table?' do
+  describe '#skip_table?' do
     describe 'table names' do
-      before(:each) do
+      before do
         database.skip_table example_table_name
         database.skip_tables example_table_names
       end
@@ -35,7 +35,7 @@ describe DynamicActiveModel::Database do
     end
 
     describe 'table names' do
-      before(:each) do
+      before do
         database.skip_table example_table_regex
       end
 
@@ -54,9 +54,9 @@ describe DynamicActiveModel::Database do
     end
   end
 
-  context '#include_table?' do
+  describe '#include_table?' do
     describe 'table names' do
-      before(:each) do
+      before do
         database.include_table example_table_name
         database.include_tables example_table_names
       end
@@ -79,7 +79,7 @@ describe DynamicActiveModel::Database do
     end
 
     describe 'table names' do
-      before(:each) do
+      before do
         database.include_table example_table_regex
       end
 
@@ -98,43 +98,45 @@ describe DynamicActiveModel::Database do
     end
   end
 
-  context '#create_models!' do
-    before(:each) do
+  describe '#create_models!' do
+    subject { database.create_models! }
+
+    before do
       database.skip_table example_table_name
       database.skip_table example_table_regex
       database.table_class_name 'websites', 'CompanyWebsite'
     end
 
     let(:expected_classes) do
-      [
-        :User,
-        :Company,
-        :Job,
-        :CompanyWebsite,
-        :Employment
+      %i[
+        User
+        Company
+        Job
+        CompanyWebsite
+        Employment
       ]
     end
     let(:undefined_classes) do
-      [
-        :Website,
-        :StatsEmploymentDuration,
-        :StatsCompanyEmployment,
-        :TmpLoadDataTable
+      %i[
+        Website
+        StatsEmploymentDuration
+        StatsCompanyEmployment
+        TmpLoadDataTable
       ]
     end
-    subject { database.create_models! }
 
     it 'creates ActiveRecord models for database' do
       subject
       expect(expected_classes.all? { |name| base_module.const_defined?(name) }).to eq(true)
-      expect(undefined_classes.all? { |name| ! base_module.const_defined?(name) }).to eq(true)
+      expect(undefined_classes.all? { |name| !base_module.const_defined?(name) }).to eq(true)
     end
 
     describe 'classes have active record functionality' do
-      before(:each) do
+      subject { base_module.const_get(:User) }
+
+      before do
         database.create_models!
       end
-      subject { base_module.const_get(:User) }
 
       it 'primary_key' do
         expect(subject.primary_key).to eq('id')
@@ -146,8 +148,10 @@ describe DynamicActiveModel::Database do
     end
   end
 
-  context '#create_models!' do
-    before(:each) do
+  describe '#create_models!' do
+    subject { database.create_models! }
+
+    before do
       database.include_table 'users'
     end
 
@@ -157,27 +161,27 @@ describe DynamicActiveModel::Database do
       ]
     end
     let(:undefined_classes) do
-      [
-        :Company,
-        :Job,
-        :Employment,
-        :Website,
-        :StatsEmploymentDuration,
-        :StatsCompanyEmployment,
-        :TmpLoadDataTable
+      %i[
+        Company
+        Job
+        Employment
+        Website
+        StatsEmploymentDuration
+        StatsCompanyEmployment
+        TmpLoadDataTable
       ]
     end
-    subject { database.create_models! }
 
     it 'creates ActiveRecord models for database' do
       subject
       expect(expected_classes.all? { |name| base_module.const_defined?(name) }).to eq(true)
-      expect(undefined_classes.all? { |name| ! base_module.const_defined?(name) }).to eq(true)
+      expect(undefined_classes.all? { |name| !base_module.const_defined?(name) }).to eq(true)
     end
   end
 
   context 'disable_standard_table_inheritance!' do
     subject { database.disable_standard_table_inheritance! }
+
     let(:company_model) { database.models.detect { |model| model.table_name == 'companies' } }
 
     before do
@@ -188,14 +192,14 @@ describe DynamicActiveModel::Database do
     it { expect(company_model.inheritance_column).to eq('_type_disabled') }
   end
 
-  context '#get_model' do
-    before(:each) do
+  describe '#get_model' do
+    subject { database.get_model(table_name) }
+
+    before do
       database.create_models!
     end
 
     let(:table_name) { :users }
-
-    subject { database.get_model(table_name) }
 
     it { expect(subject.nil?).to eq(false) }
 
@@ -206,14 +210,14 @@ describe DynamicActiveModel::Database do
     end
   end
 
-  context '#get_model!' do
-    before(:each) do
+  describe '#get_model!' do
+    subject { database.get_model!(table_name) }
+
+    before do
       database.create_models!
     end
 
     let(:table_name) { :users }
-
-    subject { database.get_model!(table_name) }
 
     it { expect(subject.nil?).to eq(false) }
 
@@ -224,11 +228,7 @@ describe DynamicActiveModel::Database do
     end
   end
 
-  context '#update_model' do
-    before(:each) do
-      database.create_models!
-    end
-
+  describe '#update_model' do
     subject do
       database.update_model(:users, 'spec/support/db/extensions/users.ext.rb') do
         attr_accessor :display_name
@@ -236,19 +236,23 @@ describe DynamicActiveModel::Database do
       database.get_model!(:users)
     end
 
+    before do
+      database.create_models!
+    end
+
     it { expect(subject.method_defined?(:display_name)).to eq(true) }
     it { expect(subject.method_defined?(:method_does_not_exist)).to eq(false) }
     it { expect(subject.method_defined?(:my_middle_name)).to eq(true) }
   end
 
-  context '#update_all_models' do
-    before(:each) do
-      database.create_models!
-    end
-
+  describe '#update_all_models' do
     subject do
       database.update_all_models('spec/support/db/extensions')
       database.get_model!(:users)
+    end
+
+    before do
+      database.create_models!
     end
 
     it { expect(subject.method_defined?(:display_name)).to eq(false) }

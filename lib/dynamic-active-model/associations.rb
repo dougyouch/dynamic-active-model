@@ -20,10 +20,10 @@ module DynamicActiveModel
   class Associations
     # @return [Database] The database instance containing the models
     attr_reader :database
-    
+
     # @return [Hash] Mapping of table names to their indexes
     attr_reader :table_indexes
-    
+
     # @return [Array] List of detected join tables
     attr_reader :join_tables
 
@@ -72,10 +72,10 @@ module DynamicActiveModel
       end
 
       @join_tables.each do |join_table_model|
-        models = join_table_model.column_names.map { |column_name| foreign_key_to_models[column_name.downcase]&.first&.first }.compact
-        if models.size == 2
-          add_has_and_belongs_to_many(join_table_model, models)
-        end
+        models = join_table_model.column_names.map do |column_name|
+          foreign_key_to_models[column_name.downcase]&.first&.first
+        end.compact
+        add_has_and_belongs_to_many(join_table_model, models) if models.size == 2
       end
     end
 
@@ -86,8 +86,10 @@ module DynamicActiveModel
     # @param models [Array<Class>] The two models to be related
     def add_has_and_belongs_to_many(join_table_model, models)
       model1, model2 = *models
-      model1.has_and_belongs_to_many model2.table_name.pluralize.to_sym, join_table: join_table_model.table_name, class_name: model2.name
-      model2.has_and_belongs_to_many model1.table_name.pluralize.to_sym, join_table: join_table_model.table_name, class_name: model1.name
+      model1.has_and_belongs_to_many model2.table_name.pluralize.to_sym, join_table: join_table_model.table_name,
+                                                                         class_name: model2.name
+      model2.has_and_belongs_to_many model1.table_name.pluralize.to_sym, join_table: join_table_model.table_name,
+                                                                         class_name: model1.name
     end
 
     # Adds appropriate relationships between two models

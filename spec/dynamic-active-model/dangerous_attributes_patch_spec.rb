@@ -5,7 +5,7 @@ require 'spec_helper'
 describe DynamicActiveModel::DangerousAttributesPatch do
   include_context 'database'
 
-  before(:each) do
+  before do
     database.create_models!
   end
 
@@ -13,7 +13,7 @@ describe DynamicActiveModel::DangerousAttributesPatch do
   let(:company_model) { database.models.detect { |m| m.table_name == 'companies' } }
   let(:column_names) { company_model.columns.map(&:name) }
 
-  context '.attribute_names' do
+  describe '.attribute_names' do
     subject { company_model.attribute_names }
 
     it 'excludes the dangerous attribue name' do

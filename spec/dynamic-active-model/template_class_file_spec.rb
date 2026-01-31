@@ -6,7 +6,7 @@ require 'spec_helper'
 describe DynamicActiveModel::TemplateClassFile do
   include_context 'database'
 
-  before(:each) do
+  before do
     relations.build!
   end
 
@@ -24,8 +24,9 @@ describe DynamicActiveModel::TemplateClassFile do
   end
 
   context 'Website' do
-    let(:model_name) { :Website }
     subject { template_class_file.to_s }
+
+    let(:model_name) { :Website }
 
     it 'verify Website relationships' do
       expect(subject.include?('has_many :companies')).to eq(true)
@@ -34,8 +35,9 @@ describe DynamicActiveModel::TemplateClassFile do
   end
 
   context 'Employment' do
-    let(:model_name) { :Employment }
     subject { template_class_file.to_s }
+
+    let(:model_name) { :Employment }
 
     it 'verify Employment relationships' do
       expect(subject.include?('has_many :stats_employment_durations')).to eq(true)

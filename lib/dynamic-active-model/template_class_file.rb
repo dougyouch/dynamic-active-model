@@ -31,14 +31,16 @@ module DynamicActiveModel
     # @return [void]
     def create_template!(dir)
       file = dir + '/' + @model.name.underscore + '.rb'
-      File.open(file, 'wb') { |f| f.write(to_s) }
+      File.binwrite(file, to_s)
     end
 
     # Generates the Ruby source code for the model
     # @return [String] The complete model class definition
     def to_s
-      str = "class #{@model.name} < ActiveRecord::Base\n".dup
-      str << "  self.table_name = #{@model.table_name.to_sym.inspect}\n" unless @model.name.underscore.pluralize == @model.table_name
+      str = "class #{@model.name} < ActiveRecord::Base\n"
+      unless @model.name.underscore.pluralize == @model.table_name
+        str << "  self.table_name = #{@model.table_name.to_sym.inspect}\n"
+      end
       all_has_many_relationships.each do |assoc|
         append_association!(str, assoc)
       end
@@ -105,15 +107,15 @@ module DynamicActiveModel
                    end
 
       association_options = case assoc_type
-                           when 'has_many'
-                             has_many_association_options(assoc)
-                           when 'belongs_to'
-                             belongs_to_association_options(assoc)
-                           when 'has_one'
-                             has_one_association_options(assoc)
-                           when 'has_and_belongs_to_many'
-                             has_and_belongs_to_many_association_options(assoc)
-                           end
+                            when 'has_many'
+                              has_many_association_options(assoc)
+                            when 'belongs_to'
+                              belongs_to_association_options(assoc)
+                            when 'has_one'
+                              has_one_association_options(assoc)
+                            when 'has_and_belongs_to_many'
+                              has_and_belongs_to_many_association_options(assoc)
+                            end
 
       str << "  #{assoc_type} #{assoc.name.inspect}"
       unless association_options.empty?
@@ -129,7 +131,10 @@ module DynamicActiveModel
     # @return [Hash] The association options
     def has_many_association_options(assoc)
       options = {}
-      options[:class_name] = assoc.options[:class_name] unless assoc.options[:class_name].underscore.pluralize == assoc.name.to_s
+      unless assoc.options[:class_name].underscore.pluralize == assoc.name.to_s
+        options[:class_name] =
+          assoc.options[:class_name]
+      end
       options[:foreign_key] = assoc.options[:foreign_key] unless assoc.options[:foreign_key] == default_foreign_key_name
       options[:primary_key] = assoc.options[:primary_key] unless assoc.options[:primary_key] == 'id'
       options
@@ -141,7 +146,10 @@ module DynamicActiveModel
     def belongs_to_association_options(assoc)
       options = {}
       options[:class_name] = assoc.options[:class_name] unless assoc.options[:class_name] == assoc.name.to_s.classify
-      options[:foreign_key] = assoc.options[:foreign_key] unless assoc.options[:foreign_key] == (assoc.options[:class_name].underscore + '_id')
+      unless assoc.options[:foreign_key] == (assoc.options[:class_name].underscore + '_id')
+        options[:foreign_key] =
+          assoc.options[:foreign_key]
+      end
       options[:primary_key] = assoc.options[:primary_key] unless assoc.options[:primary_key] == 'id'
       options
     end
@@ -151,7 +159,10 @@ module DynamicActiveModel
     # @return [Hash] The association options
     def has_one_association_options(assoc)
       options = {}
-      options[:class_name] = assoc.options[:class_name] unless assoc.options[:class_name].underscore.singularize == assoc.name.to_s
+      unless assoc.options[:class_name].underscore.singularize == assoc.name.to_s
+        options[:class_name] =
+          assoc.options[:class_name]
+      end
       options[:foreign_key] = assoc.options[:foreign_key] unless assoc.options[:foreign_key] == default_foreign_key_name
       options[:primary_key] = assoc.options[:primary_key] unless assoc.options[:primary_key] == 'id'
       options
@@ -163,7 +174,10 @@ module DynamicActiveModel
     def has_and_belongs_to_many_association_options(assoc)
       options = {}
       options[:join_table] = assoc.options[:join_table] if assoc.options[:join_table]
-      options[:class_name] = assoc.options[:class_name] unless assoc.options[:class_name].underscore.singularize == assoc.name.to_s
+      unless assoc.options[:class_name].underscore.singularize == assoc.name.to_s
+        options[:class_name] =
+          assoc.options[:class_name]
+      end
       options
     end
 

@@ -10,7 +10,7 @@ describe DynamicActiveModel::Setup do
     base_module
   end
 
-  context '#connection_options' do
+  describe '#connection_options' do
     subject { db_module.connection_options }
 
     it 'default is nil' do
@@ -18,7 +18,7 @@ describe DynamicActiveModel::Setup do
     end
 
     describe 'with #connection_options=' do
-      before(:each) do
+      before do
         db_module.connection_options(DB_CONFIG)
       end
 
@@ -28,7 +28,7 @@ describe DynamicActiveModel::Setup do
     end
   end
 
-  context '#extensions_path' do
+  describe '#extensions_path' do
     subject { db_module.extensions_path }
 
     it 'default is nil' do
@@ -37,7 +37,8 @@ describe DynamicActiveModel::Setup do
 
     describe 'with #extensions_path=' do
       let(:new_extensions_path) { 'lib/db/extensions' }
-      before(:each) do
+
+      before do
         db_module.extensions_path(new_extensions_path)
       end
 
@@ -47,7 +48,7 @@ describe DynamicActiveModel::Setup do
     end
   end
 
-  context '#extensions_suffix' do
+  describe '#extensions_suffix' do
     subject { db_module.extensions_suffix }
 
     it 'default is .ext.rb' do
@@ -56,7 +57,8 @@ describe DynamicActiveModel::Setup do
 
     describe 'with #extensions_suffix=' do
       let(:new_extensions_suffix) { '.db.rb' }
-      before(:each) do
+
+      before do
         db_module.extensions_suffix(new_extensions_suffix)
       end
 
@@ -66,7 +68,7 @@ describe DynamicActiveModel::Setup do
     end
   end
 
-  context '#skip_tables' do
+  describe '#skip_tables' do
     subject { db_module.skip_tables }
 
     it 'defautl is empty array' do
@@ -74,8 +76,9 @@ describe DynamicActiveModel::Setup do
     end
 
     describe 'with #skip_tables=' do
-      let(:tables_to_skip) { ['foo', 'bar'] }
-      before(:each) do
+      let(:tables_to_skip) { %w[foo bar] }
+
+      before do
         db_module.skip_tables(tables_to_skip)
       end
 
@@ -85,20 +88,21 @@ describe DynamicActiveModel::Setup do
     end
 
     describe '#skip_table' do
-      let(:tables_to_skip) { ['foo', 'bar'] }
-      before(:each) do
+      let(:tables_to_skip) { %w[foo bar] }
+
+      before do
         tables_to_skip.each do |table|
           db_module.skip_table table
         end
       end
 
       it 'equal to tables to skip' do
-        expect(subject).to  eq(tables_to_skip)
+        expect(subject).to eq(tables_to_skip)
       end
     end
   end
 
-  context '#relationships' do
+  describe '#relationships' do
     subject { db_module.relationships }
 
     it 'defautl to empty hash' do
@@ -114,7 +118,8 @@ describe DynamicActiveModel::Setup do
           }
         }
       end
-      before(:each) do
+
+      before do
         db_module.relationships(new_relationships)
       end
 
@@ -132,7 +137,8 @@ describe DynamicActiveModel::Setup do
           }
         }
       end
-      before(:each) do
+
+      before do
         new_relationships.each do |table_name, foreign_keys|
           foreign_keys.each do |foreign_key, relationship_name|
             db_module.foreign_key(table_name, foreign_key, relationship_name)
@@ -146,7 +152,7 @@ describe DynamicActiveModel::Setup do
     end
   end
 
-  context '#database' do
+  describe '#database' do
     subject { db_module.database }
 
     it 'defaults to nil' do
@@ -154,14 +160,15 @@ describe DynamicActiveModel::Setup do
     end
   end
 
-  context '#create_models!' do
+  describe '#create_models!' do
     subject { db_module.create_models! }
-    before(:each) do
+
+    before do
       db_module.connection_options DB_CONFIG
       db_module.extensions_path 'spec/support/db/extensions'
       db_module.foreign_key('websites', 'company_website_id', 'company_website')
       db_module.skip_table 'tmp_load_data_table'
-      subject()
+      subject
     end
 
     it 'user model exists' do

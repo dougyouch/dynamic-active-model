@@ -18,7 +18,7 @@ module DynamicActiveModel
   class ForeignKey
     # @return [Class] The model this foreign key belongs to
     attr_reader :model
-    
+
     # @return [Hash] Mapping of foreign key columns to relationship names
     attr_reader :keys
 
@@ -33,8 +33,8 @@ module DynamicActiveModel
 
     # Sets a custom foreign key suffix
     # @param val [String] The new suffix to use
-    def self.id_suffix=(val)
-      @id_suffix = val
+    class << self
+      attr_writer :id_suffix
     end
 
     # Initializes a new ForeignKey instance

@@ -22,25 +22,25 @@
 module DynamicActiveModel
   # Database class handles database connection and model creation
   autoload :Database, 'dynamic-active-model/database'
-  
+
   # Safety feature that prevents conflicts with Ruby reserved words
   autoload :DangerousAttributesPatch, 'dynamic-active-model/dangerous_attributes_patch'
-  
+
   # High-level interface for model discovery and relationship mapping
   autoload :Explorer, 'dynamic-active-model/explorer'
-  
+
   # Manages the creation of model classes
   autoload :Factory, 'dynamic-active-model/factory'
-  
+
   # Handles foreign key relationships and constraints
   autoload :ForeignKey, 'dynamic-active-model/foreign_key'
-  
+
   # Manages automatic discovery and setup of model relationships
   autoload :Associations, 'dynamic-active-model/associations'
-  
+
   # Handles generation of model class files
   autoload :TemplateClassFile, 'dynamic-active-model/template_class_file'
-  
+
   # Manages the setup process and configuration
   autoload :Setup, 'dynamic-active-model/setup'
 

@@ -5,12 +5,13 @@ require 'spec_helper'
 describe DynamicActiveModel::Associations do
   include_context 'database'
 
-  context '#build!' do
-    before(:each) do
+  describe '#build!' do
+    subject { relations.build! }
+
+    before do
       relations.add_foreign_key('websites', 'company_website_id', 'company_website')
       relations.add_foreign_key('users', 'employee_user_id', 'employee_user')
     end
-    subject { relations.build! }
 
     it 'creates relationships between models' do
       subject

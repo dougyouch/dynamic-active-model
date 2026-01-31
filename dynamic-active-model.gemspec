@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.executables << 'dynamic-db-explorer'
   s.required_ruby_version = '>= 3.0'
 
-  s.add_runtime_dependency 'activerecord', '>= 4'
-  s.add_runtime_dependency 'inheritance-helper', '~> 0.2'
+  s.add_dependency 'activerecord', '>= 4'
+  s.add_dependency 'inheritance-helper', '~> 0.2'
+  s.metadata['rubygems_mfa_required'] = 'true'
 end

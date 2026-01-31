@@ -59,12 +59,12 @@ module DynamicActiveModel
         if options.is_a?(String)
           name = options
           options = ActiveRecord::Base
-                      .configurations
-                      .configs_for(
-                        env_name: Rails.env,
-                        name: name
-                      )
-                      .configuration_hash
+                    .configurations
+                    .configs_for(
+                      env_name: Rails.env,
+                      name: name
+                    )
+                    .configuration_hash
         end
 
         if options
