@@ -243,6 +243,26 @@ describe DynamicActiveModel::Database do
     it { expect(subject.method_defined?(:display_name)).to be(true) }
     it { expect(subject.method_defined?(:method_does_not_exist)).to be(false) }
     it { expect(subject.method_defined?(:my_middle_name)).to be(true) }
+
+    context 'with only a block (no file)' do
+      subject do
+        database.update_model(:users) do
+          attr_accessor :block_only_method
+        end
+        database.get_model!(:users)
+      end
+
+      it { expect(subject.method_defined?(:block_only_method)).to be(true) }
+    end
+
+    context 'with only a file (no block)' do
+      subject do
+        database.update_model(:users, 'spec/support/db/extensions/users.ext.rb')
+        database.get_model!(:users)
+      end
+
+      it { expect(subject.method_defined?(:my_middle_name)).to be(true) }
+    end
   end
 
   describe '#update_all_models' do
@@ -258,5 +278,26 @@ describe DynamicActiveModel::Database do
     it { expect(subject.method_defined?(:display_name)).to be(false) }
     it { expect(subject.method_defined?(:method_does_not_exist)).to be(false) }
     it { expect(subject.method_defined?(:my_middle_name)).to be(true) }
+
+    context 'with directory containing subdirectories' do
+      let(:temp_dir) { Dir.mktmpdir }
+
+      before do
+        # Create a subdirectory (should be skipped)
+        FileUtils.mkdir_p("#{temp_dir}/subdir.ext.rb")
+        # Create a valid extension file
+        File.write("#{temp_dir}/users.ext.rb", 'update_model { def temp_method; end }')
+      end
+
+      after do
+        FileUtils.rm_rf(temp_dir)
+      end
+
+      it 'skips directories and only processes files' do
+        database.update_all_models(temp_dir)
+        user_model = database.get_model!(:users)
+        expect(user_model.method_defined?(:temp_method)).to be(true)
+      end
+    end
   end
 end

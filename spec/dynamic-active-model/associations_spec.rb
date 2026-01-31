@@ -132,6 +132,22 @@ describe DynamicActiveModel::Associations do
     end
   end
 
+  describe 'join table with unmatched foreign keys' do
+    # This tests the case where a join table has foreign keys that
+    # don't match any model (models.size != 2)
+    before do
+      relations.build!
+    end
+
+    it 'handles join tables where foreign keys reference existing models' do
+      job_model = base_module.const_get(:Job)
+      website_model = base_module.const_get(:Website)
+      # Verify the HABTM was created for the valid join table
+      expect(has_association?(job_model, :websites)).to be(true)
+      expect(has_association?(website_model, :jobs)).to be(true)
+    end
+  end
+
   describe '#table_indexes' do
     subject { relations.table_indexes }
 

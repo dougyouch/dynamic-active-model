@@ -174,5 +174,61 @@ describe DynamicActiveModel::TemplateClassFile do
         expect(output).to include('belongs_to :company')
       end
     end
+
+    context 'has_one relationships' do
+      let(:model_name) { :User }
+
+      it 'generates has_one with correct options' do
+        output = template_class_file.to_s
+        expect(output).to include('has_one :user_rollup')
+      end
+    end
+
+    context 'has_and_belongs_to_many relationships' do
+      let(:model_name) { :Job }
+
+      it 'includes join_table option' do
+        output = template_class_file.to_s
+        expect(output).to include("join_table: 'jobs_websites'")
+      end
+    end
+
+    context 'stats model with non-standard table name' do
+      let(:model_name) { :StatsEmploymentDuration }
+
+      it 'includes table_name declaration' do
+        output = template_class_file.to_s
+        expect(output).to include('self.table_name = :stats_employment_durations')
+      end
+
+      it 'includes belongs_to relationship' do
+        output = template_class_file.to_s
+        expect(output).to include('belongs_to :employment')
+      end
+    end
+
+    context 'website model with custom foreign key relationships' do
+      before do
+        relations.add_foreign_key('websites', 'company_website_id', 'company_website')
+        relations.build!
+      end
+
+      let(:model_name) { :Website }
+
+      it 'includes has_many with class_name when names differ' do
+        output = template_class_file.to_s
+        # company_website_companies has_many should include class_name
+        expect(output).to include('has_many :company_website_companies')
+      end
+    end
+
+    context 'user rollup model' do
+      let(:model_name) { :UserRollup }
+
+      it 'includes belongs_to relationship' do
+        output = template_class_file.to_s
+        expect(output).to include('belongs_to :user')
+      end
+    end
   end
 end
