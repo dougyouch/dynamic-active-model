@@ -1,22 +1,22 @@
+# Dynamic Active Model
+
 [![CI](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml/badge.svg)](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/dougyouch/dynamic-active-model/graph/badge.svg)](https://codecov.io/gh/dougyouch/dynamic-active-model)
 
-# Dynamic Active Model
-
-Dynamic Active Model is a powerful Ruby gem that automatically discovers your database schema and creates corresponding ActiveRecord models with proper relationships. It's perfect for rapid prototyping, database exploration, and working with legacy databases.
+A Ruby gem that automatically discovers your database schema and creates corresponding ActiveRecord models with proper relationships. Perfect for rapid prototyping, database exploration, and working with legacy databases.
 
 ## Features
 
-- 🔍 Automatic database schema discovery
-- 🏗️ Dynamic creation of ActiveRecord models
-- 🔗 Automatic relationship mapping (`has_many`, `belongs_to`, `has_one`, and `has_and_belongs_to_many`)
-- ⚡ In-memory model creation for quick exploration
-- 📁 Physical model file generation
-- 🛠️ Customizable model extensions
-- ⚙️ Flexible table filtering (blacklist/whitelist)
-- 🔒 Safe handling of dangerous attribute names
-- 🔑 Automatic `has_one` detection based on unique constraints
-- 🤝 Automatic `has_and_belongs_to_many` detection for join tables
+- **Automatic Schema Discovery**: Introspect database tables without manual configuration
+- **Dynamic Model Creation**: Generate ActiveRecord models at runtime
+- **Relationship Mapping**: Automatic `has_many`, `belongs_to`, `has_one`, and `has_and_belongs_to_many` detection
+- **Model Extensions**: Customize models with `.ext.rb` files
+- **Table Filtering**: Blacklist or whitelist tables using strings or regex patterns
+- **Dangerous Attribute Protection**: Safe handling of column names that conflict with Ruby methods
+- **Unique Constraint Detection**: Automatically uses `has_one` when foreign keys have unique indexes
+- **Join Table Detection**: Recognizes HABTM join tables (two FK columns, no primary key)
+- **Model File Generation**: Export discovered models to static Ruby files
+- **CLI Tool**: Interactive database exploration via `dynamic-db-explorer`
 
 ## Installation
 
@@ -27,11 +27,13 @@ gem 'dynamic-active-model'
 ```
 
 And then execute:
+
 ```bash
 $ bundle install
 ```
 
 Or install it yourself as:
+
 ```bash
 $ gem install dynamic-active-model
 ```
@@ -53,33 +55,26 @@ DynamicActiveModel::Explorer.explore(DB,
 )
 
 # Start using your models
-movie = DB::Movies.first
+movie = DB::Movie.first
 movie.name
 movie.actors  # Automatically mapped relationship
 ```
 
 ### Using in a Rails Application
 
-To use Dynamic Active Model in a Rails application, follow these steps:
-
-1. First, configure Rails to handle the `DB` namespace correctly. Add this to `config/initializers/inflections.rb`:
+1. Configure Rails to handle the `DB` namespace correctly in `config/initializers/inflections.rb`:
 
 ```ruby
-# config/initializers/inflections.rb
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'DB'
 end
 ```
 
-2. To avoid eager loading issues, add this to `config/application.rb`:
+2. Ignore the DB namespace for eager loading in `config/application.rb`:
 
 ```ruby
-# config/application.rb
 module YourApp
   class Application < Rails::Application
-    # ... other configuration ...
-
-    # Ignore the DB namespace for eager loading
     Rails.autoloaders.main.ignore(
       "#{config.root}/app/models/db"
     )
@@ -90,7 +85,6 @@ end
 3. Create a base module file in `app/models/db.rb`:
 
 ```ruby
-# app/models/db.rb
 module DB
   include DynamicActiveModel::Setup
 
@@ -108,7 +102,7 @@ module DB
 end
 ```
 
-4. To extend specific models, create extension files in `app/models/db/` with the `.ext.rb` suffix:
+4. Extend specific models with `.ext.rb` files in `app/models/db/`:
 
 ```ruby
 # app/models/db/users.ext.rb
@@ -123,22 +117,15 @@ update_model do
 end
 ```
 
-> **Note:** Extension files are based on the table name, not the model name. For example, if you have a table named `user_profiles`, the extension file should be named `user_profiles.ext.rb`, even if the model is named `UserProfile`.
+> **Note:** Extension files are based on the table name, not the model name. For a table named `user_profiles`, use `user_profiles.ext.rb`.
 
-5. The extension files will be automatically loaded and applied to their respective models. For example, `users.ext.rb` will extend the `DB::User` model.
-
-6. You can now use your models throughout your Rails application:
+5. Use your models throughout the Rails application:
 
 ```ruby
-# In a controller
 class UsersController < ApplicationController
-  def index
-    @users = DB::User.all
-  end
-
   def show
     @user = DB::User.find(params[:id])
-    @full_name = @user.full_name  # Using the extended method
+    @full_name = @user.full_name
   end
 end
 ```
@@ -160,28 +147,16 @@ dynamic-db-explorer \
 
 Dynamic Active Model automatically detects and creates four types of relationships:
 
-1. **`belongs_to`** - Created when a table has a foreign key column
-2. **`has_many`** - Created when another table has a foreign key pointing to this table
-3. **`has_one`** - Automatically detected when:
-   - A table has a foreign key with a unique constraint
-   - A table has a unique key constraint that another table references
-4. **`has_and_belongs_to_many`** - Automatically detected when:
-   - A join table exists with exactly two columns
-   - Both columns are foreign keys to other tables
-   - The join table has no primary key
-   - The table name follows Rails conventions (alphabetically ordered plural model names)
+| Relationship | Detection |
+|--------------|-----------|
+| `belongs_to` | Foreign key column exists |
+| `has_many` | Another table references this table |
+| `has_one` | Foreign key has a unique constraint |
+| `has_and_belongs_to_many` | Join table with exactly two FK columns and no primary key |
 
-Example of automatic `has_and_belongs_to_many` detection:
+Example join table detection:
 
 ```ruby
-# Table: actors
-#   - id (primary key)
-#   - name
-
-# Table: movies
-#   - id (primary key)
-#   - title
-
 # Table: actors_movies (join table)
 #   - actor_id (foreign key to actors.id)
 #   - movie_id (foreign key to movies.id)
@@ -197,16 +172,13 @@ class Movie < ActiveRecord::Base
 end
 ```
 
-Note: If a join table has additional columns or a primary key, it will be treated as a regular model with `has_many`/`belongs_to` relationships instead.
-
 ### Table Filtering
 
-#### Blacklist (Skip) Tables
+#### Blacklist Tables
 
 ```ruby
 db = DynamicActiveModel::Database.new(DB, database_config)
 
-# Skip specific tables
 db.skip_table 'temporary_data'
 db.skip_table /^temp_/
 db.skip_tables ['old_data', /^backup_/]
@@ -219,7 +191,6 @@ db.create_models!
 ```ruby
 db = DynamicActiveModel::Database.new(DB, database_config)
 
-# Include only specific tables
 db.include_table 'users'
 db.include_table /^customer_/
 db.include_tables ['orders', 'products']
@@ -260,15 +231,12 @@ db.update_model(:users, 'lib/db/users.ext.rb')
 #### Mass Update All Models
 
 ```ruby
-# Apply all .ext.rb files from a directory
 db.update_all_models('lib/db')
 ```
 
-## Configuration
-
 ### Database Connection
 
-The gem supports all ActiveRecord database adapters. Here's a typical configuration:
+The gem supports all ActiveRecord database adapters:
 
 ```ruby
 {
@@ -277,35 +245,29 @@ The gem supports all ActiveRecord database adapters. Here's a typical configurat
   database: 'your_database',
   username: 'your_username',
   password: 'your_password',
-  port: 5432            # optional
+  port: 5432
 }
 ```
-
-## Best Practices
-
-1. Always use a dedicated namespace for dynamic models to avoid conflicts
-2. Use table filtering for large databases to improve performance
-3. Keep model extensions modular and focused
-4. Follow Ruby naming conventions in your extensions
-5. Consider using whitelisting in production environments
 
 ## Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md)
 - [API Documentation](https://www.rubydoc.info/gems/dynamic-active-model)
 
+## Development
+
+After checking out the repo, run `bundle install` to install dependencies. Then, run `bundle exec rspec` to run the tests.
+
+```bash
+bundle install
+bundle exec rspec
+bundle exec rubocop
+```
+
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Bug reports and pull requests are welcome on GitHub at https://github.com/dougyouch/dynamic-active-model.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
-
-## Support
-
-If you discover any issues or have questions, please [create an issue](https://github.com/dougyouch/dynamic-active-model/issues).
+The gem is available as open source under the terms of the MIT License.
