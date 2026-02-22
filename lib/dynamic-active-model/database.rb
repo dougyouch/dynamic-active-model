@@ -150,7 +150,11 @@ module DynamicActiveModel
     # @return [Class] The updated model class
     def update_model(table_name, file = nil, &block)
       model = get_model!(table_name)
-      ModelUpdater.new(model).instance_eval(File.read(file), file, 1) if file
+      if file
+        updater = ModelUpdater.new(model)
+        ctx = updater.instance_eval { binding }
+        eval(File.read(file), ctx, file, 1)
+      end
       model.class_eval(&block) if block
       model
     end

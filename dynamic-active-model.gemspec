@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dynamic-active-model'
-  s.version     = '0.7.1'
+  s.version     = '0.7.2'
   s.summary     = 'Automatically discover database schemas and create ActiveRecord models with relationships'
   s.description = 'Dynamic Active Model automatically discovers database schemas and creates ActiveRecord ' \
                   'models without manual class definitions. It detects and configures relationships ' \
