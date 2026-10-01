@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.9.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.8.0...v0.9.0) (2026-10-01)
+
+
+### Features
+
+* **factory:** raise ClassNameConflict when tables share a class name ([585ffaf](https://github.com/dougyouch/dynamic-active-model/commit/585ffaf93d21fedd9a9307ee42add8afeb14c1c8))
+
+
+### Bug Fixes
+
+* **associations:** use the parent primary key for has_many and has_one ([7e484de](https://github.com/dougyouch/dynamic-active-model/commit/7e484de1c5a690b72e45ee8e36396d323932ec5b))
+* **database:** make create_models! idempotent and return the models ([bb6b914](https://github.com/dougyouch/dynamic-active-model/commit/bb6b914b7e07a321660b7f59e25b40269d6beb84))
+
 ## [0.8.0](https://github.com/dougyouch/dynamic-active-model/compare/bbe64b6...v0.8.0) (2026-10-01)
 
 
