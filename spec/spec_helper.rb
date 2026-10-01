@@ -34,6 +34,7 @@ FileUtils.rm_f(DB_FILE)
 ActiveRecord::Base.establish_connection(DB_CONFIG)
 ActiveRecord::Schema.verbose = false
 require 'support/db/schema'
+require 'support/sqlite_database'
 
 RSpec.shared_context 'database' do
   let(:base_module_name) { "Module#{SecureRandom.hex(8)}" }
