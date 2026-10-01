@@ -46,6 +46,12 @@ module DynamicActiveModel
   # Manages the setup process and configuration
   autoload :Setup, 'dynamic-active-model/setup'
 
+  # Base class for errors raised by DynamicActiveModel
+  class Error < StandardError; end
+
   # Raised when a requested model cannot be found
-  class ModelNotFound < StandardError; end
+  class ModelNotFound < Error; end
+
+  # Raised when two tables map to the same model class name
+  class ClassNameConflict < Error; end
 end

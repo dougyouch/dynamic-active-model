@@ -58,6 +58,55 @@ describe DynamicActiveModel::Explorer do
       end
     end
 
+    context 'with Regexp skip_tables' do
+      let(:skip_tables) { [/\Astats_/] }
+
+      it 'skips tables matching the pattern' do
+        subject
+        expect(base_module.const_defined?(:StatsEmploymentDuration)).to be(false)
+        expect(base_module.const_defined?(:User)).to be(true)
+      end
+    end
+
+    context 'with a trailing wildcard' do
+      let(:skip_tables) { ['users*'] }
+
+      it 'treats * as a glob, not a regex quantifier' do
+        subject
+        expect(base_module.const_defined?(:User)).to be(false)
+        expect(base_module.const_defined?(:UserRollup)).to be(true)
+      end
+    end
+
+    context 'with a leading wildcard' do
+      let(:skip_tables) { ['*_durations'] }
+
+      it 'skips tables ending with the pattern' do
+        subject
+        expect(base_module.const_defined?(:StatsEmploymentDuration)).to be(false)
+        expect(base_module.const_defined?(:StatsCompanyEmployment)).to be(true)
+      end
+    end
+
+    context 'with a class name conflict' do
+      let(:connection_options) do
+        create_sqlite_database(<<~SQL)
+          CREATE TABLE status (id INTEGER PRIMARY KEY);
+          CREATE TABLE statuses (id INTEGER PRIMARY KEY);
+        SQL
+      end
+
+      it 'raises ClassNameConflict' do
+        expect { subject }.to raise_error(DynamicActiveModel::ClassNameConflict)
+      end
+
+      it 'creates both models when given table class names' do
+        described_class.explore(base_module, connection_options, [], {}, { 'statuses' => 'StatusList' })
+        expect(base_module.const_get(:StatusList).table_name).to eq('statuses')
+        expect(base_module.const_get(:Status).table_name).to eq('status')
+      end
+    end
+
     context 'with custom relationships' do
       let(:relationships) do
         {

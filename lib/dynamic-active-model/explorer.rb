@@ -28,9 +28,11 @@ module DynamicActiveModel
     # @param connection_options [Hash] Database connection options
     # @param skip_tables [Array<String, Regexp>] Tables to exclude from model creation
     # @param relationships [Hash] Custom foreign key relationships to add
+    # @param table_class_names [Hash] Custom class names by table name
     # @return [Database] The configured database instance
-    def self.explore(base_module, connection_options, skip_tables = [], relationships = {})
-      database = create_models!(base_module, connection_options, skip_tables)
+    # @raise [ClassNameConflict] If two tables map to the same class name
+    def self.explore(base_module, connection_options, skip_tables = [], relationships = {}, table_class_names = {})
+      database = create_models!(base_module, connection_options, skip_tables, table_class_names)
       build_relationships!(database, relationships)
       database
     end
@@ -39,15 +41,23 @@ module DynamicActiveModel
     # @param base_module [Module] The namespace for created models
     # @param connection_options [Hash] Database connection options
     # @param skip_tables [Array<String, Regexp>] Tables to exclude from model creation
+    # @param table_class_names [Hash] Custom class names by table name
     # @return [Database] The configured database instance
-    def self.create_models!(base_module, connection_options, skip_tables)
+    def self.create_models!(base_module, connection_options, skip_tables, table_class_names = {})
       database = Database.new(base_module, connection_options)
-      skip_tables.each do |table_name|
-        table_name = Regexp.new("^#{table_name}") if table_name.include?('*')
-        database.skip_table(table_name)
-      end
+      skip_tables.each { |table| database.skip_table(skip_table_matcher(table)) }
+      table_class_names.each { |table_name, class_name| database.table_class_name(table_name, class_name) }
       database.create_models!
       database
+    end
+
+    # Converts a table name containing * wildcards into an anchored Regexp
+    # @param table [String, Regexp] Table name, wildcard pattern, or Regexp
+    # @return [String, Regexp] The table name or matching Regexp
+    def self.skip_table_matcher(table)
+      return table unless table.is_a?(String) && table.include?('*')
+
+      Regexp.new("\\A#{Regexp.escape(table).gsub('\\*', '.*')}\\z")
     end
 
     # Sets up relationships between created models

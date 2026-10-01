@@ -152,6 +152,39 @@ describe DynamicActiveModel::Setup do
     end
   end
 
+  describe '#table_class_name' do
+    subject { db_module.table_class_names }
+
+    it 'defaults to empty' do
+      expect(subject).to eq({})
+    end
+
+    describe 'with a table class name' do
+      before do
+        db_module.table_class_name 'statuses', 'StatusList'
+      end
+
+      it 'stores the class name by table' do
+        expect(subject).to eq('statuses' => 'StatusList')
+      end
+    end
+  end
+
+  describe '#create_models! with table class names' do
+    before do
+      db_module.connection_options(create_sqlite_database(<<~SQL))
+        CREATE TABLE status (id INTEGER PRIMARY KEY);
+        CREATE TABLE statuses (id INTEGER PRIMARY KEY);
+      SQL
+      db_module.table_class_name 'statuses', 'StatusList'
+      db_module.create_models!
+    end
+
+    it 'uses the table class name' do
+      expect(base_module.const_get(:StatusList).table_name).to eq('statuses')
+    end
+  end
+
   describe '#database' do
     subject { db_module.database }
 

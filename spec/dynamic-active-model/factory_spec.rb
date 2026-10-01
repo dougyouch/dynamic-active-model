@@ -144,4 +144,36 @@ describe DynamicActiveModel::Factory do
       end
     end
   end
+
+  describe '#create with a class name already used by another table' do
+    let(:connection_options) do
+      create_sqlite_database(<<~SQL)
+        CREATE TABLE status (id INTEGER PRIMARY KEY);
+        CREATE TABLE statuses (id INTEGER PRIMARY KEY);
+      SQL
+    end
+
+    before do
+      factory.create('status')
+    end
+
+    it 'raises ClassNameConflict naming both tables' do
+      expect { factory.create('statuses') }
+        .to raise_error(DynamicActiveModel::ClassNameConflict, /statuses.*Status.*status/)
+    end
+
+    it 'creates the model when given a distinct class name' do
+      expect(factory.create('statuses', 'StatusList').table_name).to eq('statuses')
+    end
+  end
+
+  describe '#create with a table named like a top-level constant' do
+    let(:connection_options) { create_sqlite_database('CREATE TABLE strings (id INTEGER PRIMARY KEY);') }
+
+    it 'creates a model in the base module instead of returning the top-level constant' do
+      model = factory.create('strings')
+      expect(model).not_to eq(String)
+      expect(model.table_name).to eq('strings')
+    end
+  end
 end

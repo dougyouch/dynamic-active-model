@@ -47,6 +47,7 @@ module DynamicActiveModel
           connection_options: nil,
           skip_tables: [],
           relationships: {},
+          table_class_names: {},
           extensions_path: nil,
           extensions_suffix: '.ext.rb'
         }
@@ -120,6 +121,21 @@ module DynamicActiveModel
         redefine_class_method(:dynamic_active_model_config, config)
       end
 
+      # Sets a custom class name for a table
+      # @param table_name [String] Name of the table
+      # @param class_name [String] Class name to use for the table's model
+      def table_class_name(table_name, class_name)
+        config = dynamic_active_model_config
+        config[:table_class_names][table_name.to_s] = class_name
+        redefine_class_method(:dynamic_active_model_config, config)
+      end
+
+      # Gets the custom class names by table name
+      # @return [Hash] The current table class names
+      def table_class_names
+        dynamic_active_model_config[:table_class_names]
+      end
+
       # Sets or gets the path for model extensions
       # @param path [String, nil] Path to extension files
       # @return [String, nil] The current extensions path
@@ -156,7 +172,8 @@ module DynamicActiveModel
             self,
             connection_options,
             skip_tables,
-            relationships
+            relationships,
+            table_class_names
           )
         )
         database.update_all_models(extensions_path, extensions_suffix) if extensions_path

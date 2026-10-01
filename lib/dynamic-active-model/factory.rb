@@ -33,10 +33,12 @@ module DynamicActiveModel
     # @param table_name [String] Name of the database table
     # @param class_name [String, nil] Optional custom class name
     # @return [Class] The model class
+    # @raise [ClassNameConflict] If the class name is already used by a different table
     def create(table_name, class_name = nil)
       class_name ||= generate_class_name(table_name)
-      create!(table_name, class_name) unless @base_module.const_defined?(class_name)
-      @base_module.const_get(class_name)
+      return create!(table_name, class_name) unless @base_module.const_defined?(class_name, false)
+
+      existing_model!(table_name, class_name)
     end
 
     # Creates a new model class for a table, overwriting if it exists
@@ -49,7 +51,7 @@ module DynamicActiveModel
         include DynamicActiveModel::DangerousAttributesPatch
       end
       @base_module.const_set(class_name, kls)
-      @base_module.const_get(class_name)
+      @base_module.const_get(class_name, false)
     end
 
     # Gets or creates the base class for all models
@@ -84,6 +86,23 @@ module DynamicActiveModel
       return "N#{class_name}" if class_name =~ /\A\d/
 
       class_name
+    end
+
+    private
+
+    # Returns the existing model for a class name if it belongs to the table
+    # @param table_name [String] Name of the database table
+    # @param class_name [String] Name of the existing class
+    # @return [Class] The existing model class
+    # @raise [ClassNameConflict] If the class belongs to a different table
+    def existing_model!(table_name, class_name)
+      model = @base_module.const_get(class_name, false)
+      return model if model.respond_to?(:table_name) && model.table_name == table_name.to_s
+
+      raise ClassNameConflict,
+            "table #{table_name} maps to class #{model.name}, which is already used by " \
+            "#{model.respond_to?(:table_name) ? "table #{model.table_name}" : 'another constant'}; " \
+            'set a different class name with table_class_name'
     end
   end
 end

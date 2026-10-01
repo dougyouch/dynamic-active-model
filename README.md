@@ -198,6 +198,25 @@ db.include_tables ['orders', 'products']
 db.create_models!
 ```
 
+With `Explorer.explore` and the `Setup` DSL, `skip_tables` also accepts `*` wildcards that match whole table names (`'stats_*'`, `'*_backup'`).
+
+### Custom Class Names
+
+Model class names come from the singularized table name. When two tables map to the same class (e.g. `status` and `statuses`), `create_models!` raises `DynamicActiveModel::ClassNameConflict`. Give one of them its own class name:
+
+```ruby
+db.table_class_name 'statuses', 'StatusList'
+
+# or with the Setup DSL
+module DB
+  include DynamicActiveModel::Setup
+  table_class_name 'statuses', 'StatusList'
+end
+
+# or with Explorer
+DynamicActiveModel::Explorer.explore(DB, database_config, [], {}, { 'statuses' => 'StatusList' })
+```
+
 ### Extending Models
 
 #### Inline Extensions
