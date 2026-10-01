@@ -36,6 +36,13 @@ ActiveRecord::Schema.verbose = false
 require 'support/db/schema'
 require 'support/sqlite_database'
 
+RSpec.configure do |config|
+  # Every example builds its own abstract base class with its own connection pool;
+  # close them so the suite doesn't run out of file descriptors. Registered after
+  # support/sqlite_database so it runs before that file's cleanup (after hooks run in reverse).
+  config.after { ActiveRecord::Base.connection_handler.connection_pool_list.each(&:disconnect!) }
+end
+
 RSpec.shared_context 'database' do
   let(:base_module_name) { "Module#{SecureRandom.hex(8)}" }
   let(:base_module) do
