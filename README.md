@@ -1,7 +1,7 @@
 # Dynamic Active Model
 
-[![CI](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml/badge.svg)](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/dougyouch/dynamic-active-model/graph/badge.svg)](https://codecov.io/gh/dougyouch/dynamic-active-model)
+[![CI](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml)
+[![Coverage](https://raw.githubusercontent.com/dougyouch/dynamic-active-model/badges/coverage.svg)](https://github.com/dougyouch/dynamic-active-model/actions/workflows/ci.yml)
 
 A Ruby gem that automatically discovers your database schema and creates corresponding ActiveRecord models with proper relationships. Perfect for rapid prototyping, database exploration, and working with legacy databases.
 

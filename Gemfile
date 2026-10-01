@@ -14,6 +14,5 @@ group :development, :test do
   gem 'rubocop'
   gem 'rubocop-rspec'
   gem 'simplecov', require: false
-  gem 'simplecov-cobertura'
   gem 'sqlite3'
 end

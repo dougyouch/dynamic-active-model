@@ -11,8 +11,10 @@ permissions:
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
+    # ceiling for the called workflow: its coverage-badge job declares contents: write
+    # (skipped on tags); lint/test still run with ci.yml's top-level contents: read
     permissions:
-      contents: read
+      contents: write
 
   release:
     needs: ci
