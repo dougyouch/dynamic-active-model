@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'dynamic-active-model/version'
+
 # DynamicActiveModel is a Ruby gem that provides automatic database discovery,
 # model creation, and relationship mapping for Rails applications.
 #

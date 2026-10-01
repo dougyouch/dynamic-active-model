@@ -1,46 +1,68 @@
 name: Release
 
-# Push a tag matching the gemspec version (e.g. v0.7.2) to publish to RubyGems.
+# release-please keeps a release PR open that bumps lib/dynamic-active-model/version.rb,
+# Gemfile.lock and CHANGELOG.md from conventional commits. Merging it tags the release,
+# creates the GitHub release and publishes the gem to RubyGems.
 on:
   push:
-    tags: ['v*']
+    branches: [master]
 
 permissions:
   contents: read
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # release commits, tags and GitHub releases
+      issues: write # release labels
+      pull-requests: write # the release PR
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  # The release PR is opened with GITHUB_TOKEN, which doesn't trigger CI on it,
+  # so run the suite here before anything is published.
   ci:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
     uses: ./.github/workflows/ci.yml
     # ceiling for the called workflow: its coverage-badge job declares contents: write
-    # (skipped on tags); lint/test still run with ci.yml's top-level contents: read
+    # (skipped when called from here); lint/test still run with ci.yml's top-level contents: read
     permissions:
       contents: write
 
-  release:
-    needs: ci
+  publish:
+    needs: [release-please, ci]
     runs-on: ubuntu-latest
     environment:
       name: rubygems
       url: https://rubygems.org/gems/dynamic-active-model
     permissions:
-      contents: write # create the GitHub release
+      contents: write # attach the gem to the GitHub release
       id-token: write # RubyGems trusted publishing (OIDC)
+    env:
+      TAG: ${{ needs.release-please.outputs.tag_name }}
+      VERSION: ${{ needs.release-please.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
           persist-credentials: false
       - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: '4.0'
-
-      - name: Verify tag matches gemspec version
-        run: |
-          version=$(ruby -e 'puts Gem::Specification.load("dynamic-active-model.gemspec").version')
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::tag $GITHUB_REF_NAME does not match gemspec version $version"
-            exit 1
-          fi
-          echo "VERSION=$version" >> "$GITHUB_ENV"
 
       - run: gem build dynamic-active-model.gemspec
 
@@ -48,7 +70,7 @@ jobs:
 
       - run: gem push "dynamic-active-model-$VERSION.gem"
 
-      - name: Create GitHub release
+      - name: Attach gem to GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" "dynamic-active-model-$VERSION.gem" --title "$GITHUB_REF_NAME" --generate-notes
+        run: gh release upload "$TAG" "dynamic-active-model-$VERSION.gem" --repo "$GITHUB_REPOSITORY"

@@ -65,6 +65,10 @@ end
 
 Tests use SQLite with schema defined in `spec/support/db/schema.rb`. The shared context 'database' in `spec/spec_helper.rb` creates isolated modules for each test to avoid constant collision.
 
+## Releases
+
+Releases are automated by release-please (`.github/workflows/release.yml`). Conventional commits on `master` (`fix:` → patch, `feat:` → minor, `!`/`BREAKING CHANGE` → major) update an open release PR that bumps `lib/dynamic-active-model/version.rb`, `Gemfile.lock`, and `CHANGELOG.md`. Merging that PR tags `vX.Y.Z`, creates the GitHub release, and publishes the gem. Don't bump the version by hand.
+
 ## Code Commits
 
 Format using angular formatting:

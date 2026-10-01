@@ -50,7 +50,7 @@ Naming/FileName:
     - 'lib/dynamic-active-model.rb'
 
 # These methods return option hashes, not predicates
-Naming/PredicateName:
+Naming/PredicatePrefix:
   AllowedMethods:
     - has_many_association_options
     - has_one_association_options

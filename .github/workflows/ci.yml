@@ -49,8 +49,9 @@ jobs:
           retention-days: 14
 
   # Publishes coverage.svg to the orphan `badges` branch; the README badge points at it.
+  # Skipped when called from release.yml (github.workflow is the caller's name there).
   coverage-badge:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.workflow == 'CI' && github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: test
     runs-on: ubuntu-latest
     permissions:

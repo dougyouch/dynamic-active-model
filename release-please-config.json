@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "bbe64b6",
+  "packages": {
+    ".": {
+      "release-type": "ruby",
+      "package-name": "dynamic-active-model",
+      "version-file": "lib/dynamic-active-model/version.rb",
+      "include-component-in-tag": false
+    }
+  }
+}
