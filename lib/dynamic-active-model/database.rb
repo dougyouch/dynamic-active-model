@@ -153,7 +153,7 @@ module DynamicActiveModel
       if file
         updater = ModelUpdater.new(model)
         ctx = updater.instance_eval { binding }
-        eval(File.read(file), ctx, file, 1)
+        eval(File.read(file), ctx, file, 1) # rubocop:disable Security/Eval -- extension files are trusted code
       end
       model.class_eval(&block) if block
       model

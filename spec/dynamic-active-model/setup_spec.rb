@@ -83,7 +83,7 @@ describe DynamicActiveModel::Setup do
       end
 
       it 'equal to tables to skip' do
-        expect(subject).to  eq(tables_to_skip)
+        expect(subject).to eq(tables_to_skip)
       end
     end
 

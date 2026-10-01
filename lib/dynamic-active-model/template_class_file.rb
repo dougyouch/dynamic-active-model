@@ -62,33 +62,25 @@ module DynamicActiveModel
     # Gets all has_many relationships for the model
     # @return [Array<ActiveRecord::Reflection::HasManyReflection>]
     def all_has_many_relationships
-      @model.reflect_on_all_associations.select do |assoc|
-        assoc.is_a?(ActiveRecord::Reflection::HasManyReflection)
-      end
+      @model.reflect_on_all_associations.grep(ActiveRecord::Reflection::HasManyReflection)
     end
 
     # Gets all belongs_to relationships for the model
     # @return [Array<ActiveRecord::Reflection::BelongsToReflection>]
     def all_belongs_to_relationships
-      @model.reflect_on_all_associations.select do |assoc|
-        assoc.is_a?(ActiveRecord::Reflection::BelongsToReflection)
-      end
+      @model.reflect_on_all_associations.grep(ActiveRecord::Reflection::BelongsToReflection)
     end
 
     # Gets all has_one relationships for the model
     # @return [Array<ActiveRecord::Reflection::HasOneReflection>]
     def all_has_one_relationships
-      @model.reflect_on_all_associations.select do |assoc|
-        assoc.is_a?(ActiveRecord::Reflection::HasOneReflection)
-      end
+      @model.reflect_on_all_associations.grep(ActiveRecord::Reflection::HasOneReflection)
     end
 
     # Gets all has_and_belongs_to_many relationships for the model
     # @return [Array<ActiveRecord::Reflection::HasAndBelongsToManyReflection>]
     def all_has_and_belongs_to_many_relationships
-      @model.reflect_on_all_associations.select do |assoc|
-        assoc.is_a?(ActiveRecord::Reflection::HasAndBelongsToManyReflection)
-      end
+      @model.reflect_on_all_associations.grep(ActiveRecord::Reflection::HasAndBelongsToManyReflection)
     end
 
     # Appends an association definition to the source string
