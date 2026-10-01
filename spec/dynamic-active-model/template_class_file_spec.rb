@@ -216,4 +216,55 @@ describe DynamicActiveModel::TemplateClassFile do
       end
     end
   end
+
+  describe 'top-level models with explicit association options' do
+    subject { described_class.new(custom_model).to_s }
+
+    let(:custom_model) do
+      Class.new(factory.base_class) do
+        self.table_name = 'users'
+        def self.name = 'User'
+      end
+    end
+
+    context 'when options match the Rails defaults' do
+      before do
+        custom_model.has_many :employments, class_name: 'Employment', foreign_key: 'user_id', primary_key: 'id'
+        custom_model.belongs_to :website, class_name: 'Website', foreign_key: 'website_id', primary_key: 'id'
+        custom_model.has_one :user_rollup, class_name: 'UserRollup', foreign_key: 'user_id', primary_key: 'id'
+        custom_model.has_and_belongs_to_many :jobs, class_name: 'Job'
+      end
+
+      it 'omits the default options and the table name' do
+        expect(subject).to eq(<<~RUBY)
+          class User < ActiveRecord::Base
+            has_many :employments
+            belongs_to :website
+            has_one :user_rollup
+            has_and_belongs_to_many :jobs
+          end
+        RUBY
+      end
+    end
+
+    context 'when options differ from the Rails defaults' do
+      before do
+        custom_model.has_many :jobs, class_name: 'Employment', foreign_key: 'owner_id', primary_key: 'uuid'
+        custom_model.belongs_to :site, class_name: 'Website', foreign_key: 'home_site_id'
+        custom_model.has_one :rollup, class_name: 'UserRollup', foreign_key: 'owner_id', primary_key: 'uuid'
+        custom_model.has_and_belongs_to_many :tags, class_name: 'Job', join_table: 'user_tags'
+      end
+
+      it 'includes every non-default option and skips unset ones' do
+        expect(subject).to eq(<<~RUBY)
+          class User < ActiveRecord::Base
+            has_many :jobs, class_name: 'Employment', foreign_key: 'owner_id', primary_key: 'uuid'
+            belongs_to :site, class_name: 'Website', foreign_key: 'home_site_id'
+            has_one :rollup, class_name: 'UserRollup', foreign_key: 'owner_id', primary_key: 'uuid'
+            has_and_belongs_to_many :tags, join_table: 'user_tags', class_name: 'Job'
+          end
+        RUBY
+      end
+    end
+  end
 end

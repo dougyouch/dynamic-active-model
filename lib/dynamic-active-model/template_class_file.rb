@@ -42,16 +42,17 @@ module DynamicActiveModel
         str << "  self.table_name = #{@model.table_name.to_sym.inspect}\n"
       end
       all_has_many_relationships.each do |assoc|
-        append_association!(str, assoc)
+        append_association!(str, 'has_many', assoc, has_many_association_options(assoc))
       end
       all_belongs_to_relationships.each do |assoc|
-        append_association!(str, assoc)
+        append_association!(str, 'belongs_to', assoc, belongs_to_association_options(assoc))
       end
       all_has_one_relationships.each do |assoc|
-        append_association!(str, assoc)
+        append_association!(str, 'has_one', assoc, has_one_association_options(assoc))
       end
       all_has_and_belongs_to_many_relationships.each do |assoc|
-        append_association!(str, assoc)
+        append_association!(str, 'has_and_belongs_to_many', assoc,
+                            has_and_belongs_to_many_association_options(assoc))
       end
       str << "end\n"
       str
@@ -85,35 +86,13 @@ module DynamicActiveModel
 
     # Appends an association definition to the source string
     # @param str [String] The source string being built
+    # @param assoc_type [String] The association macro, e.g. 'has_many'
     # @param assoc [ActiveRecord::Reflection::AssociationReflection] The association to add
-    def append_association!(str, assoc)
-      assoc_type = case assoc
-                   when ActiveRecord::Reflection::HasManyReflection
-                     'has_many'
-                   when ActiveRecord::Reflection::BelongsToReflection
-                     'belongs_to'
-                   when ActiveRecord::Reflection::HasOneReflection
-                     'has_one'
-                   when ActiveRecord::Reflection::HasAndBelongsToManyReflection
-                     'has_and_belongs_to_many'
-                   end
-
-      association_options = case assoc_type
-                            when 'has_many'
-                              has_many_association_options(assoc)
-                            when 'belongs_to'
-                              belongs_to_association_options(assoc)
-                            when 'has_one'
-                              has_one_association_options(assoc)
-                            when 'has_and_belongs_to_many'
-                              has_and_belongs_to_many_association_options(assoc)
-                            end
-
+    # @param association_options [Hash] Non-default options to write; nil values are skipped
+    def append_association!(str, assoc_type, assoc, association_options)
       str << "  #{assoc_type} #{assoc.name.inspect}"
-      unless association_options.empty?
-        association_options.each do |name, value|
-          str << ", #{name}: '#{value}'"
-        end
+      association_options.compact.each do |name, value|
+        str << ", #{name}: '#{value}'"
       end
       str << "\n"
     end
@@ -166,7 +145,7 @@ module DynamicActiveModel
     def has_and_belongs_to_many_association_options(assoc)
       options = {}
       options[:join_table] = assoc.options[:join_table] if assoc.options[:join_table]
-      unless assoc.options[:class_name].underscore.singularize == assoc.name.to_s
+      unless assoc.options[:class_name].underscore.pluralize == assoc.name.to_s
         options[:class_name] =
           assoc.options[:class_name]
       end
@@ -177,20 +156,6 @@ module DynamicActiveModel
     # @return [String] The default foreign key name
     def default_foreign_key_name
       "#{@model.table_name.underscore.singularize}_id"
-    end
-
-    # Generates the default foreign key for the associated model
-    # @param assoc [ActiveRecord::Reflection::HasAndBelongsToManyReflection] The association
-    # @return [String] The generated foreign key name
-    def generate_association_foreign_key(assoc)
-      "#{assoc.options[:class_name].underscore.singularize}_id"
-    end
-
-    # Gets a constant by its fully qualified name
-    # @param class_name [String] The fully qualified class name
-    # @return [Class] The resolved class
-    def const_get(class_name)
-      class_name.split('::').inject(Object) { |mod, name| mod.const_get(name) }
     end
   end
 end
