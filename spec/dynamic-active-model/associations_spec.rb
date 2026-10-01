@@ -210,4 +210,70 @@ describe DynamicActiveModel::Associations do
       end
     end
   end
+
+  describe 'tables with non-id primary keys' do
+    let(:connection_options) do
+      create_sqlite_database(<<~SQL)
+        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);
+        CREATE TABLE posts (post_uuid TEXT PRIMARY KEY, user_id INTEGER);
+        CREATE TABLE profiles (profile_key INTEGER PRIMARY KEY, user_id INTEGER);
+        CREATE UNIQUE INDEX index_profiles_on_user_id ON profiles (user_id);
+        INSERT INTO users (id, name) VALUES (1, 'Jane');
+        INSERT INTO posts (post_uuid, user_id) VALUES ('p1', 1);
+        INSERT INTO profiles (profile_key, user_id) VALUES (99, 1);
+      SQL
+    end
+    let(:user) { base_module.const_get(:User).find(1) }
+
+    before do
+      relations.build!
+    end
+
+    it 'finds has_many records through the parent primary key' do
+      expect(user.posts.map(&:post_uuid)).to eq(['p1'])
+    end
+
+    it 'finds the has_one record through the parent primary key' do
+      expect(user.profile.profile_key).to eq(99)
+    end
+
+    it 'finds the belongs_to record through the parent primary key' do
+      expect(base_module.const_get(:Post).find('p1').user).to eq(user)
+    end
+  end
+
+  describe '#add_foreign_key with a symbol table name' do
+    it 'adds the foreign key to the table' do
+      relations.add_foreign_key(:websites, 'company_website_id', 'company_website')
+      relations.build!
+      website_model = base_module.const_get('Website')
+      expect(has_association?(website_model, :company_website_companies)).to be(true)
+    end
+  end
+
+  describe '#add_foreign_key with an unknown table' do
+    it 'raises ModelNotFound' do
+      expect { relations.add_foreign_key('missing_table', 'missing_id') }
+        .to raise_error(DynamicActiveModel::ModelNotFound, /missing_table/)
+    end
+  end
+
+  describe '#join_table? with a custom id suffix' do
+    let(:column) { Struct.new(:name) }
+    let(:model) do
+      Struct.new(:primary_key, :columns).new(nil, [column.new('job_xref'), column.new('website_xref')])
+    end
+
+    before do
+      DynamicActiveModel::ForeignKey.id_suffix = '.ref'
+    end
+
+    after do
+      DynamicActiveModel::ForeignKey.id_suffix = nil
+    end
+
+    it 'matches the suffix literally' do
+      expect(relations.send(:join_table?, model)).to be(false)
+    end
+  end
 end

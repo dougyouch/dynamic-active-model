@@ -45,8 +45,11 @@ module DynamicActiveModel
     # @param table_name [String] Name of the table with the foreign key
     # @param foreign_key [String] Name of the foreign key column
     # @param relationship_name [String, nil] Custom name for the relationship
+    # @raise [ModelNotFound] If no model exists for the table
     def add_foreign_key(table_name, foreign_key, relationship_name = nil)
-      @foreign_keys[table_name].add(foreign_key, relationship_name)
+      @foreign_keys
+        .fetch(table_name.to_s) { raise ModelNotFound, "no model found for table #{table_name}" }
+        .add(foreign_key, relationship_name)
     end
 
     # Builds all relationships between models based on foreign keys and constraints
@@ -122,29 +125,29 @@ module DynamicActiveModel
 
     # Adds a has_many relationship to a model
     # @param relationship_name [String] Name of the relationship
-    # @param model [Class] The model with the foreign key
-    # @param has_many_model [Class] The model being referenced
+    # @param model [Class] The referenced (parent) model that gets the association
+    # @param has_many_model [Class] The model with the foreign key
     # @param foreign_key [String] The foreign key column name
     def add_has_many(relationship_name, model, has_many_model, foreign_key)
       model.has_many(
         generate_has_many_association_name(relationship_name, model, has_many_model),
         class_name: has_many_model.name,
         foreign_key: foreign_key,
-        primary_key: has_many_model.primary_key
+        primary_key: model.primary_key
       )
     end
 
     # Adds a has_one relationship to a model
     # @param relationship_name [String] Name of the relationship
-    # @param model [Class] The model with the foreign key
-    # @param has_one_model [Class] The model being referenced
+    # @param model [Class] The referenced (parent) model that gets the association
+    # @param has_one_model [Class] The model with the foreign key
     # @param foreign_key [String] The foreign key column name
     def add_has_one(relationship_name, model, has_one_model, foreign_key)
       model.has_one(
         generate_has_one_association_name(relationship_name, model, has_one_model),
         class_name: has_one_model.name,
         foreign_key: foreign_key,
-        primary_key: has_one_model.primary_key
+        primary_key: model.primary_key
       )
     end
 
@@ -161,8 +164,8 @@ module DynamicActiveModel
 
     # Generates an appropriate name for a has_many association
     # @param relationship_name [String] Original relationship name
-    # @param model [Class] The model with the foreign key
-    # @param has_many_model [Class] The model being referenced
+    # @param model [Class] The referenced (parent) model that gets the association
+    # @param has_many_model [Class] The model with the foreign key
     # @return [Symbol] The generated association name
     def generate_has_many_association_name(relationship_name, model, has_many_model)
       name =
@@ -176,8 +179,8 @@ module DynamicActiveModel
 
     # Generates an appropriate name for a has_one association
     # @param relationship_name [String] Original relationship name
-    # @param model [Class] The model with the foreign key
-    # @param has_one_model [Class] The model being referenced
+    # @param model [Class] The referenced (parent) model that gets the association
+    # @param has_one_model [Class] The model with the foreign key
     # @return [Symbol] The generated association name
     def generate_has_one_association_name(relationship_name, model, has_one_model)
       name =
@@ -208,7 +211,7 @@ module DynamicActiveModel
     def join_table?(model)
       model.primary_key.nil? &&
         model.columns.size == 2 &&
-        model.columns.all? { |column| column.name =~ /#{ForeignKey.id_suffix}$/ }
+        model.columns.all? { |column| column.name.end_with?(ForeignKey.id_suffix) }
     end
   end
 end
