@@ -300,4 +300,18 @@ describe DynamicActiveModel::Database do
       end
     end
   end
+
+  describe '#create_models! called twice' do
+    before do
+      database.create_models!
+    end
+
+    it 'does not duplicate models' do
+      expect { database.create_models! }.not_to(change { database.models.size })
+    end
+
+    it 'returns the models' do
+      expect(database.create_models!).to eq(database.models)
+    end
+  end
 end

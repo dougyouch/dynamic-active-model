@@ -94,15 +94,16 @@ module DynamicActiveModel
       @table_class_names[table_name.to_s] = class_name
     end
 
-    # Creates ActiveRecord models for all included tables
-    # @return [Array] List of created model classes
+    # Creates ActiveRecord models for all included tables that don't have one yet
+    # @return [Array] List of model classes
+    # @raise [ClassNameConflict] If two tables map to the same class name
     def create_models!
       @factory.base_class.connection.tables.each do |table_name|
-        next if skip_table?(table_name)
-        next unless include_table?(table_name)
+        next unless create_model?(table_name)
 
         @models << @factory.create(table_name, @table_class_names[table_name])
       end
+      @models
     end
 
     # @return [Array] List of all skipped tables and patterns
@@ -173,6 +174,13 @@ module DynamicActiveModel
     end
 
     private
+
+    # Checks if a model should be created for a table
+    # @param table_name [String] Name of the table
+    # @return [Boolean] Whether the table is included and has no model yet
+    def create_model?(table_name)
+      !skip_table?(table_name) && include_table?(table_name) && get_model(table_name).nil?
+    end
 
     # Checks if a table should be skipped
     # @param table_name [String] Name of the table
