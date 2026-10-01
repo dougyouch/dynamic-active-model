@@ -11,9 +11,7 @@ require 'simplecov-cobertura'
 SimpleCov.start do
   enable_coverage :branch
 
-  add_filter '/spec/'
-
-  track_files 'lib/**/*.rb'
+  cover 'lib/**/*.rb'
 
   if ENV['CI']
     formatter SimpleCov::Formatter::CoberturaFormatter
@@ -44,7 +42,6 @@ ActiveRecord::Base.establish_connection(DB_CONFIG)
 ActiveRecord::Schema.verbose = false
 require 'support/db/schema'
 
-# rubocop:disable Metrics/BlockLength
 RSpec.shared_context 'database' do
   let(:base_module_name) { "Module#{SecureRandom.hex(8)}" }
   let(:base_module) do
@@ -78,7 +75,6 @@ RSpec.shared_context 'database' do
     DynamicActiveModel::Associations.new(database)
   end
 end
-# rubocop:enable Metrics/BlockLength
 
 def get_association(model, name)
   model.reflect_on_all_associations.detect { |assoc| assoc.name == name }
