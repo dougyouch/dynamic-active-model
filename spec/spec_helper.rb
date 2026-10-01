@@ -11,6 +11,8 @@ SimpleCov.start do
   enable_coverage :branch
 
   cover 'lib/**/*.rb'
+  # loaded by the gemspec before SimpleCov starts, so it would always show as missed
+  skip 'lib/dynamic-active-model/version.rb'
 end
 
 begin

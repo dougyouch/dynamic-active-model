@@ -176,4 +176,15 @@ describe DynamicActiveModel::Factory do
       expect(model.table_name).to eq('strings')
     end
   end
+
+  describe '#create when the class name is used by a non-model constant' do
+    before do
+      base_module.const_set(:User, Module.new)
+    end
+
+    it 'raises ClassNameConflict' do
+      expect { factory.create('users') }
+        .to raise_error(DynamicActiveModel::ClassNameConflict, /already used by another constant/)
+    end
+  end
 end

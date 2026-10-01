@@ -76,7 +76,7 @@ module DynamicActiveModel
 
       @join_tables.each do |join_table_model|
         models = join_table_model.column_names.map do |column_name|
-          foreign_key_to_models[column_name.downcase]&.first&.first
+          foreign_key_to_models.dig(column_name.downcase, 0, 0)
         end.compact
         add_has_and_belongs_to_many(join_table_model, models) if models.size == 2
       end

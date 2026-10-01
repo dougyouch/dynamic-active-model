@@ -68,6 +68,24 @@ describe DynamicActiveModel::Setup do
     end
   end
 
+  describe '#connection_options with a database configuration name' do
+    subject { db_module.connection_options('primary') }
+
+    let(:configurations) { instance_double(ActiveRecord::DatabaseConfigurations) }
+    let(:db_config) { instance_double(ActiveRecord::DatabaseConfigurations::HashConfig, configuration_hash: DB_CONFIG) }
+
+    before do
+      stub_const('Rails', Module.new)
+      allow(Rails).to receive(:env).and_return('test')
+      allow(ActiveRecord::Base).to receive(:configurations).and_return(configurations)
+      allow(configurations).to receive(:configs_for).with(env_name: 'test', name: 'primary').and_return(db_config)
+    end
+
+    it 'loads the named configuration for the current Rails environment' do
+      expect(subject).to eq(DB_CONFIG)
+    end
+  end
+
   describe '#skip_tables' do
     subject { db_module.skip_tables }
 

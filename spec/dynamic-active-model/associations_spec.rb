@@ -276,4 +276,26 @@ describe DynamicActiveModel::Associations do
       expect(relations.send(:join_table?, model)).to be(false)
     end
   end
+
+  describe 'join table with only one foreign key matching a model' do
+    let(:connection_options) do
+      create_sqlite_database(<<~SQL)
+        CREATE TABLE jobs (id INTEGER PRIMARY KEY);
+        CREATE TABLE jobs_tags (job_id INTEGER, tag_id INTEGER);
+      SQL
+    end
+
+    before do
+      relations.build!
+    end
+
+    it 'detects the join table' do
+      expect(relations.join_tables.map(&:table_name)).to eq(['jobs_tags'])
+    end
+
+    it 'does not add a has_and_belongs_to_many association' do
+      job_model = base_module.const_get(:Job)
+      expect(job_model.reflect_on_all_associations(:has_and_belongs_to_many)).to be_empty
+    end
+  end
 end
