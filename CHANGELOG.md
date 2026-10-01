@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/dougyouch/dynamic-active-model/compare/v0.9.0...v0.9.1) (2026-10-01)
+
+
+### Bug Fixes
+
+* **template:** omit default habtm class_name and unset options in class files ([ae221ae](https://github.com/dougyouch/dynamic-active-model/commit/ae221ae243a1657a5aa7d6e1b4b1b72b37ea1373))
+
 ## [0.9.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.8.0...v0.9.0) (2026-10-01)
 
 
