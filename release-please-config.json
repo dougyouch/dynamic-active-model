@@ -1,6 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-  "bootstrap-sha": "bbe64b6",
   "packages": {
     ".": {
       "release-type": "ruby",

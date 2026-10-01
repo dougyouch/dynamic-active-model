@@ -3,9 +3,11 @@ name: Release
 # release-please keeps a release PR open that bumps lib/dynamic-active-model/version.rb,
 # Gemfile.lock and CHANGELOG.md from conventional commits. Merging it tags the release,
 # creates the GitHub release and publishes the gem to RubyGems.
+# Run it manually (workflow_dispatch) to retry publishing the current version.
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -25,6 +27,7 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
       version: ${{ steps.release.outputs.version }}
+      pr_branch: ${{ steps.release.outputs.pr && fromJSON(steps.release.outputs.pr).headBranchName || '' }}
     steps:
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
@@ -32,11 +35,35 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  # release-please only rewrites the first "dynamic-active-model (x.y.z)" in Gemfile.lock,
+  # leaving the CHECKSUMS entry stale, so regenerate the lockfile on the release PR branch.
+  sync-lockfile:
+    needs: release-please
+    if: needs.release-please.outputs.pr_branch != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push to the release PR branch
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.release-please.outputs.pr_branch }}
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+        with:
+          ruby-version: '4.0'
+      - run: bundle lock
+      - name: Push updated Gemfile.lock
+        run: |
+          git diff --quiet Gemfile.lock && exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'build(deps): sync Gemfile.lock checksums' Gemfile.lock
+          git push
+
   # The release PR is opened with GITHUB_TOKEN, which doesn't trigger CI on it,
   # so run the suite here before anything is published.
   ci:
     needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
+    if: needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/ci.yml
     # ceiling for the called workflow: its coverage-badge job declares contents: write
     # (skipped when called from here); lint/test still run with ci.yml's top-level contents: read
@@ -52,17 +79,21 @@ jobs:
     permissions:
       contents: write # attach the gem to the GitHub release
       id-token: write # RubyGems trusted publishing (OIDC)
-    env:
-      TAG: ${{ needs.release-please.outputs.tag_name }}
-      VERSION: ${{ needs.release-please.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
+          # the new tag on release; the dispatched commit on a manual retry
+          ref: ${{ needs.release-please.outputs.tag_name || github.sha }}
           persist-credentials: false
       - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: '4.0'
+
+      - name: Read version
+        run: |
+          version=$(ruby -e 'puts Gem::Specification.load("dynamic-active-model.gemspec").version')
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "TAG=v$version" >> "$GITHUB_ENV"
 
       - run: gem build dynamic-active-model.gemspec
 
