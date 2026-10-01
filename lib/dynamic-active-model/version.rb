@@ -2,5 +2,5 @@
 
 module DynamicActiveModel
   # Gem version, bumped by release-please
-  VERSION = '0.9.0'
+  VERSION = '0.9.1'
 end
