@@ -158,6 +158,24 @@ Avoid `Rails.application.config.after_initialize { GrantDB.database... }`. It ru
 - **Migrations.** After migrations run or a schema is loaded (`db:migrate`, `db:rollback`, `db:prepare`, `db:schema:load`, `maintain_test_schema!`), models are reset and rebuild on next use. That means `bin/rails db:prepare` followed by seeding works in one process.
 - **Reloading.** In development, models are rebuilt whenever the app reloads, including after edits to `.ext.rb` files or to anything under `db/`, such as a migration rewriting `db/schema.rb`.
 
+## Schema Cache
+
+Models read columns, primary keys and indexes through Rails' schema cache. Dump it at deploy time, and building models no longer queries every table:
+
+```bash
+bin/rails db:schema:cache:dump   # db/schema_cache.yml, db/<name>_schema_cache.yml
+```
+
+| | Queries to build 5 tables (SQLite) |
+|---|---|
+| No dump | 28 |
+| Dump, Rails defaults | 4 |
+| Dump, `config.active_record.check_schema_cache_dump_version = false` | 2 |
+
+The table list is always one live query. By default, Rails also checks the dump's schema version against the database, and ignores a stale dump.
+
+When models are reset after a code reload or schema change, the gem clears the database's schema cache too. That matters because Rails only clears the primary database's cache on reload.
+
 ## Migrations
 
 Migrations stay standard Rails. The gem reads the schema; it never owns it. For a secondary database, give its database.yml entry a `migrations_paths`:
