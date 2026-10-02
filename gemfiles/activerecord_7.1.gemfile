@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+# CI matrix: the core gem against ActiveRecord 7.1 (Ruby 4.0 + 8.1 uses the root Gemfile and its lockfile)
+source 'https://rubygems.org'
+
+gemspec path: '..'
+
+gem 'activerecord', '~> 7.1.0'
+gem 'rake'
+gem 'rspec'
+gem 'simplecov', require: false
+gem 'sqlite3'

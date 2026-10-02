@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+# CI matrix: the core gem against ActiveRecord 8.1
+source 'https://rubygems.org'
+
+gemspec path: '..'
+
+gem 'activerecord', '~> 8.1.0'
+gem 'rake'
+gem 'rspec'
+gem 'simplecov', require: false
+gem 'sqlite3'

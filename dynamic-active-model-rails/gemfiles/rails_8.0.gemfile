@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+# CI matrix: the Rails gem against Rails 8.0 (8.1 uses dynamic-active-model-rails/Gemfile)
+source 'https://rubygems.org'
+
+gemspec path: '..'
+
+gem 'activerecord', '~> 8.0.0'
+gem 'dynamic-active-model', path: '../..'
+gem 'railties', '~> 8.0.0'
+gem 'rake'
+gem 'rspec'
+gem 'simplecov', require: false
+gem 'sqlite3'
