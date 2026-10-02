@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.16.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.15.1...v0.16.0) (2026-10-02)
+
+
+### Features
+
+* deprecate connection_options with a String database.yml name ([cd2e75e](https://github.com/dougyouch/dynamic-active-model/commit/cd2e75e874de33beca0fa8f50e0222a26180b8e9))
+* **rails:** register the core gem's deprecator with the app ([eee0304](https://github.com/dougyouch/dynamic-active-model/commit/eee0304cf5ecfa0f16057042430520d912688a7f))
+* **setup:** deprecate connection_options with a String database.yml name ([6074649](https://github.com/dougyouch/dynamic-active-model/commit/60746492bdd0a0af182f257c92bc8ee8666be253))
+
 ## [0.15.1](https://github.com/dougyouch/dynamic-active-model/compare/v0.15.0...v0.15.1) (2026-10-02)
 
 
