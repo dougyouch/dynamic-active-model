@@ -119,7 +119,33 @@ describe DynamicActiveModel::Setup do
     end
 
     it 'loads the named configuration for the current Rails environment' do
-      expect(subject).to eq(DB_CONFIG)
+      DynamicActiveModel.deprecator.silence { expect(subject).to eq(DB_CONFIG) }
+    end
+
+    it 'warns that a String name is deprecated, pointing at the caller' do
+      expect { subject }.to output(/database.yml name as a String \("primary"\) is deprecated.*connection_options :primary.*called from .*setup_spec\.rb/).to_stderr
+    end
+  end
+
+  describe '#connection_options with a database configuration name as a Symbol' do
+    let(:original_configurations) { ActiveRecord::Base.configurations.configurations }
+    let(:env) { ActiveRecord::ConnectionHandling::DEFAULT_ENV.call }
+    let(:secondary) { create_sqlite_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
+
+    before do
+      original_configurations
+      ActiveRecord::Base.configurations = { env => { 'secondary' => secondary.transform_keys(&:to_s) } }
+    end
+
+    after { ActiveRecord::Base.configurations = original_configurations }
+
+    it 'passes the Symbol to establish_connection, which resolves it without a warning' do
+      expect do
+        db_module.connection_options(:secondary)
+        db_module.create_models!
+      end.not_to output.to_stderr
+      expect(db_module.connection_options).to eq(:secondary)
+      expect(db_module.database.models.map(&:table_name)).to eq(['widgets'])
     end
   end
 

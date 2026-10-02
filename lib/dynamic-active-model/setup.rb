@@ -62,19 +62,12 @@ module DynamicActiveModel
       end
 
       # Sets or gets the database connection options
-      # @param options [Hash, String, nil] Database configuration or named configuration
-      # @return [Hash] The current connection options
+      # @param options [Hash, Symbol, String, nil] Anything establish_connection accepts:
+      #   a config hash, or a Symbol naming a database.yml entry for the current
+      #   environment. A String database.yml name is deprecated.
+      # @return [Hash, Symbol] The current connection options
       def connection_options(options = nil)
-        if options.is_a?(String)
-          name = options
-          options = ActiveRecord::Base
-                    .configurations
-                    .configs_for(
-                      env_name: ::Rails.env,
-                      name: name
-                    )
-                    .configuration_hash
-        end
+        options = deprecated_named_configuration(options) if options.is_a?(String)
 
         update_config(:connection_options, options) if options
 
@@ -179,6 +172,19 @@ module DynamicActiveModel
       end
 
       private
+
+      # Resolves a database.yml name given as a String, warning that it's deprecated
+      # @param name [String]
+      # @return [Hash] The named configuration for the current Rails environment
+      def deprecated_named_configuration(name)
+        DynamicActiveModel.deprecator.warn(
+          "connection_options with a database.yml name as a String (#{name.inspect}) is deprecated; " \
+          "pass a Symbol instead (connection_options #{name.to_sym.inspect}), " \
+          'or use dynamic-active-model-rails in a Rails app',
+          caller_locations(2) # point at the caller of connection_options
+        )
+        ActiveRecord::Base.configurations.configs_for(env_name: ::Rails.env, name: name).configuration_hash
+      end
 
       # Stores a single configuration value
       # @param key [Symbol] Configuration key

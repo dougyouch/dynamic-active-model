@@ -32,7 +32,7 @@ module DB
   # Share ApplicationRecord's connection pool
   parent_class ApplicationRecord
   # or connect to another database from database.yml:
-  # connection_options 'secondary'
+  # connection_options :secondary
 
   # Directory of extension files; use an absolute path, since a relative one
   # resolves against the process's working directory, not Rails.root
