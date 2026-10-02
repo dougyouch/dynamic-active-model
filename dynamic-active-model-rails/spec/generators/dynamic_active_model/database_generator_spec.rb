@@ -15,7 +15,7 @@ RSpec.describe DynamicActiveModel::Generators::DatabaseGenerator, type: :generat
 
     it 'adds the database inside the configure block' do
       run_generator(described_class, %w[inventory --connection cars])
-      expect(initializer).to match(/:grant_db\n.*\n  config.add_database :inventory, :cars\nend\n/m)
+      expect(initializer).to include("  config.add_database :grant_db\n  config.add_database :inventory, :cars\nend\n")
       expect(valid_ruby?(initializer)).to be(true)
       expect(generated?('app/models/inventory_db/.keep')).to be(true)
     end

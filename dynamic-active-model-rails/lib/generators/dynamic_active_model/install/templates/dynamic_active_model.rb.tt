@@ -4,11 +4,13 @@
 # are built on first use and rebuilt after code reloads and migrations. Per-table
 # extensions go in app/models/<name>_db/<table_name>.ext.rb.
 # https://github.com/dougyouch/dynamic-active-model/tree/master/dynamic-active-model-rails
+#
+# Add databases with bin/rails g dynamic_active_model:database NAME, or by hand:
+#   config.add_database :cars, :cars do |db|  # CarsDB, "cars" entry in database.yml
+#     db.skip_tables 'legacy_*'
+#   end
 DynamicActiveModel::Rails.configure do |config|
   <%= add_database_line %>
-  # config.add_database :cars, :cars do |db|  # CarsDB, "cars" entry in database.yml
-  #   db.skip_tables 'legacy_*'
-  # end
 end
 
 # Setup that touches the models (e.g. has_paper_trail) belongs in a load hook,
