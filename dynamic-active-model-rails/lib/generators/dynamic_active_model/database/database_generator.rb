@@ -14,6 +14,10 @@ module DynamicActiveModel
 
       argument :name, type: :string, banner: 'NAME'
 
+      def check_options
+        check_replica_has_connection
+      end
+
       def check_initializer
         return if File.exist?(File.join(destination_root, INITIALIZER))
 

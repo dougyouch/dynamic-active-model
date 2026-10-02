@@ -15,6 +15,10 @@ module DynamicActiveModel
 
       argument :name, type: :string, default: 'db', banner: 'NAME'
 
+      def check_options
+        check_replica_has_connection
+      end
+
       def create_initializer
         template 'dynamic_active_model.rb.tt', INITIALIZER
       end

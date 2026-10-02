@@ -34,6 +34,13 @@ module DynamicActiveModel
         database.models
       end
 
+      # Switches role or shard for this database's models, like ActiveRecord's
+      # connected_to, e.g. CarsDB.connected_to(role: :reading) { CarsDB::Car.count }
+      # @return [Object] The block's result
+      def connected_to(**, &)
+        dynamic_active_model_loader.connection_class.connected_to(**, &)
+      end
+
       # Builds the models on first reference, then retries the lookup
       # @param name [Symbol]
       # @return [Object]

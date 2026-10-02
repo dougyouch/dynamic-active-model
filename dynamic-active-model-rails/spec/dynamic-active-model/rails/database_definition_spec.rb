@@ -130,6 +130,59 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseDefinition do
     end
   end
 
+  describe '#connects_to' do
+    it 'defaults to nil' do
+      expect(definition.connects_to).to be_nil
+    end
+
+    context 'with roles' do
+      let(:options) { { connects_to: { writing: :cars, reading: :cars_replica } } }
+
+      it 'wraps them as the database: argument' do
+        expect(definition.connects_to).to eq(database: { writing: :cars, reading: :cars_replica })
+      end
+    end
+
+    context "with connects_to's own arguments" do
+      let(:options) { { connects_to: { shards: { one: { writing: :cars } } } } }
+
+      it 'passes them through' do
+        expect(definition.connects_to).to eq(shards: { one: { writing: :cars } })
+      end
+    end
+
+    context 'with a connection as well' do
+      let(:connection) { :cars }
+      let(:options) { { connects_to: { writing: :cars } } }
+
+      it 'raises' do
+        expect { definition }.to raise_error(ArgumentError, /either a connection or connects_to/)
+      end
+    end
+  end
+
+  describe '#own_connection?' do
+    it 'is false when sharing the parent class connection' do
+      expect(definition.own_connection?).to be(false)
+    end
+
+    context 'with a connection' do
+      let(:connection) { :cars }
+
+      it 'is true' do
+        expect(definition.own_connection?).to be(true)
+      end
+    end
+
+    context 'with connects_to' do
+      let(:options) { { connects_to: { writing: :cars } } }
+
+      it 'is true' do
+        expect(definition.own_connection?).to be(true)
+      end
+    end
+  end
+
   describe '#parent_class_name' do
     it 'defaults to ApplicationRecord' do
       expect(definition.parent_class_name).to eq('ApplicationRecord')

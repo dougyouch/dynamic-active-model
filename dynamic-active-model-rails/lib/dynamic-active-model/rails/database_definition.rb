@@ -26,6 +26,9 @@ module DynamicActiveModel
       # @return [String] File suffix of extension files
       attr_reader :extensions_suffix
 
+      # @return [Hash, nil] Keyword arguments for the base class's connects_to
+      attr_reader :connects_to
+
       # @return [Hash] Custom relationship names by table and foreign key
       attr_reader :relationships
 
@@ -39,9 +42,15 @@ module DynamicActiveModel
       # @param extensions_path [String, nil] Extensions directory, absolute or relative to
       #   the app root; defaults to app/models/<folder>, which may be absent
       # @param extensions_suffix [String] File suffix of extension files
+      # @param connects_to [Hash, nil] Roles ({ writing: :cars, reading: :cars_replica }) or
+      #   connects_to's own arguments ({ database: ..., shards: ... })
+      # @raise [ArgumentError] If both a connection and connects_to are given
       def initialize(name, connection = nil, module_name: nil, parent_class: 'ApplicationRecord',
-                     extensions_path: nil, extensions_suffix: '.ext.rb')
+                     extensions_path: nil, extensions_suffix: '.ext.rb', connects_to: nil)
+        raise ArgumentError, 'pass either a connection or connects_to:, not both' if connection && connects_to
+
         @connection = connection
+        @connects_to = connects_to && normalize_connects_to(connects_to)
         @module_name = module_name || default_module_name(name)
         @parent_class_name = parent_class.to_s
         @extensions_path = extensions_path&.to_s
@@ -66,6 +75,12 @@ module DynamicActiveModel
       # @return [String] Absolute directory holding this database's extension files
       def extensions_path(root)
         File.expand_path(@extensions_path || File.join('app', 'models', folder), root.to_s)
+      end
+
+      # @return [Boolean] Whether the generated base class owns its connection, rather
+      #   than sharing the parent class's
+      def own_connection?
+        !(connection.nil? && connects_to.nil?)
       end
 
       # @return [Boolean] Whether extensions_path was configured, so it must exist
@@ -106,6 +121,13 @@ module DynamicActiveModel
       end
 
       private
+
+      # Treats a hash of roles as connects_to's database: argument
+      # @param options [Hash]
+      # @return [Hash]
+      def normalize_connects_to(options)
+        options.key?(:database) || options.key?(:shards) ? options : { database: options }
+      end
 
       # :cars => "CarsDB", :grant_db => "GrantDB", :db => "DB"
       # @param name [Symbol, String]
