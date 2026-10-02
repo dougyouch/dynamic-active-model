@@ -73,7 +73,8 @@ module DynamicActiveModel
       # primary pool on code reload, and nothing on schema changes outside migrations.
       # @return [void]
       def clear_schema_cache
-        @database.models.map(&:connection_pool).uniq.each { |pool| pool.schema_cache.clear! }
+        # schema_reflection rather than schema_cache: ConnectionPool#schema_cache is 7.2+
+        @database.models.map(&:connection_pool).uniq.each { |pool| pool.schema_reflection.clear! }
       end
 
       # @return [DynamicActiveModel::Database] A database configured from the definition
