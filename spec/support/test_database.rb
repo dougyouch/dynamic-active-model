@@ -68,7 +68,7 @@ module TestDatabase
 
   def with_connection(config, &)
     Connection.establish_connection(config)
-    Connection.with_connection(&)
+    Connection.connection_pool.with_connection(&) # ActiveRecord::Base.with_connection is 7.2+
   ensure
     Connection.remove_connection
   end
