@@ -57,6 +57,16 @@ update_model do
 end
 ```
 
+### Rails Gem
+
+`dynamic-active-model-rails/` is a separate gem in this repo (Railtie, lazy `<Name>DB` namespaces, reload and migration hooks). Its gemspec reads the core `VERSION`, so the two release in lockstep. It has its own Gemfile and specs, which boot a test Rails app in `spec/dummy`:
+
+```bash
+cd dynamic-active-model-rails && bundle install && bundle exec rspec
+```
+
+Rubocop runs from the repo root and covers both gems.
+
 ### CLI Tool
 
 `bin/dynamic-db-explorer` - Interactive database exploration tool. Can also generate model files with `--create-class-files DIR`.
@@ -67,7 +77,7 @@ Tests use SQLite with schema defined in `spec/support/db/schema.rb`. The shared 
 
 ## Releases
 
-Releases are automated by release-please (`.github/workflows/release.yml`). Conventional commits on `master` (`fix:` → patch, `feat:` → minor, `!`/`BREAKING CHANGE` → major) update an open release PR that bumps `lib/dynamic-active-model/version.rb`, `Gemfile.lock`, and `CHANGELOG.md`. Merging that PR tags `vX.Y.Z`, creates the GitHub release, and publishes the gem. Don't bump the version by hand.
+Releases are automated by release-please (`.github/workflows/release.yml`). Conventional commits on `master` (`fix:` → patch, `feat:` → minor, `!`/`BREAKING CHANGE` → major) update an open release PR that bumps `lib/dynamic-active-model/version.rb`, `Gemfile.lock`, and `CHANGELOG.md`. Merging that PR tags `vX.Y.Z`, creates the GitHub release, and publishes both gems. Don't bump the version by hand.
 
 ## Code Commits
 

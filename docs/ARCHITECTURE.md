@@ -43,6 +43,23 @@ Dynamic Active Model automatically discovers database schemas and creates Active
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+## Rails Integration (dynamic-active-model-rails)
+
+The companion gem lives in `dynamic-active-model-rails/`. It shares this repo's `VERSION`, and both gems are released together. It drives the core gem through `Database` and `Explorer`, and never subclasses its classes.
+
+| Component | Responsibility |
+|-----------|----------------|
+| `DynamicActiveModel::Rails` | `configure`, plus `eager_load!` / `reset!` across all databases |
+| Configuration | Collects `add_database` declarations |
+| DatabaseDefinition | One database: connection, `<Name>DB` namespace, `<name>_db` folder, table settings |
+| LazyNamespace | Extended into the namespace module; `const_missing` builds models on first reference |
+| DatabaseLoader | Builds a database's models (synchronized), applies `.ext.rb` files, undoes a partial build |
+| AutoloaderSetup | Zeitwerk-only `cars_db` → `CarsDB` inflection; ignores `.ext.rb` files |
+| SchemaChangeHook | Prepended to `Migrator#migrate`/`#run` and `DatabaseTasks.load_schema` to reset models |
+| Railtie | Registers eager loading, reset on code reload, and a watch on `db/` |
+
+Lifecycle: `configure` (from an initializer) defines each namespace module and configures the autoloader before Zeitwerk is set up. Models are built on first constant reference, or at boot when eager loading. Code reloads and schema changes call `reset!` (`Database#reset!`), and the next reference rebuilds models against the current schema and the reloaded `ApplicationRecord`.
+
 ## Data Flow
 
 ### Model Creation Flow

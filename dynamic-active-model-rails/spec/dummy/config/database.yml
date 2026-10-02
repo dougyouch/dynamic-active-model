@@ -1,0 +1,7 @@
+test:
+  primary:
+    adapter: sqlite3
+    database: tmp/primary.sqlite3
+  cars:
+    adapter: sqlite3
+    database: tmp/cars.sqlite3
