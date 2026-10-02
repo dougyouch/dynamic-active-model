@@ -17,6 +17,7 @@ A Ruby gem that automatically discovers your database schema and creates corresp
 - **Join Table Detection**: Recognizes HABTM join tables (two FK columns, no primary key)
 - **Model File Generation**: Export discovered models to static Ruby files
 - **CLI Tool**: Interactive database exploration via `dynamic-db-explorer`
+- **Rails Integration**: The companion [`dynamic-active-model-rails`](dynamic-active-model-rails/) gem configures everything from one initializer
 
 ## Installation
 
@@ -61,6 +62,21 @@ movie.actors  # Automatically mapped relationship
 ```
 
 ### Using in a Rails Application
+
+The easiest way is the companion gem [`dynamic-active-model-rails`](dynamic-active-model-rails/). It builds models lazily, rebuilds them after migrations, reloads them in development, and sets up the autoloader for you:
+
+```ruby
+# Gemfile
+gem 'dynamic-active-model-rails'
+
+# config/initializers/dynamic_active_model.rb
+DynamicActiveModel::Rails.configure do |config|
+  config.add_database :grant_db       # GrantDB::*, sharing ApplicationRecord's connection
+  config.add_database :cars, :cars    # CarsDB::*, using the "cars" entry in database.yml
+end
+```
+
+See its [README](dynamic-active-model-rails/README.md) for details. To wire things up by hand with the `Setup` DSL instead:
 
 1. Configure Rails to handle the `DB` namespace correctly in `config/initializers/inflections.rb`:
 

@@ -111,6 +111,8 @@ describe DynamicActiveModel::Setup do
 
     before do
       stub_const('Rails', Module.new)
+      # dynamic-active-model-rails defines DynamicActiveModel::Rails; the lookup must still reach ::Rails
+      stub_const('DynamicActiveModel::Rails', Module.new)
       allow(Rails).to receive(:env).and_return('test')
       allow(ActiveRecord::Base).to receive(:configurations).and_return(configurations)
       allow(configurations).to receive(:configs_for).with(env_name: 'test', name: 'primary').and_return(db_config)

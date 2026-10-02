@@ -50,4 +50,7 @@ pkg
 
 *.gem
 
+# the Rails gem pins the core gem's version, so a committed lockfile would go stale on every release
+dynamic-active-model-rails/Gemfile.lock
+
 *.db
