@@ -32,7 +32,7 @@ bundle exec rubocop -a
 
 ## Architecture Overview
 
-Dynamic Active Model is a Ruby gem that automatically discovers database schemas and creates ActiveRecord models with relationships. It requires Ruby 3.0+ and ActiveRecord 4+.
+Dynamic Active Model is a Ruby gem that automatically discovers database schemas and creates ActiveRecord models with relationships. It requires Ruby 3.2+ and ActiveRecord 7.1+ (the range CI tests; see `.github/workflows/ci.yml`).
 
 ### Core Components
 
