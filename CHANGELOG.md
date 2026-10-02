@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.10.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.9.1...v0.10.0) (2026-10-02)
+
+
+### Features
+
+* core changes for Rails integration (parent_class, reset!, skip internal tables) ([f88e08b](https://github.com/dougyouch/dynamic-active-model/commit/f88e08b809adb554ba529405191d411767678a70))
+* **database:** add reset! to rebuild models after a schema change ([b2cae71](https://github.com/dougyouch/dynamic-active-model/commit/b2cae7197682917e329c7d9a95f23fb39bdeac74))
+* **database:** skip ActiveRecord internal tables by default ([5786f00](https://github.com/dougyouch/dynamic-active-model/commit/5786f000cc0a2bf87ab71a68986c2b3ebff740ed))
+* **factory:** add parent_class option to share an existing connection ([2129378](https://github.com/dougyouch/dynamic-active-model/commit/2129378f2084e5758899cb862ccb39c945779691))
+
 ## [0.9.1](https://github.com/dougyouch/dynamic-active-model/compare/v0.9.0...v0.9.1) (2026-10-01)
 
 
