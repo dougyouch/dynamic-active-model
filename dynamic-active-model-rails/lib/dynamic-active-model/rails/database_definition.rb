@@ -81,11 +81,11 @@ module DynamicActiveModel
 
       private
 
-      # :cars => "CarsDB", :grant_db => "GrantDB"
+      # :cars => "CarsDB", :grant_db => "GrantDB", :db => "DB"
       # @param name [Symbol, String]
       # @return [String]
       def default_module_name(name)
-        "#{name.to_s.underscore.delete_suffix('_db').camelize}DB"
+        "#{name.to_s.underscore.sub(/(?:\A|_)db\z/, '').camelize}DB"
       end
     end
   end

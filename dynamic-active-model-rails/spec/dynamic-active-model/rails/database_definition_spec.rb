@@ -20,6 +20,23 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseDefinition do
       end
     end
 
+    context 'when the name is just db' do
+      let(:name) { :db }
+
+      it 'is DB' do
+        expect(definition.module_name).to eq('DB')
+        expect(definition.folder).to eq('db')
+      end
+    end
+
+    context 'when db is part of a word' do
+      let(:name) { :mydb }
+
+      it 'keeps the word and appends DB' do
+        expect(definition.module_name).to eq('MydbDB')
+      end
+    end
+
     context 'when the name is a camelized string' do
       let(:name) { 'GrantDB' }
 
