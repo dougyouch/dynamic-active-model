@@ -96,7 +96,7 @@ describe DynamicActiveModel::Factory do
     end
 
     context 'with connection options' do
-      let(:connection_options) { create_sqlite_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
+      let(:connection_options) { create_test_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
 
       it 'establishes its own connection' do
         expect(subject.connection_pool).not_to equal(parent_class.connection_pool)
@@ -221,7 +221,7 @@ describe DynamicActiveModel::Factory do
 
   describe '#create with a class name already used by another table' do
     let(:connection_options) do
-      create_sqlite_database(<<~SQL)
+      create_test_database(<<~SQL)
         CREATE TABLE status (id INTEGER PRIMARY KEY);
         CREATE TABLE statuses (id INTEGER PRIMARY KEY);
       SQL
@@ -242,7 +242,7 @@ describe DynamicActiveModel::Factory do
   end
 
   describe '#create with a table named like a top-level constant' do
-    let(:connection_options) { create_sqlite_database('CREATE TABLE strings (id INTEGER PRIMARY KEY);') }
+    let(:connection_options) { create_test_database('CREATE TABLE strings (id INTEGER PRIMARY KEY);') }
 
     it 'creates a model in the base module instead of returning the top-level constant' do
       model = factory.create('strings')

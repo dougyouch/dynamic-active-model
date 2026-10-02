@@ -90,7 +90,7 @@ describe DynamicActiveModel::Explorer do
 
     context 'with a class name conflict' do
       let(:connection_options) do
-        create_sqlite_database(<<~SQL)
+        create_test_database(<<~SQL)
           CREATE TABLE status (id INTEGER PRIMARY KEY);
           CREATE TABLE statuses (id INTEGER PRIMARY KEY);
         SQL
