@@ -15,6 +15,10 @@ module DynamicActiveModel
   # @example With Custom Class Name
   #   factory = DynamicActiveModel::Factory.new(DB, database_config)
   #   model = factory.create('users', 'CustomUser')
+  #
+  # @example Sharing an Existing Connection Pool
+  #   factory = DynamicActiveModel::Factory.new(DB, nil, parent_class: ApplicationRecord)
+  #   model = factory.create('users')
   class Factory
     # @return [Class] The base class for all generated models
     attr_writer :base_class
@@ -23,10 +27,13 @@ module DynamicActiveModel
     # @param base_module [Module] The namespace for created models
     # @param connection_options [Hash] Database connection options
     # @param base_class_name [Symbol, nil] Optional name for the base class
-    def initialize(base_module, connection_options, base_class_name = nil)
+    # @param parent_class [Class, nil] Optional superclass for the base class. When given
+    #   without connection options, the base class inherits the parent's connection.
+    def initialize(base_module, connection_options, base_class_name = nil, parent_class: nil)
       @base_module = base_module
       @connection_options = connection_options
       @base_class_name = base_class_name || :DynamicAbstractBase
+      @parent_class = parent_class
     end
 
     # Creates a new model class for a table if it doesn't exist
@@ -56,8 +63,8 @@ module DynamicActiveModel
 
     # Gets or creates the base class for all models
     # This method:
-    # 1. Creates an abstract ActiveRecord::Base subclass if needed
-    # 2. Establishes the database connection
+    # 1. Creates an abstract subclass of the parent class if needed
+    # 2. Establishes the database connection, unless inheriting the parent's
     # 3. Returns the configured base class
     # @return [Class] The base class for all models
     def base_class
@@ -65,17 +72,28 @@ module DynamicActiveModel
         begin
           require 'active_record'
 
-          unless @base_module.const_defined?(@base_class_name)
-            new_base_class = Class.new(ActiveRecord::Base) do
-              self.abstract_class = true
-            end
-            @base_module.const_set(@base_class_name, new_base_class)
-          end
+          define_base_class unless @base_module.const_defined?(@base_class_name)
 
           @base_module.const_get(@base_class_name).tap do |kls|
-            kls.establish_connection @connection_options
+            kls.establish_connection(@connection_options) if establish_connection?
           end
         end
+    end
+
+    # Removes a model's constant from the base module
+    # @param model [Class] A model class created by this factory
+    # @return [void]
+    def remove(model)
+      @base_module.send(:remove_const, model.name.demodulize)
+    end
+
+    # Removes the base class constant if this factory defined it and forgets the
+    # cached base class, so the next call to #base_class builds a fresh one
+    # @return [void]
+    def reset!
+      @base_module.send(:remove_const, @base_class_name) if @defined_base_class
+      @defined_base_class = false
+      @base_class = nil
     end
 
     # Generates a valid Ruby class name from a table name
@@ -89,6 +107,22 @@ module DynamicActiveModel
     end
 
     private
+
+    # Defines the abstract base class in the base module
+    # @return [void]
+    def define_base_class
+      new_base_class = Class.new(@parent_class || ActiveRecord::Base) do
+        self.abstract_class = true
+      end
+      @base_module.const_set(@base_class_name, new_base_class)
+      @defined_base_class = true
+    end
+
+    # Checks if the base class needs its own connection
+    # @return [Boolean] False when inheriting the parent class's connection
+    def establish_connection?
+      @parent_class.nil? || !@connection_options.nil?
+    end
 
     # Returns the existing model for a class name if it belongs to the table
     # @param table_name [String] Name of the database table

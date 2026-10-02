@@ -70,6 +70,80 @@ describe DynamicActiveModel::Factory do
     end
   end
 
+  describe '#base_class with a parent class' do
+    subject { factory.base_class }
+
+    let(:factory) { described_class.new(base_module, connection_options, nil, parent_class: parent_class) }
+    let(:parent_class) do
+      base_module.const_set(:Parent, Class.new(ActiveRecord::Base) { self.abstract_class = true })
+      base_module::Parent.tap { |kls| kls.establish_connection(DB_CONFIG) }
+    end
+
+    context 'without connection options' do
+      let(:connection_options) { nil }
+
+      it 'subclasses the parent class' do
+        expect(subject.superclass).to eq(parent_class)
+      end
+
+      it "shares the parent class's connection pool" do
+        expect(subject.connection_pool).to equal(parent_class.connection_pool)
+      end
+
+      it 'creates models that read through the shared connection' do
+        expect(factory.create('users').column_names).to include('name')
+      end
+    end
+
+    context 'with connection options' do
+      let(:connection_options) { create_sqlite_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
+
+      it 'establishes its own connection' do
+        expect(subject.connection_pool).not_to equal(parent_class.connection_pool)
+        expect(subject.connection.tables).to eq(['widgets'])
+      end
+    end
+  end
+
+  describe '#reset!' do
+    context 'when the factory defined the base class' do
+      let!(:original_base_class) { factory.base_class }
+
+      before { factory.reset! }
+
+      it 'removes the base class constant' do
+        expect(base_module.const_defined?(:DynamicAbstractBase, false)).to be(false)
+      end
+
+      it 'builds a new base class on next use' do
+        expect(factory.base_class).not_to equal(original_base_class)
+      end
+    end
+
+    context 'when the base class was defined elsewhere' do
+      let!(:existing_base_class) do
+        base_module.const_set(:DynamicAbstractBase, Class.new(ActiveRecord::Base) { self.abstract_class = true })
+      end
+
+      before do
+        factory.base_class
+        factory.reset!
+      end
+
+      it 'keeps the base class constant' do
+        expect(base_module::DynamicAbstractBase).to equal(existing_base_class)
+      end
+    end
+  end
+
+  describe '#remove' do
+    before { factory.remove(factory.create('users')) }
+
+    it 'removes the model constant' do
+      expect(base_module.const_defined?(:User, false)).to be(false)
+    end
+  end
+
   describe '#base_class=' do
     subject { factory.base_class }
 

@@ -16,6 +16,10 @@ module DynamicActiveModel
   #   db.include_table 'users'
   #   db.create_models!
   #
+  # @example Rebuilding After a Schema Change
+  #   db.reset!
+  #   db.create_models!
+  #
   # @example Model Updates
   #   db.update_model(:users) do
   #     def full_name
@@ -45,8 +49,9 @@ module DynamicActiveModel
     # @param base_module [Module] The namespace for created models
     # @param connection_options [Hash] Database connection options
     # @param base_class_name [String, nil] Optional base class name for models
-    def initialize(base_module, connection_options, base_class_name = nil)
-      @factory = Factory.new(base_module, connection_options, base_class_name)
+    # @param parent_class [Class, nil] Optional superclass for the base class (see Factory)
+    def initialize(base_module, connection_options, base_class_name = nil, parent_class: nil)
+      @factory = Factory.new(base_module, connection_options, base_class_name, parent_class: parent_class)
       @table_class_names = {}
       @skip_tables = []
       @skip_table_matchers = []
@@ -104,6 +109,15 @@ module DynamicActiveModel
         @models << @factory.create(table_name, @table_class_names[table_name])
       end
       @models
+    end
+
+    # Removes every created model constant and the factory's base class so the
+    # next call to #create_models! rebuilds them, e.g. after a schema change
+    # @return [void]
+    def reset!
+      @models.each { |model| @factory.remove(model) }
+      @models.clear
+      @factory.reset!
     end
 
     # @return [Array] List of all skipped tables and patterns
@@ -182,11 +196,22 @@ module DynamicActiveModel
       !skip_table?(table_name) && include_table?(table_name) && get_model(table_name).nil?
     end
 
-    # Checks if a table should be skipped
+    # Checks if a table is one of ActiveRecord's bookkeeping tables
+    # (schema_migrations, ar_internal_metadata)
+    # @param table_name [String] Name of the table
+    # @return [Boolean] Whether the table is internal to ActiveRecord
+    def internal_table?(table_name)
+      base_class = @factory.base_class
+      [base_class.schema_migrations_table_name, base_class.internal_metadata_table_name].include?(table_name)
+    end
+
+    # Checks if a table should be skipped. ActiveRecord's internal tables are
+    # skipped unless included by exact name.
     # @param table_name [String] Name of the table
     # @return [Boolean] Whether the table should be skipped
     def skip_table?(table_name)
-      @skip_tables.include?(table_name.to_s) ||
+      (internal_table?(table_name) && !@include_tables.include?(table_name)) ||
+        @skip_tables.include?(table_name.to_s) ||
         @skip_table_matchers.any? { |r| r.match(table_name) }
     end
 

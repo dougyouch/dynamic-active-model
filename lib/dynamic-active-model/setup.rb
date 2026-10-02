@@ -18,6 +18,13 @@ module DynamicActiveModel
   #     create_models!
   #   end
   #
+  # @example Sharing ApplicationRecord's Connection
+  #   module DB
+  #     include DynamicActiveModel::Setup
+  #     parent_class ApplicationRecord
+  #     create_models!
+  #   end
+  #
   # @example With Custom Relationships
   #   module DB
   #     include DynamicActiveModel::Setup
@@ -45,6 +52,7 @@ module DynamicActiveModel
       def dynamic_active_model_config
         {
           connection_options: nil,
+          parent_class: nil,
           skip_tables: [],
           relationships: {},
           table_class_names: {},
@@ -68,24 +76,25 @@ module DynamicActiveModel
                     .configuration_hash
         end
 
-        if options
-          config = dynamic_active_model_config
-          config[:connection_options] = options
-          redefine_class_method(:dynamic_active_model_config, config)
-        end
+        update_config(:connection_options, options) if options
 
         dynamic_active_model_config[:connection_options]
+      end
+
+      # Sets or gets the superclass for the generated base class. Without connection
+      # options, models inherit the parent class's connection.
+      # @param klass [Class, nil] Superclass, e.g. ApplicationRecord
+      # @return [Class, nil] The current parent class
+      def parent_class(klass = nil)
+        update_config(:parent_class, klass) if klass
+        dynamic_active_model_config[:parent_class]
       end
 
       # Sets or gets the list of tables to skip
       # @param tables [Array<String>, nil] Tables to skip
       # @return [Array<String>] The current list of skipped tables
       def skip_tables(tables = nil)
-        if tables
-          config = dynamic_active_model_config
-          config[:skip_tables] = tables
-          redefine_class_method(:dynamic_active_model_config, config)
-        end
+        update_config(:skip_tables, tables) if tables
         dynamic_active_model_config[:skip_tables]
       end
 
@@ -101,11 +110,7 @@ module DynamicActiveModel
       # @param all_relationships [Hash, nil] All custom relationships
       # @return [Hash] The current relationships
       def relationships(all_relationships = nil)
-        if all_relationships
-          config = dynamic_active_model_config
-          config[:relationships] = all_relationships
-          redefine_class_method(:dynamic_active_model_config, config)
-        end
+        update_config(:relationships, all_relationships) if all_relationships
         dynamic_active_model_config[:relationships]
       end
 
@@ -140,11 +145,7 @@ module DynamicActiveModel
       # @param path [String, nil] Path to extension files
       # @return [String, nil] The current extensions path
       def extensions_path(path = nil)
-        if path
-          config = dynamic_active_model_config
-          config[:extensions_path] = path
-          redefine_class_method(:dynamic_active_model_config, config)
-        end
+        update_config(:extensions_path, path) if path
         dynamic_active_model_config[:extensions_path]
       end
 
@@ -152,11 +153,7 @@ module DynamicActiveModel
       # @param suffix [String, nil] File extension suffix
       # @return [String] The current extensions suffix
       def extensions_suffix(suffix = nil)
-        if suffix
-          config = dynamic_active_model_config
-          config[:extensions_suffix] = suffix
-          redefine_class_method(:dynamic_active_model_config, config)
-        end
+        update_config(:extensions_suffix, suffix) if suffix
         dynamic_active_model_config[:extensions_suffix]
       end
 
@@ -173,11 +170,23 @@ module DynamicActiveModel
             connection_options,
             skip_tables,
             relationships,
-            table_class_names
+            table_class_names,
+            parent_class: parent_class
           )
         )
         database.update_all_models(extensions_path, extensions_suffix) if extensions_path
         database
+      end
+
+      private
+
+      # Stores a single configuration value
+      # @param key [Symbol] Configuration key
+      # @param value [Object] Configuration value
+      def update_config(key, value)
+        config = dynamic_active_model_config
+        config[key] = value
+        redefine_class_method(:dynamic_active_model_config, config)
       end
     end
   end
