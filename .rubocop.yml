@@ -52,6 +52,7 @@ Layout/LineLength:
 Naming/FileName:
   Exclude:
     - 'lib/dynamic-active-model.rb'
+    - 'spec/dynamic-active-model_spec.rb'
 
 # These methods return option hashes, not predicates
 Naming/PredicatePrefix:
