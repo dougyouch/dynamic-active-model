@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.1](https://github.com/dougyouch/dynamic-active-model/compare/v0.16.0...v0.16.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **rails:** clear the schema cache through schema_reflection on Rails 7.1 ([9c7fbf7](https://github.com/dougyouch/dynamic-active-model/commit/9c7fbf7142c4cb4204c47308ba34b28bafd8cb33))
+
 ## [0.16.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.15.1...v0.16.0) (2026-10-02)
 
 
