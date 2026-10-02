@@ -70,7 +70,7 @@ module DynamicActiveModel
           options = ActiveRecord::Base
                     .configurations
                     .configs_for(
-                      env_name: Rails.env,
+                      env_name: ::Rails.env,
                       name: name
                     )
                     .configuration_hash
