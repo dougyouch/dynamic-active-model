@@ -105,6 +105,45 @@ describe DynamicActiveModel::Factory do
     end
   end
 
+  describe '#reset!' do
+    context 'when the factory defined the base class' do
+      let!(:original_base_class) { factory.base_class }
+
+      before { factory.reset! }
+
+      it 'removes the base class constant' do
+        expect(base_module.const_defined?(:DynamicAbstractBase, false)).to be(false)
+      end
+
+      it 'builds a new base class on next use' do
+        expect(factory.base_class).not_to equal(original_base_class)
+      end
+    end
+
+    context 'when the base class was defined elsewhere' do
+      let!(:existing_base_class) do
+        base_module.const_set(:DynamicAbstractBase, Class.new(ActiveRecord::Base) { self.abstract_class = true })
+      end
+
+      before do
+        factory.base_class
+        factory.reset!
+      end
+
+      it 'keeps the base class constant' do
+        expect(base_module::DynamicAbstractBase).to equal(existing_base_class)
+      end
+    end
+  end
+
+  describe '#remove' do
+    before { factory.remove(factory.create('users')) }
+
+    it 'removes the model constant' do
+      expect(base_module.const_defined?(:User, false)).to be(false)
+    end
+  end
+
   describe '#base_class=' do
     subject { factory.base_class }
 

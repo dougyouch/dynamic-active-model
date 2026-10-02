@@ -192,6 +192,32 @@ describe DynamicActiveModel::Database do
     it { expect(company_model.inheritance_column).to eq('_type_disabled') }
   end
 
+  describe '#reset!' do
+    let(:connection_options) { create_sqlite_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
+    let!(:original_widget) do
+      database.create_models!
+      base_module::Widget
+    end
+
+    before { database.reset! }
+
+    it 'removes the model and base class constants' do
+      expect(base_module.const_defined?(:Widget, false)).to be(false)
+      expect(base_module.const_defined?(:DynamicAbstractBase, false)).to be(false)
+    end
+
+    it 'forgets the created models' do
+      expect(database.models).to be_empty
+    end
+
+    it 'rebuilds models from the current schema' do
+      SQLite3::Database.new(connection_options[:database]) { |db| db.execute('CREATE TABLE gadgets (id INTEGER PRIMARY KEY)') }
+      database.create_models!
+      expect(database.models.map(&:table_name)).to contain_exactly('widgets', 'gadgets')
+      expect(base_module::Widget).not_to equal(original_widget)
+    end
+  end
+
   describe '#get_model' do
     subject { database.get_model(table_name) }
 

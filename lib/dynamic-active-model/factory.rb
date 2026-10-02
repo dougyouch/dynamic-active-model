@@ -80,6 +80,22 @@ module DynamicActiveModel
         end
     end
 
+    # Removes a model's constant from the base module
+    # @param model [Class] A model class created by this factory
+    # @return [void]
+    def remove(model)
+      @base_module.send(:remove_const, model.name.demodulize)
+    end
+
+    # Removes the base class constant if this factory defined it and forgets the
+    # cached base class, so the next call to #base_class builds a fresh one
+    # @return [void]
+    def reset!
+      @base_module.send(:remove_const, @base_class_name) if @defined_base_class
+      @defined_base_class = false
+      @base_class = nil
+    end
+
     # Generates a valid Ruby class name from a table name
     # @param table_name [String] Name of the database table
     # @return [String] A valid Ruby class name

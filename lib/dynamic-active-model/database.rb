@@ -16,6 +16,10 @@ module DynamicActiveModel
   #   db.include_table 'users'
   #   db.create_models!
   #
+  # @example Rebuilding After a Schema Change
+  #   db.reset!
+  #   db.create_models!
+  #
   # @example Model Updates
   #   db.update_model(:users) do
   #     def full_name
@@ -105,6 +109,15 @@ module DynamicActiveModel
         @models << @factory.create(table_name, @table_class_names[table_name])
       end
       @models
+    end
+
+    # Removes every created model constant and the factory's base class so the
+    # next call to #create_models! rebuilds them, e.g. after a schema change
+    # @return [void]
+    def reset!
+      @models.each { |model| @factory.remove(model) }
+      @models.clear
+      @factory.reset!
     end
 
     # @return [Array] List of all skipped tables and patterns
