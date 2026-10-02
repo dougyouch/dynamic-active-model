@@ -51,6 +51,12 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseDefinition do
     end
   end
 
+  describe '#load_hook' do
+    it 'is named after the folder' do
+      expect(definition.load_hook).to eq(:cars_db)
+    end
+  end
+
   describe '#extensions_path' do
     it 'is the folder under app/models' do
       expect(definition.extensions_path(Pathname.new('/app'))).to eq('/app/app/models/cars_db')

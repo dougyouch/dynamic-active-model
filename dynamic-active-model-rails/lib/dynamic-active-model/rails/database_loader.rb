@@ -6,6 +6,8 @@ module DynamicActiveModel
   module Rails
     # Builds one declared database's models on demand and tears them down again.
     # Loading is synchronized so concurrent first references build only once.
+    # After every build it runs the database's ActiveSupport load hook, so
+    # ActiveSupport.on_load(:cars_db) { ... } reapplies after reloads and migrations.
     class DatabaseLoader
       # @return [DatabaseDefinition]
       attr_reader :definition
@@ -41,13 +43,15 @@ module DynamicActiveModel
 
       private
 
-      # Creates models, relationships and extensions; undoes a partial build on error
+      # Creates models, relationships and extensions, then runs load hooks;
+      # undoes a partial build on error
       # @return [void]
       def build
         @database = new_database
         @database.create_models!
         Explorer.build_relationships!(@database, definition.relationships)
         load_extensions
+        ActiveSupport.run_load_hooks(definition.load_hook, @database)
       rescue StandardError
         reset!
         raise

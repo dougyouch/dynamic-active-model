@@ -53,7 +53,7 @@ The companion gem lives in `dynamic-active-model-rails/`. It shares this repo's 
 | Configuration | Collects `add_database` declarations |
 | DatabaseDefinition | One database: connection, `<Name>DB` namespace, `<name>_db` folder, table settings |
 | LazyNamespace | Extended into the namespace module; `const_missing` builds models on first reference |
-| DatabaseLoader | Builds a database's models (synchronized), applies `.ext.rb` files, undoes a partial build |
+| DatabaseLoader | Builds a database's models (synchronized), applies `.ext.rb` files, runs the `:<name>_db` ActiveSupport load hook, undoes a partial build |
 | AutoloaderSetup | Zeitwerk-only `cars_db` → `CarsDB` inflection; ignores `.ext.rb` files |
 | SchemaChangeHook | Prepended to `Migrator#migrate`/`#run` and `DatabaseTasks.load_schema` to reset models |
 | Railtie | Registers eager loading, reset on code reload, and a watch on `db/` |
