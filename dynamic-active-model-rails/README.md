@@ -13,6 +13,21 @@ gem 'dynamic-active-model-rails'
 
 `dynamic-active-model-rails` is released in lockstep with `dynamic-active-model` and pins the same version.
 
+## Generators
+
+```bash
+bin/rails generate dynamic_active_model:install                        # DB, app/models/db/
+bin/rails generate dynamic_active_model:install grant_db               # GrantDB, app/models/grant_db/
+bin/rails generate dynamic_active_model:database cars --connection cars
+bin/rails generate dynamic_active_model:extension grant_db users       # app/models/grant_db/users.ext.rb
+```
+
+- **`install [NAME]`** creates `config/initializers/dynamic_active_model.rb`, declaring the first database (default `db`), and its models folder.
+- **`database NAME`** adds another `add_database` line to the initializer and creates the folder. It refuses a namespace the app already declares.
+- **`extension DATABASE TABLE`** creates an extension file. `DATABASE` can be a name (`grant_db`) or a namespace (`GrantDB`). The generator uses the app's configuration, so a custom `extensions_path:` or `extensions_suffix:` is respected.
+
+`--connection NAME` points the database at a `database.yml` entry. The generators warn if the current environment has no such entry. Without `--connection`, the database shares `ApplicationRecord`'s connection.
+
 ## Configuration
 
 ```ruby

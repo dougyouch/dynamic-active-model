@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+# Each database's tables become ActiveRecord models in a <Name>DB namespace. Models
+# are built on first use and rebuilt after code reloads and migrations. Per-table
+# extensions go in app/models/<name>_db/<table_name>.ext.rb.
+# https://github.com/dougyouch/dynamic-active-model/tree/master/dynamic-active-model-rails
+DynamicActiveModel::Rails.configure do |config|
+  <%= add_database_line %>
+  # config.add_database :cars, :cars do |db|  # CarsDB, "cars" entry in database.yml
+  #   db.skip_tables 'legacy_*'
+  # end
+end
+
+# Setup that touches the models (e.g. has_paper_trail) belongs in a load hook,
+# which runs after every build of <%= definition.module_name %>'s models:
+# ActiveSupport.on_load(<%= definition.load_hook.inspect %>) do
+#   get_model!(:users).has_paper_trail
+# end
