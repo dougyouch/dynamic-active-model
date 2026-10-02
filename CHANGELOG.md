@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0](https://github.com/dougyouch/dynamic-active-model/compare/v1.0.0...v1.1.0) (2026-10-02)
+
+
+### Features
+
+* **associations:** opt-in detection from foreign key constraints ([4f7da12](https://github.com/dougyouch/dynamic-active-model/commit/4f7da12fab7dc6441212e6b07dcfd50a67ad2226))
+* opt-in association detection from foreign key constraints ([f4cd4b1](https://github.com/dougyouch/dynamic-active-model/commit/f4cd4b15bb91fa7c2614f540b1fadcc4b16cce52))
+* **rails:** add_database foreign_key_constraints: option ([3dee585](https://github.com/dougyouch/dynamic-active-model/commit/3dee585319f12536ec951cf3bd0969336dc7960d))
+
 ## [1.0.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.16.1...v1.0.0) (2026-10-02)
 
 
