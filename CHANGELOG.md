@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.14.0...v0.15.0) (2026-10-02)
+
+
+### Features
+
+* **rails:** support connects_to for read replicas and shards ([c4b5eaa](https://github.com/dougyouch/dynamic-active-model/commit/c4b5eaa7b1c9b483677fac557e1e2c688654e12c))
+* **rails:** support connects_to for read replicas and shards ([1881a26](https://github.com/dougyouch/dynamic-active-model/commit/1881a26cc53c3a0b5f15c91d29d9b9cb3545412e))
+
 ## [0.14.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.13.0...v0.14.0) (2026-10-02)
 
 
