@@ -103,27 +103,16 @@ describe DynamicActiveModel::Setup do
     end
   end
 
-  describe '#connection_options with a database configuration name' do
-    subject { db_module.connection_options('primary') }
-
-    let(:configurations) { instance_double(ActiveRecord::DatabaseConfigurations) }
-    let(:db_config) { instance_double(ActiveRecord::DatabaseConfigurations::HashConfig, configuration_hash: DB_CONFIG) }
-
-    before do
-      stub_const('Rails', Module.new)
-      # dynamic-active-model-rails defines DynamicActiveModel::Rails; the lookup must still reach ::Rails
-      stub_const('DynamicActiveModel::Rails', Module.new)
-      allow(Rails).to receive(:env).and_return('test')
-      allow(ActiveRecord::Base).to receive(:configurations).and_return(configurations)
-      allow(configurations).to receive(:configs_for).with(env_name: 'test', name: 'primary').and_return(db_config)
+  describe '#connection_options with a String' do
+    it 'rejects a database.yml name, pointing at the Symbol form' do
+      expect { db_module.connection_options('secondary') }
+        .to raise_error(ArgumentError, /no longer accepts a database.yml name as a String \("secondary"\).*connection_options :secondary/)
+      expect(db_module.connection_options).to be_nil
     end
 
-    it 'loads the named configuration for the current Rails environment' do
-      DynamicActiveModel.deprecator.silence { expect(subject).to eq(DB_CONFIG) }
-    end
-
-    it 'warns that a String name is deprecated, pointing at the caller' do
-      expect { subject }.to output(/database.yml name as a String \("primary"\) is deprecated.*connection_options :primary.*called from .*setup_spec\.rb/).to_stderr
+    it 'accepts a URL' do
+      db_module.connection_options('sqlite3:///tmp/example.db')
+      expect(db_module.connection_options).to eq('sqlite3:///tmp/example.db')
     end
   end
 

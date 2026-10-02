@@ -63,11 +63,12 @@ module DynamicActiveModel
 
       # Sets or gets the database connection options
       # @param options [Hash, Symbol, String, nil] Anything establish_connection accepts:
-      #   a config hash, or a Symbol naming a database.yml entry for the current
-      #   environment. A String database.yml name is deprecated.
-      # @return [Hash, Symbol] The current connection options
+      #   a config hash, a URL, or a Symbol naming a database.yml entry for the
+      #   current environment
+      # @return [Hash, Symbol, String] The current connection options
+      # @raise [ArgumentError] For a database.yml name given as a String
       def connection_options(options = nil)
-        options = deprecated_named_configuration(options) if options.is_a?(String)
+        reject_database_yml_name!(options) if options.is_a?(String)
 
         update_config(:connection_options, options) if options
 
@@ -173,17 +174,16 @@ module DynamicActiveModel
 
       private
 
-      # Resolves a database.yml name given as a String, warning that it's deprecated
-      # @param name [String]
-      # @return [Hash] The named configuration for the current Rails environment
-      def deprecated_named_configuration(name)
-        DynamicActiveModel.deprecator.warn(
-          "connection_options with a database.yml name as a String (#{name.inspect}) is deprecated; " \
-          "pass a Symbol instead (connection_options #{name.to_sym.inspect}), " \
-          'or use dynamic-active-model-rails in a Rails app',
-          caller_locations(2) # point at the caller of connection_options
-        )
-        ActiveRecord::Base.configurations.configs_for(env_name: ::Rails.env, name: name).configuration_hash
+      # A String database.yml name was deprecated in 0.16 and removed in 1.0. Without
+      # this check it would reach establish_connection as a URL and fail confusingly.
+      # @param options [String]
+      # @raise [ArgumentError] Unless the String is a URL
+      def reject_database_yml_name!(options)
+        return if options.include?('://')
+
+        raise ArgumentError,
+              "connection_options no longer accepts a database.yml name as a String (#{options.inspect}); " \
+              "pass a Symbol instead (connection_options #{options.to_sym.inspect})"
       end
 
       # Stores a single configuration value

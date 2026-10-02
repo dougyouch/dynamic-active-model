@@ -21,7 +21,7 @@ A Ruby gem that automatically discovers your database schema and creates corresp
 
 ## Installation
 
-Tested in CI against Ruby 3.2–4.0 and ActiveRecord 7.1–8.1.
+Requires Ruby 3.2+ and ActiveRecord 7.1+. Tested in CI against Ruby 3.2–4.0 and ActiveRecord 7.1–8.1.
 
 Add this line to your application's Gemfile:
 
@@ -220,7 +220,7 @@ The gem supports all ActiveRecord database adapters:
 }
 ```
 
-Connection options can be anything `establish_connection` accepts: a config hash, a URL, or a Symbol naming an entry in `ActiveRecord::Base.configurations` for the current environment (for example `connection_options :secondary` in the `Setup` DSL). Passing a database.yml name as a String to `connection_options` is deprecated and will be removed in 1.0.
+Connection options can be anything `establish_connection` accepts: a config hash, a URL, or a Symbol naming an entry in `ActiveRecord::Base.configurations` for the current environment (for example `connection_options :secondary` in the `Setup` DSL). Since 1.0, `connection_options` no longer accepts a database.yml name as a String. Pass a Symbol instead.
 
 To share an existing connection pool instead of opening a new one, pass a `parent_class`. The generated abstract base class subclasses it and inherits its connection when no connection options are given:
 

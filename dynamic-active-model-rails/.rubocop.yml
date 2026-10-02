@@ -2,9 +2,6 @@
 
 inherit_from: ../.rubocop.yml
 
-AllCops:
-  TargetRubyVersion: 3.2
-
 Naming/FileName:
   Exclude:
     - 'lib/dynamic-active-model-rails.rb'
