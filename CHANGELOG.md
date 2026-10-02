@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.11.0...v0.12.0) (2026-10-02)
+
+
+### Features
+
+* **rails:** run an ActiveSupport load hook after each database build ([9f66fde](https://github.com/dougyouch/dynamic-active-model/commit/9f66fde3822080aef8dbef261753d4de0c6c70a5))
+* **rails:** run an ActiveSupport load hook after each database build ([ebf0a20](https://github.com/dougyouch/dynamic-active-model/commit/ebf0a206b8a1017664b059d20aa29d311a284d3b))
+
 ## [0.11.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.10.0...v0.11.0) (2026-10-02)
 
 
