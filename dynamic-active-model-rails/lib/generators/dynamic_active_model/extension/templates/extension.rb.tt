@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+# Extends <%= model_name %> (table <%= table %>). Columns and associations that
+# follow foreign key conventions are detected from the schema; add the rest here:
+# through/polymorphic associations, validations, scopes and methods.
+update_model do
+end

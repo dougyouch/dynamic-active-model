@@ -16,6 +16,7 @@ FileUtils.rm_f(Dir.glob(File.join(__dir__, 'dummy', 'tmp', '*.sqlite3*')))
 $LOAD_PATH.unshift(__dir__)
 require 'dummy/config/environment'
 require 'support/dummy_schema'
+require 'support/generator_helpers'
 
 DummySchema.create!
 ActiveRecord::Migration.verbose = false
