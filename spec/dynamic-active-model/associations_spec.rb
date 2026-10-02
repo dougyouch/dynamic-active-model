@@ -148,6 +148,81 @@ describe DynamicActiveModel::Associations do
     end
   end
 
+  describe 'foreign key constraints' do
+    let(:connection_options) { create_test_database(FOREIGN_KEY_CONSTRAINTS_SCHEMA) }
+
+    def model(table_name)
+      database.get_model!(table_name)
+    end
+
+    def association(table_name, name)
+      model(table_name).reflect_on_association(name)
+    end
+
+    before do
+      database.skip_table 'archivists'
+      database.create_models!
+    end
+
+    context 'when not in use (the default)' do
+      before { relations.build! }
+
+      it 'relates columns by naming convention only' do
+        expect(association('posts', :user).klass).to eq(model('users'))
+        expect(association('posts', :author)).to be_nil
+        expect(association('employees', :manager)).to be_nil
+        expect(association('profiles', :account).klass).to eq(model('accounts'))
+      end
+    end
+
+    context 'when in use' do
+      before do
+        relations.use_foreign_key_constraints!
+        relations.build!
+      end
+
+      it 'relates a column the naming convention misses' do
+        expect(association('posts', :author)).to have_attributes(macro: :belongs_to, klass: model('users'))
+        expect(association('users', :author_posts)).to have_attributes(macro: :has_many, klass: model('posts'))
+      end
+
+      it 'keeps the conventional names for conventional columns' do
+        expect(association('posts', :user).klass).to eq(model('users'))
+        expect(association('users', :posts).foreign_key).to eq('user_id')
+      end
+
+      it 'relates a self-reference' do
+        expect(association('employees', :manager).klass).to eq(model('employees'))
+        expect(association('employees', :manager_employees).foreign_key).to eq('manager_id')
+      end
+
+      it 'follows the constraint over the naming convention' do
+        expect(association('profiles', :account).klass).to eq(model('users'))
+        expect(association('accounts', :profiles)).to be_nil
+      end
+
+      it 'uses the referenced column when it is not the primary key' do
+        expect(association('tickets', :requester).options[:primary_key]).to eq('legacy_id')
+        expect(association('users', :requester_tickets).options[:primary_key]).to eq('legacy_id')
+      end
+
+      it 'loads records through constraint associations' do
+        model('users').create!(id: 1, legacy_id: 101, name: 'Ada')
+        model('posts').create!(id: 1, author_id: 1)
+        model('tickets').create!(id: 1, requester_id: 101)
+        expect(model('posts').find(1).author.name).to eq('Ada')
+        expect(model('tickets').find(1).requester.name).to eq('Ada')
+        expect(model('users').find(1).requester_tickets.map(&:id)).to eq([1])
+      end
+
+      it 'adds nothing for skipped constraints' do
+        expect(association('posts', :owner)).to be_nil
+        expect(association('posts', :archivist)).to be_nil
+        expect(association('stores', :region_country)).to be_nil
+      end
+    end
+  end
+
   describe 'index lookups' do
     def queries_during(&block)
       queries = []

@@ -63,6 +63,26 @@ describe DynamicActiveModel::Setup do
     end
   end
 
+  describe '#foreign_key_constraints' do
+    it 'defaults to false' do
+      expect(db_module.foreign_key_constraints).to be(false)
+    end
+
+    context 'when enabled' do
+      before do
+        db_module.connection_options(create_test_database(FOREIGN_KEY_CONSTRAINTS_SCHEMA))
+        db_module.skip_tables ['archivists']
+        db_module.foreign_key_constraints true
+        db_module.create_models!
+      end
+
+      it 'relates columns through constraints' do
+        expect(db_module.foreign_key_constraints).to be(true)
+        expect(db_module::Employee.reflect_on_association(:manager).klass).to eq(db_module::Employee)
+      end
+    end
+  end
+
   describe '#extensions_path' do
     subject { db_module.extensions_path }
 
