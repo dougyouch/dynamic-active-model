@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.13.0...v0.14.0) (2026-10-02)
+
+
+### Features
+
+* **rails:** add install, database and extension generators ([6004307](https://github.com/dougyouch/dynamic-active-model/commit/6004307086b62f0f4467d2cc8fb2e606c4d9237c))
+* **rails:** add install, database and extension generators ([b1080ec](https://github.com/dougyouch/dynamic-active-model/commit/b1080ec7f8f958b8d96518cb098fa71944891c1d))
+
 ## [0.13.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.12.0...v0.13.0) (2026-10-02)
 
 
