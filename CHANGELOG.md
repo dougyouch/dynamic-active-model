@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.15.1](https://github.com/dougyouch/dynamic-active-model/compare/v0.15.0...v0.15.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **rails:** clear a database's schema cache when resetting its models ([8667e06](https://github.com/dougyouch/dynamic-active-model/commit/8667e068ab24147c6466d811c0f27dc7c1e1c378))
+
+
+### Performance Improvements
+
+* **associations:** read indexes through the connection's schema cache ([c90dfe2](https://github.com/dougyouch/dynamic-active-model/commit/c90dfe286c606ea090d26ca7f4a457167697527b))
+* build models from Rails' schema cache (indexes) ([aed2be1](https://github.com/dougyouch/dynamic-active-model/commit/aed2be14dcede8fb48d26e1478601f162e7209d5))
+
 ## [0.15.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.14.0...v0.15.0) (2026-10-02)
 
 
