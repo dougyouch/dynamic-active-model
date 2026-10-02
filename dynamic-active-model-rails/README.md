@@ -78,6 +78,7 @@ The `cars_db` → `CarsDB` mapping is registered with the Rails autoloader only,
 | `module_name:` | `"<Name>DB"` | Namespace override. |
 | `parent_class:` | `'ApplicationRecord'` | Superclass of the generated abstract base class, given as a name so it can be reloaded. |
 | `connects_to:` | `nil` | Roles for Rails multi-database support, such as `{ writing: :cars, reading: :cars_replica }`, or `connects_to`'s own arguments (`{ database: ..., shards: ... }`). Can't be combined with a `connection`. |
+| `foreign_key_constraints:` | `false` | Also derive associations from the database's foreign key constraints. This catches columns like `posts.author_id → users` and self-references, and costs one query per table at build time. See the core README. |
 | `extensions_path:` | `app/models/<folder>` | Directory of extension files, absolute or relative to `Rails.root`. The default folder may be absent; a configured path must exist. |
 | `extensions_suffix:` | `'.ext.rb'` | Suffix of extension files. The autoloader ignores files with this suffix. |
 
