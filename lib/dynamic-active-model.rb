@@ -37,6 +37,9 @@ module DynamicActiveModel
   # Handles foreign key relationships and constraints
   autoload :ForeignKey, 'dynamic-active-model/foreign_key'
 
+  # Resolves the database's foreign key constraints to models
+  autoload :ForeignKeyConstraints, 'dynamic-active-model/foreign_key_constraints'
+
   # Manages automatic discovery and setup of model relationships
   autoload :Associations, 'dynamic-active-model/associations'
 

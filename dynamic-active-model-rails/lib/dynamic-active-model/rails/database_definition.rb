@@ -29,6 +29,9 @@ module DynamicActiveModel
       # @return [Hash, nil] Keyword arguments for the base class's connects_to
       attr_reader :connects_to
 
+      # @return [Boolean] Whether to also relate columns through foreign key constraints
+      attr_reader :foreign_key_constraints
+
       # @return [Hash] Custom relationship names by table and foreign key
       attr_reader :relationships
 
@@ -44,13 +47,17 @@ module DynamicActiveModel
       # @param extensions_suffix [String] File suffix of extension files
       # @param connects_to [Hash, nil] Roles ({ writing: :cars, reading: :cars_replica }) or
       #   connects_to's own arguments ({ database: ..., shards: ... })
+      # @param foreign_key_constraints [Boolean] Also relate columns through the database's
+      #   foreign key constraints
       # @raise [ArgumentError] If both a connection and connects_to are given
       def initialize(name, connection = nil, module_name: nil, parent_class: 'ApplicationRecord',
-                     extensions_path: nil, extensions_suffix: '.ext.rb', connects_to: nil)
+                     extensions_path: nil, extensions_suffix: '.ext.rb', connects_to: nil,
+                     foreign_key_constraints: false)
         raise ArgumentError, 'pass either a connection or connects_to:, not both' if connection && connects_to
 
         @connection = connection
         @connects_to = connects_to && normalize_connects_to(connects_to)
+        @foreign_key_constraints = foreign_key_constraints
         @module_name = module_name || default_module_name(name)
         @parent_class_name = parent_class.to_s
         @extensions_path = extensions_path&.to_s

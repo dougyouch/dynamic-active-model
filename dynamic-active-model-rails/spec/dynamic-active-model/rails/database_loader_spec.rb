@@ -58,6 +58,26 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseLoader do
       end
     end
 
+    context 'with foreign_key_constraints' do
+      let(:definition) do
+        DynamicActiveModel::Rails::DatabaseDefinition.new(:plain, foreign_key_constraints: true)
+                                                     .tap { |db| db.include_tables 'users', 'reviews' }
+      end
+
+      before do
+        DummySchema.execute(:primary, <<~SQL)
+          CREATE TABLE reviews (id INTEGER PRIMARY KEY, reviewer_id INTEGER, FOREIGN KEY (reviewer_id) REFERENCES users(id))
+        SQL
+      end
+
+      after { DummySchema.execute(:primary, 'DROP TABLE IF EXISTS reviews') }
+
+      it 'relates columns through constraints' do
+        loader.load!
+        expect(PlainDB::Review.reflect_on_association(:reviewer).klass).to eq(PlainDB::User)
+      end
+    end
+
     context 'with a custom extensions_path and suffix' do
       let(:definition) do
         DynamicActiveModel::Rails::DatabaseDefinition.new(:plain, extensions_path: 'ext', extensions_suffix: '.model.rb')

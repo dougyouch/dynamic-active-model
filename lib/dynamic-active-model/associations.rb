@@ -53,6 +53,13 @@ module DynamicActiveModel
         .add(foreign_key, relationship_name)
     end
 
+    # Relates columns through the database's foreign key constraints as well as by
+    # naming convention. A column with a constraint follows the constraint.
+    # @return [void]
+    def use_foreign_key_constraints!
+      @constraints = ForeignKeyConstraints.new(@database)
+    end
+
     # Builds all relationships between models based on foreign keys and constraints
     # This method:
     # 1. Maps foreign keys to their corresponding models
@@ -64,15 +71,7 @@ module DynamicActiveModel
       foreign_key_to_models = create_foreign_key_to_model_map
 
       @database.models.each do |model|
-        model.column_names.each do |column_name|
-          next unless foreign_key_to_models[column_name.downcase]
-
-          foreign_key_to_models[column_name.downcase].each do |foreign_model, relationship_name|
-            next if foreign_model == model
-
-            add_relationships(relationship_name, model, foreign_model, column_name)
-          end
-        end
+        model.column_names.each { |column_name| add_column_relationships(model, column_name, foreign_key_to_models) }
       end
 
       @join_tables.each do |join_table_model|
@@ -84,6 +83,30 @@ module DynamicActiveModel
     end
 
     private
+
+    # Relates a column through its foreign key constraint when it has one (and
+    # constraints are in use), otherwise by naming convention
+    # @param model [Class] The model with the column
+    # @param column_name [String]
+    # @param foreign_key_to_models [Hash] See #create_foreign_key_to_model_map
+    def add_column_relationships(model, column_name, foreign_key_to_models)
+      constraint = @constraints&.find(model, column_name)
+      return add_constraint_relationships(constraint) if constraint
+
+      foreign_key_to_models.fetch(column_name.downcase, []).each do |foreign_model, relationship_name|
+        next if foreign_model == model
+
+        add_relationships(relationship_name, model, foreign_model, column_name)
+      end
+    end
+
+    # Adds the relationships a foreign key constraint describes; unlike the naming
+    # convention, these may reference the same model (employees.manager_id)
+    # @param constraint [ForeignKeyConstraints::Constraint]
+    def add_constraint_relationships(constraint)
+      add_relationships(constraint.relationship_name, constraint.model, constraint.referenced_model,
+                        constraint.column, constraint.primary_key)
+    end
 
     # Adds has_and_belongs_to_many relationships between two models
     # @param join_table_model [Class] The join table model
@@ -101,12 +124,14 @@ module DynamicActiveModel
     # @param model [Class] The model with the foreign key
     # @param belongs_to_model [Class] The model being referenced
     # @param foreign_key [String] The foreign key column name
-    def add_relationships(relationship_name, model, belongs_to_model, foreign_key)
-      add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
+    # @param primary_key [String] The referenced column, normally the primary key
+    def add_relationships(relationship_name, model, belongs_to_model, foreign_key,
+                          primary_key = belongs_to_model.primary_key)
+      add_belongs_to(relationship_name, model, belongs_to_model, foreign_key, primary_key)
       if unique_index?(model, foreign_key)
-        add_has_one(relationship_name, belongs_to_model, model, foreign_key)
+        add_has_one(relationship_name, belongs_to_model, model, foreign_key, primary_key)
       else
-        add_has_many(relationship_name, belongs_to_model, model, foreign_key)
+        add_has_many(relationship_name, belongs_to_model, model, foreign_key, primary_key)
       end
     end
 
@@ -115,12 +140,13 @@ module DynamicActiveModel
     # @param model [Class] The model with the foreign key
     # @param belongs_to_model [Class] The model being referenced
     # @param foreign_key [String] The foreign key column name
-    def add_belongs_to(relationship_name, model, belongs_to_model, foreign_key)
+    # @param primary_key [String] The referenced column
+    def add_belongs_to(relationship_name, model, belongs_to_model, foreign_key, primary_key)
       model.belongs_to(
         relationship_name.singularize.to_sym,
         class_name: belongs_to_model.name,
         foreign_key: foreign_key,
-        primary_key: belongs_to_model.primary_key
+        primary_key: primary_key
       )
     end
 
@@ -129,12 +155,13 @@ module DynamicActiveModel
     # @param model [Class] The referenced (parent) model that gets the association
     # @param has_many_model [Class] The model with the foreign key
     # @param foreign_key [String] The foreign key column name
-    def add_has_many(relationship_name, model, has_many_model, foreign_key)
+    # @param primary_key [String] The referenced column on the parent model
+    def add_has_many(relationship_name, model, has_many_model, foreign_key, primary_key)
       model.has_many(
         generate_has_many_association_name(relationship_name, model, has_many_model),
         class_name: has_many_model.name,
         foreign_key: foreign_key,
-        primary_key: model.primary_key
+        primary_key: primary_key
       )
     end
 
@@ -143,12 +170,13 @@ module DynamicActiveModel
     # @param model [Class] The referenced (parent) model that gets the association
     # @param has_one_model [Class] The model with the foreign key
     # @param foreign_key [String] The foreign key column name
-    def add_has_one(relationship_name, model, has_one_model, foreign_key)
+    # @param primary_key [String] The referenced column on the parent model
+    def add_has_one(relationship_name, model, has_one_model, foreign_key, primary_key)
       model.has_one(
         generate_has_one_association_name(relationship_name, model, has_one_model),
         class_name: has_one_model.name,
         foreign_key: foreign_key,
-        primary_key: model.primary_key
+        primary_key: primary_key
       )
     end
 

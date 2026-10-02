@@ -107,6 +107,19 @@ describe DynamicActiveModel::Explorer do
       end
     end
 
+    context 'with foreign key constraints' do
+      subject do
+        described_class.explore(base_module, connection_options, ['archivists'], {}, {}, foreign_key_constraints: true)
+      end
+
+      let(:connection_options) { create_test_database(FOREIGN_KEY_CONSTRAINTS_SCHEMA) }
+
+      it 'relates columns through constraints' do
+        subject
+        expect(base_module::Post.reflect_on_association(:author).klass).to eq(base_module::User)
+      end
+    end
+
     context 'with custom relationships' do
       let(:relationships) do
         {

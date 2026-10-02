@@ -66,6 +66,10 @@ OptionParser.new do |opts|
     options[:id_suffix] = v
   end
 
+  opts.on('--foreign-key-constraints', 'Also relate columns through foreign key constraints') do
+    options[:foreign_key_constraints] = true
+  end
+
   opts.on('-c', '--config FILE', "config file, default #{DEFAULT_CONFIG_FILE}") do |v|
     options[:config_file] = v
   end
@@ -91,6 +95,7 @@ if options[:config_file]
   config = YAML.safe_load_file(options[:config_file], permitted_classes: [Symbol])[options[:config_section]]
   options[:skip_tables] = config.delete('skip_tables') || []
   options[:relationships] = config.delete('relationships') || {}
+  options[:foreign_key_constraints] ||= config.delete('foreign_key_constraints') || false
   if (module_name = config.delete('module'))
     raise ArgumentError, "Invalid module name: #{module_name}" unless module_name.match?(/\A[A-Z][A-Za-z0-9_]*\z/)
 
@@ -104,7 +109,8 @@ DYNAMIC_DATABASE = DynamicActiveModel::Explorer.explore(
   options[:base_module],
   options[:connection_options],
   options[:skip_tables],
-  options[:relationships]
+  options[:relationships],
+  foreign_key_constraints: options[:foreign_key_constraints] || false
 )
 
 if options[:class_files_dir]

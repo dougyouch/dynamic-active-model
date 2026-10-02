@@ -122,6 +122,38 @@ class Movie < ActiveRecord::Base
 end
 ```
 
+### Foreign Key Constraints
+
+By default, relationships come from column naming conventions (`user_id` → `users`). Turn on `foreign_key_constraints` to also use the database's foreign key constraints:
+
+```ruby
+DynamicActiveModel::Explorer.explore(DB, database_config, foreign_key_constraints: true)
+
+# or with the Setup DSL
+module DB
+  include DynamicActiveModel::Setup
+  connection_options database_config
+  foreign_key_constraints true
+  create_models!
+end
+```
+
+```bash
+dynamic-db-explorer --foreign-key-constraints ...
+```
+
+Constraints add relationships the naming convention can't infer:
+
+| Constraint | Associations |
+|---|---|
+| `posts.author_id → users.id` | `Post belongs_to :author`, `User has_many :author_posts` |
+| `employees.manager_id → employees.id` (self-reference) | `Employee belongs_to :manager`, `Employee has_many :manager_employees` |
+| `tickets.requester_id → users.legacy_id` | `Ticket belongs_to :requester, primary_key: 'legacy_id'` |
+
+Columns that follow the convention, such as `posts.user_id → users`, keep their usual names (`Post belongs_to :user`, `User has_many :posts`). A column with a constraint follows the constraint, even when its name suggests another table. Constraints on columns that don't end in the id suffix are skipped, because a `belongs_to` named after the column would hide the column itself. Composite constraints and constraints referencing a table without a model are skipped too.
+
+Rails' schema cache doesn't store foreign keys, so reading constraints costs one query per table when models are built.
+
 ### Table Filtering
 
 #### Blacklist Tables

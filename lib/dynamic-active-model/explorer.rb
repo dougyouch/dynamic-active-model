@@ -14,6 +14,9 @@ module DynamicActiveModel
   #   skip_tables = ['temporary_data', 'audit_logs']
   #   DynamicActiveModel::Explorer.explore(DB, database_config, skip_tables)
   #
+  # @example With Foreign Key Constraints
+  #   DynamicActiveModel::Explorer.explore(DB, database_config, foreign_key_constraints: true)
+  #
   # @example With Custom Relationships
   #   relationships = {
   #     'users' => {
@@ -30,13 +33,15 @@ module DynamicActiveModel
     # @param relationships [Hash] Custom foreign key relationships to add
     # @param table_class_names [Hash] Custom class names by table name
     # @param parent_class [Class, nil] Optional superclass for the base class (see Factory)
+    # @param foreign_key_constraints [Boolean] Also relate columns through the database's
+    #   foreign key constraints (see ForeignKeyConstraints)
     # @return [Database] The configured database instance
     # @raise [ClassNameConflict] If two tables map to the same class name
     def self.explore(base_module, connection_options, skip_tables = [], relationships = {}, table_class_names = {},
-                     parent_class: nil)
+                     parent_class: nil, foreign_key_constraints: false)
       database = create_models!(base_module, connection_options, skip_tables, table_class_names,
                                 parent_class: parent_class)
-      build_relationships!(database, relationships)
+      build_relationships!(database, relationships, foreign_key_constraints: foreign_key_constraints)
       database
     end
 
@@ -67,9 +72,11 @@ module DynamicActiveModel
     # Sets up relationships between created models
     # @param database [Database] The database instance containing the models
     # @param relationships [Hash] Custom foreign key relationships to add
+    # @param foreign_key_constraints [Boolean] Also relate columns through foreign key constraints
     # @return [void]
-    def self.build_relationships!(database, relationships)
+    def self.build_relationships!(database, relationships, foreign_key_constraints: false)
       relations = Associations.new(database)
+      relations.use_foreign_key_constraints! if foreign_key_constraints
       relationships.each do |table_name, foreign_keys|
         foreign_keys.each do |foreign_key, relationship_name|
           relations.add_foreign_key(table_name, foreign_key, relationship_name)

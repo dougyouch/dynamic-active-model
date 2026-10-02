@@ -161,6 +161,20 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseDefinition do
     end
   end
 
+  describe '#foreign_key_constraints' do
+    it 'defaults to false' do
+      expect(definition.foreign_key_constraints).to be(false)
+    end
+
+    context 'when enabled' do
+      let(:options) { { foreign_key_constraints: true } }
+
+      it 'is true' do
+        expect(definition.foreign_key_constraints).to be(true)
+      end
+    end
+  end
+
   describe '#own_connection?' do
     it 'is false when sharing the parent class connection' do
       expect(definition.own_connection?).to be(false)

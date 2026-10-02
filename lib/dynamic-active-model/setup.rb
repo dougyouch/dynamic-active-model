@@ -53,6 +53,7 @@ module DynamicActiveModel
         {
           connection_options: nil,
           parent_class: nil,
+          foreign_key_constraints: false,
           skip_tables: [],
           relationships: {},
           table_class_names: {},
@@ -82,6 +83,15 @@ module DynamicActiveModel
       def parent_class(klass = nil)
         update_config(:parent_class, klass) if klass
         dynamic_active_model_config[:parent_class]
+      end
+
+      # Sets or gets whether columns are also related through the database's foreign
+      # key constraints (see ForeignKeyConstraints)
+      # @param enabled [Boolean, nil]
+      # @return [Boolean] The current setting
+      def foreign_key_constraints(enabled = nil)
+        update_config(:foreign_key_constraints, enabled) unless enabled.nil?
+        dynamic_active_model_config[:foreign_key_constraints]
       end
 
       # Sets or gets the list of tables to skip
@@ -165,7 +175,8 @@ module DynamicActiveModel
             skip_tables,
             relationships,
             table_class_names,
-            parent_class: parent_class
+            parent_class: parent_class,
+            foreign_key_constraints: foreign_key_constraints
           )
         )
         database.update_all_models(extensions_path, extensions_suffix) if extensions_path
