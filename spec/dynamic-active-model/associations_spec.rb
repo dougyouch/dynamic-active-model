@@ -149,9 +149,9 @@ describe DynamicActiveModel::Associations do
   end
 
   describe 'index lookups' do
-    def index_queries(&block)
+    def queries_during(&block)
       queries = []
-      callback = ->(*, payload) { queries << payload[:sql] if payload[:sql].include?('index_list') }
+      callback = ->(*, payload) { queries << payload[:sql] }
       ActiveSupport::Notifications.subscribed(callback, 'sql.active_record', &block)
       queries
     end
@@ -159,7 +159,7 @@ describe DynamicActiveModel::Associations do
     it 'reads indexes through the schema cache' do
       database.create_models!
       described_class.new(database)
-      expect(index_queries { described_class.new(database) }).to be_empty
+      expect(queries_during { described_class.new(database) }).to be_empty
     end
 
     it 'sees a new index once the schema cache is cleared' do
@@ -240,9 +240,9 @@ describe DynamicActiveModel::Associations do
 
   describe 'tables with non-id primary keys' do
     let(:connection_options) do
-      create_sqlite_database(<<~SQL)
+      create_test_database(<<~SQL)
         CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);
-        CREATE TABLE posts (post_uuid TEXT PRIMARY KEY, user_id INTEGER);
+        CREATE TABLE posts (post_uuid VARCHAR(36) PRIMARY KEY, user_id INTEGER);
         CREATE TABLE profiles (profile_key INTEGER PRIMARY KEY, user_id INTEGER);
         CREATE UNIQUE INDEX index_profiles_on_user_id ON profiles (user_id);
         INSERT INTO users (id, name) VALUES (1, 'Jane');
@@ -306,7 +306,7 @@ describe DynamicActiveModel::Associations do
 
   describe 'join table with only one foreign key matching a model' do
     let(:connection_options) do
-      create_sqlite_database(<<~SQL)
+      create_test_database(<<~SQL)
         CREATE TABLE jobs (id INTEGER PRIMARY KEY);
         CREATE TABLE jobs_tags (job_id INTEGER, tag_id INTEGER);
       SQL

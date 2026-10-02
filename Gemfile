@@ -16,3 +16,11 @@ group :development, :test do
   gem 'simplecov', require: false
   gem 'sqlite3'
 end
+
+# Database drivers for running the specs against PostgreSQL or MySQL (via trilogy):
+#   bundle config set --local with databases && bundle install
+#   DATABASE_ADAPTER=postgresql bundle exec rspec
+group :databases, optional: true do
+  gem 'pg'
+  gem 'trilogy'
+end

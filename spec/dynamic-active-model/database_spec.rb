@@ -218,7 +218,7 @@ describe DynamicActiveModel::Database do
   end
 
   describe '#reset!' do
-    let(:connection_options) { create_sqlite_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
+    let(:connection_options) { create_test_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
     let!(:original_widget) do
       database.create_models!
       base_module::Widget
@@ -236,7 +236,7 @@ describe DynamicActiveModel::Database do
     end
 
     it 'rebuilds models from the current schema' do
-      SQLite3::Database.new(connection_options[:database]) { |db| db.execute('CREATE TABLE gadgets (id INTEGER PRIMARY KEY)') }
+      execute_in_test_database(connection_options, 'CREATE TABLE gadgets (id INTEGER PRIMARY KEY)')
       database.create_models!
       expect(database.models.map(&:table_name)).to contain_exactly('widgets', 'gadgets')
       expect(base_module::Widget).not_to equal(original_widget)

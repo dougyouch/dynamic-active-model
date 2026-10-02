@@ -119,7 +119,7 @@ describe DynamicActiveModel::Setup do
   describe '#connection_options with a database configuration name as a Symbol' do
     let(:original_configurations) { ActiveRecord::Base.configurations.configurations }
     let(:env) { ActiveRecord::ConnectionHandling::DEFAULT_ENV.call }
-    let(:secondary) { create_sqlite_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
+    let(:secondary) { create_test_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
 
     before do
       original_configurations
@@ -242,7 +242,7 @@ describe DynamicActiveModel::Setup do
 
   describe '#create_models! with table class names' do
     before do
-      db_module.connection_options(create_sqlite_database(<<~SQL))
+      db_module.connection_options(create_test_database(<<~SQL))
         CREATE TABLE status (id INTEGER PRIMARY KEY);
         CREATE TABLE statuses (id INTEGER PRIMARY KEY);
       SQL

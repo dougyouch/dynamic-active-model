@@ -27,21 +27,19 @@ $LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
 $LOAD_PATH.unshift(__dir__)
 require 'dynamic-active-model'
 
-DB_FILE = 'spec/test.db'
-DB_CONFIG = {
-  adapter: 'sqlite3',
-  database: DB_FILE
-}.freeze
-FileUtils.rm_f(DB_FILE)
+require 'support/test_database'
+require 'support/test_database_helpers'
+
+DB_CONFIG = TestDatabase.recreate('dynamic_active_model_test').freeze
 ActiveRecord::Base.establish_connection(DB_CONFIG)
 ActiveRecord::Schema.verbose = false
 require 'support/db/schema'
-require 'support/sqlite_database'
 
 RSpec.configure do |config|
   # Every example builds its own abstract base class with its own connection pool;
   # close them so the suite doesn't run out of file descriptors. Registered after
-  # support/sqlite_database so it runs before that file's cleanup (after hooks run in reverse).
+  # support/test_database_helpers so it runs before that file's cleanup (after hooks run in
+  # reverse); PostgreSQL won't drop a database with open connections.
   config.after { ActiveRecord::Base.connection_handler.connection_pool_list.each(&:disconnect!) }
 end
 

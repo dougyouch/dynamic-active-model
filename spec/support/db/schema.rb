@@ -5,12 +5,17 @@ ActiveRecord::Schema.define(version: 20_190_712_000_000) do
     t.string   'name'
   end
 
+  # referenced by companies; PostgreSQL and MySQL check foreign keys at create time
+  create_table 'websites', force: true do |t|
+    t.string 'url'
+  end
+
   create_table 'companies', force: true do |t|
     t.string 'name'
     t.string 'type'
     t.references :website, foreign_key: true
-    t.integer :company_website_id
-    t.foreign_key :website, column: :company_website_id
+    t.bigint :company_website_id # must match websites.id for MySQL foreign keys
+    t.foreign_key :websites, column: :company_website_id
     t.text 'reload' # dangerous column name
     t.text 'save'
     t.text 'hash'
@@ -18,10 +23,6 @@ ActiveRecord::Schema.define(version: 20_190_712_000_000) do
 
   create_table 'jobs', force: true do |t|
     t.string 'title'
-  end
-
-  create_table 'websites', force: true do |t|
-    t.string 'url'
   end
 
   create_table :jobs_websites, force: true, id: false do |t|
@@ -61,7 +62,7 @@ ActiveRecord::Schema.define(version: 20_190_712_000_000) do
   end
 
   create_table 'employee_users' do |t|
-    t.integer :employee_user_id, null: false
+    t.bigint :employee_user_id, null: false # must match users.id for MySQL foreign keys
     t.foreign_key :users, column: :employee_user_id
     t.index :employee_user_id, unique: true
     t.boolean :super_user
