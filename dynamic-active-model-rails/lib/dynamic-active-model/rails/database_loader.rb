@@ -61,15 +61,22 @@ module DynamicActiveModel
       def new_database
         Database.new(namespace, definition.connection, parent_class: parent_class).tap do |database|
           definition.skipped_tables.each { |table| database.skip_table(Explorer.skip_table_matcher(table)) }
+          definition.included_tables.each { |table| database.include_table(Explorer.skip_table_matcher(table)) }
           definition.table_class_names.each { |table, class_name| database.table_class_name(table, class_name) }
         end
       end
 
-      # Applies the .ext.rb files in the database's models folder
+      # Applies the database's extension files. The default folder is optional;
+      # a configured extensions_path must exist.
       # @return [void]
+      # @raise [DynamicActiveModel::Error] If a configured extensions_path is missing
       def load_extensions
         path = definition.extensions_path(@root)
-        @database.update_all_models(path) if File.directory?(path)
+        if File.directory?(path)
+          @database.update_all_models(path, definition.extensions_suffix)
+        elsif definition.custom_extensions_path?
+          raise DynamicActiveModel::Error, "extensions_path #{path} for #{definition.module_name} does not exist"
+        end
       end
 
       # @return [Module] The namespace models are defined in

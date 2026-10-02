@@ -20,6 +20,12 @@ module DynamicActiveModel
       # @return [Array<String, Regexp>] Tables (or patterns) to skip
       attr_reader :skipped_tables
 
+      # @return [Array<String, Regexp>] Tables (or patterns) to model; empty means all
+      attr_reader :included_tables
+
+      # @return [String] File suffix of extension files
+      attr_reader :extensions_suffix
+
       # @return [Hash] Custom relationship names by table and foreign key
       attr_reader :relationships
 
@@ -30,11 +36,18 @@ module DynamicActiveModel
       # @param connection [Symbol, String, Hash, nil] See Configuration#add_database
       # @param module_name [String, nil] Namespace override, e.g. "Inventory"
       # @param parent_class [String] Superclass for the generated base class
-      def initialize(name, connection = nil, module_name: nil, parent_class: 'ApplicationRecord')
+      # @param extensions_path [String, nil] Extensions directory, absolute or relative to
+      #   the app root; defaults to app/models/<folder>, which may be absent
+      # @param extensions_suffix [String] File suffix of extension files
+      def initialize(name, connection = nil, module_name: nil, parent_class: 'ApplicationRecord',
+                     extensions_path: nil, extensions_suffix: '.ext.rb')
         @connection = connection
         @module_name = module_name || default_module_name(name)
         @parent_class_name = parent_class.to_s
+        @extensions_path = extensions_path&.to_s
+        @extensions_suffix = extensions_suffix
         @skipped_tables = []
+        @included_tables = []
         @relationships = {}
         @table_class_names = {}
       end
@@ -50,9 +63,14 @@ module DynamicActiveModel
       end
 
       # @param root [Pathname, String] Application root
-      # @return [String] Directory holding this database's .ext.rb files
+      # @return [String] Absolute directory holding this database's extension files
       def extensions_path(root)
-        File.join(root.to_s, 'app', 'models', folder)
+        File.expand_path(@extensions_path || File.join('app', 'models', folder), root.to_s)
+      end
+
+      # @return [Boolean] Whether extensions_path was configured, so it must exist
+      def custom_extensions_path?
+        !@extensions_path.nil?
       end
 
       # Skips tables; strings may use * wildcards
@@ -60,6 +78,14 @@ module DynamicActiveModel
       # @return [void]
       def skip_tables(*tables)
         @skipped_tables.concat(tables.flatten)
+      end
+
+      # Models only these tables; strings may use * wildcards. ActiveRecord's
+      # internal tables still need their exact name.
+      # @param tables [Array<String, Regexp>]
+      # @return [void]
+      def include_tables(*tables)
+        @included_tables.concat(tables.flatten)
       end
 
       # Names the relationship for a foreign key column
@@ -81,11 +107,11 @@ module DynamicActiveModel
 
       private
 
-      # :cars => "CarsDB", :grant_db => "GrantDB"
+      # :cars => "CarsDB", :grant_db => "GrantDB", :db => "DB"
       # @param name [Symbol, String]
       # @return [String]
       def default_module_name(name)
-        "#{name.to_s.underscore.delete_suffix('_db').camelize}DB"
+        "#{name.to_s.underscore.sub(/(?:\A|_)db\z/, '').camelize}DB"
       end
     end
   end

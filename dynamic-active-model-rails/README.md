@@ -26,6 +26,7 @@ DynamicActiveModel::Rails.configure do |config|
   # A Symbol names a database.yml entry; a URL string or config hash also works
   config.add_database :cars, :cars do |db|
     db.skip_tables 'legacy_*', /^tmp_/
+    db.include_tables 'cars', 'makes', 'owner*'   # whitelist; default is every table
     db.foreign_key :cars, :owner_id, :owner
     db.table_class_name :status, 'StatusCode'
   end
@@ -48,6 +49,7 @@ Namespaces always end in `DB`, so a database's namespace never collides with an 
 |---|---|---|
 | `add_database :cars` | `CarsDB` | `app/models/cars_db/` |
 | `add_database :grant_db` | `GrantDB` | `app/models/grant_db/` |
+| `add_database :db` | `DB` | `app/models/db/` |
 | `add_database :cars, module_name: 'Inventory'` | `Inventory` | `app/models/inventory/` |
 
 The `cars_db` → `CarsDB` mapping is registered with the Rails autoloader only, not with the global inflector, so `'cars_db'.camelize` elsewhere in your app is unaffected.
@@ -59,6 +61,8 @@ The `cars_db` → `CarsDB` mapping is registered with the Rails autoloader only,
 | `connection` (2nd argument) | `nil` | `nil` shares the parent class's connection. Otherwise it's passed to `establish_connection`: a database.yml entry name (Symbol), URL or hash. |
 | `module_name:` | `"<Name>DB"` | Namespace override. |
 | `parent_class:` | `'ApplicationRecord'` | Superclass of the generated abstract base class, given as a name so it can be reloaded. |
+| `extensions_path:` | `app/models/<folder>` | Directory of extension files, absolute or relative to `Rails.root`. The default folder may be absent; a configured path must exist. |
+| `extensions_suffix:` | `'.ext.rb'` | Suffix of extension files. The autoloader ignores files with this suffix. |
 
 ## Extending Models
 
@@ -120,6 +124,37 @@ development:
     database: storage/cars.sqlite3
     migrations_paths: db/cars_migrate
 ```
+
+## Migrating from the Setup DSL
+
+If your app followed the core gem's [manual setup](../docs/manual-rails-setup.md):
+
+1. Replace `gem 'dynamic-active-model'` with `gem 'dynamic-active-model-rails'`.
+2. Delete `app/models/db.rb`. Move its settings into an initializer:
+
+   ```ruby
+   # config/initializers/dynamic_active_model.rb
+   DynamicActiveModel::Rails.configure do |config|
+     config.add_database :db do |db|      # DB, app/models/db/
+       db.skip_tables 'versions'
+     end
+   end
+   ```
+
+   | Setup DSL | Rails gem |
+   |---|---|
+   | `parent_class ApplicationRecord` | default (omit) |
+   | `connection_options 'secondary'` | `add_database :db, :secondary` |
+   | `extensions_path '...'` | default for `app/models/db/`; otherwise `extensions_path:` |
+   | `extensions_suffix '.x.rb'` | `extensions_suffix:` |
+   | `skip_tables [...]` / `skip_table` | `db.skip_tables` |
+   | `foreign_key t, col, name` | `db.foreign_key t, col, name` |
+   | `table_class_name t, name` | `db.table_class_name t, name` |
+
+3. Remove the `DB` inflection and the `app/models/db` ignore from `config/application.rb`. The gem registers both.
+4. Move setup that ran after `create_models!` into `ActiveSupport.on_load(:db) { ... }`.
+
+`.ext.rb` files stay where they are.
 
 ## Development
 

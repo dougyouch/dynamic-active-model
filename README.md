@@ -63,7 +63,7 @@ movie.actors  # Automatically mapped relationship
 
 ### Using in a Rails Application
 
-The easiest way is the companion gem [`dynamic-active-model-rails`](dynamic-active-model-rails/). It builds models lazily, rebuilds them after migrations, reloads them in development, and sets up the autoloader for you:
+Use the companion gem [`dynamic-active-model-rails`](dynamic-active-model-rails/). It builds models lazily, rebuilds them after migrations, reloads them in development, and sets up the autoloader for you:
 
 ```ruby
 # Gemfile
@@ -76,78 +76,7 @@ DynamicActiveModel::Rails.configure do |config|
 end
 ```
 
-See its [README](dynamic-active-model-rails/README.md) for details. To wire things up by hand with the `Setup` DSL instead:
-
-1. Configure Rails to handle the `DB` namespace correctly in `config/initializers/inflections.rb`:
-
-```ruby
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.acronym 'DB'
-end
-```
-
-2. Ignore the DB namespace for eager loading in `config/application.rb`:
-
-```ruby
-module YourApp
-  class Application < Rails::Application
-    Rails.autoloaders.main.ignore(
-      "#{config.root}/app/models/db"
-    )
-  end
-end
-```
-
-3. Create a base module file in `app/models/db.rb`:
-
-```ruby
-module DB
-  include DynamicActiveModel::Setup
-
-  # Share ApplicationRecord's connection pool
-  parent_class ApplicationRecord
-  # or connect to another database from database.yml:
-  # connection_options 'secondary'
-
-  # Set the path for auto-loading extension files
-  extensions_path 'app/models/db'
-
-  # Optionally skip tables you don't want to model
-  # (schema_migrations and ar_internal_metadata are skipped automatically)
-  skip_tables ['versions']
-
-  # Create all models
-  create_models!
-end
-```
-
-4. Extend specific models with `.ext.rb` files in `app/models/db/`:
-
-```ruby
-# app/models/db/users.ext.rb
-update_model do
-  def full_name
-    "#{first_name} #{last_name}"
-  end
-
-  def active?
-    status == 'active'
-  end
-end
-```
-
-> **Note:** Extension files are based on the table name, not the model name. For a table named `user_profiles`, use `user_profiles.ext.rb`.
-
-5. Use your models throughout the Rails application:
-
-```ruby
-class UsersController < ApplicationController
-  def show
-    @user = DB::User.find(params[:id])
-    @full_name = @user.full_name
-  end
-end
-```
+See its [README](dynamic-active-model-rails/README.md) for configuration, extension files, load hooks and migrations. If you can't use the Rails gem, [docs/manual-rails-setup.md](docs/manual-rails-setup.md) shows how to wire up the core gem by hand.
 
 ### Generate Model Files
 

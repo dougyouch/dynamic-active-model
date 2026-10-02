@@ -20,6 +20,23 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseDefinition do
       end
     end
 
+    context 'when the name is just db' do
+      let(:name) { :db }
+
+      it 'is DB' do
+        expect(definition.module_name).to eq('DB')
+        expect(definition.folder).to eq('db')
+      end
+    end
+
+    context 'when db is part of a word' do
+      let(:name) { :mydb }
+
+      it 'keeps the word and appends DB' do
+        expect(definition.module_name).to eq('MydbDB')
+      end
+    end
+
     context 'when the name is a camelized string' do
       let(:name) { 'GrantDB' }
 
@@ -58,8 +75,50 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseDefinition do
   end
 
   describe '#extensions_path' do
+    let(:root) { Pathname.new('/app') }
+
     it 'is the folder under app/models' do
-      expect(definition.extensions_path(Pathname.new('/app'))).to eq('/app/app/models/cars_db')
+      expect(definition.extensions_path(root)).to eq('/app/app/models/cars_db')
+      expect(definition.custom_extensions_path?).to be(false)
+    end
+
+    context 'with a relative extensions_path option' do
+      let(:options) { { extensions_path: 'lib/cars_ext' } }
+
+      it 'resolves it against the app root' do
+        expect(definition.extensions_path(root)).to eq('/app/lib/cars_ext')
+        expect(definition.custom_extensions_path?).to be(true)
+      end
+    end
+
+    context 'with an absolute extensions_path option' do
+      let(:options) { { extensions_path: Pathname.new('/shared/cars_ext') } }
+
+      it 'uses it as is' do
+        expect(definition.extensions_path(root)).to eq('/shared/cars_ext')
+      end
+    end
+  end
+
+  describe '#extensions_suffix' do
+    it 'defaults to .ext.rb' do
+      expect(definition.extensions_suffix).to eq('.ext.rb')
+    end
+
+    context 'with an extensions_suffix option' do
+      let(:options) { { extensions_suffix: '.model.rb' } }
+
+      it 'uses the option' do
+        expect(definition.extensions_suffix).to eq('.model.rb')
+      end
+    end
+  end
+
+  describe '#include_tables' do
+    it 'accumulates tables and arrays of tables' do
+      definition.include_tables 'cars', /^make/
+      definition.include_tables %w[owners]
+      expect(definition.included_tables).to eq(['cars', /^make/, 'owners'])
     end
   end
 

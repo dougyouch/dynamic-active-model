@@ -37,6 +37,55 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseLoader do
     end
   end
 
+  describe 'definition options' do
+    let(:root) { Dir.mktmpdir }
+    let(:loader) { described_class.new(definition, root) }
+
+    before { DynamicActiveModel::Rails::LazyNamespace.define(stub_const('PlainDB', Module.new).name, loader) }
+
+    after do
+      loader.reset!
+      FileUtils.rm_rf(root)
+    end
+
+    context 'with include_tables' do
+      let(:definition) do
+        DynamicActiveModel::Rails::DatabaseDefinition.new(:plain).tap { |db| db.include_tables 'u*', 'posts' }
+      end
+
+      it 'models only the included tables, expanding wildcards' do
+        expect(loader.load!.models.map(&:table_name)).to contain_exactly('users', 'posts')
+      end
+    end
+
+    context 'with a custom extensions_path and suffix' do
+      let(:definition) do
+        DynamicActiveModel::Rails::DatabaseDefinition.new(:plain, extensions_path: 'ext', extensions_suffix: '.model.rb')
+      end
+
+      before do
+        FileUtils.mkdir_p(File.join(root, 'ext'))
+        File.write(File.join(root, 'ext', 'users.model.rb'), "update_model { def custom_ext? = true }\n")
+        File.write(File.join(root, 'ext', 'posts.ext.rb'), "raise 'wrong suffix applied'\n")
+      end
+
+      it 'applies only files with the suffix from that directory' do
+        loader.load!
+        expect(PlainDB::User.new.custom_ext?).to be(true)
+      end
+    end
+
+    context 'with a custom extensions_path that does not exist' do
+      let(:definition) { DynamicActiveModel::Rails::DatabaseDefinition.new(:plain, extensions_path: 'missing') }
+
+      it 'raises and leaves nothing built' do
+        expect { loader.load! }.to raise_error(DynamicActiveModel::Error, %r{extensions_path .*/missing for PlainDB})
+        expect(loader.loaded?).to be(false)
+        expect(PlainDB.const_defined?(:User, false)).to be(false)
+      end
+    end
+  end
+
   describe 'load hooks' do
     it 'runs the database load hook on every build' do
       expect(AppDB::User.load_hook_ran?).to be(true)
