@@ -7,6 +7,11 @@ module DynamicActiveModel
     class Railtie < ::Rails::Railtie
       config.eager_load_namespaces << DynamicActiveModel::Rails
 
+      # so config.active_support.deprecation (log, raise in tests, ...) applies
+      initializer 'dynamic_active_model.deprecator' do |app|
+        app.deprecators[:dynamic_active_model] = DynamicActiveModel.deprecator
+      end
+
       initializer 'dynamic_active_model.schema_change_hook' do
         ActiveSupport.on_load(:active_record) { DynamicActiveModel::Rails::SchemaChangeHook.install }
       end

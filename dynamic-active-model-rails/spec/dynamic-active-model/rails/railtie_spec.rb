@@ -5,6 +5,10 @@ RSpec.describe DynamicActiveModel::Rails::Railtie do
     expect(Rails.application.config.eager_load_namespaces).to include(DynamicActiveModel::Rails)
   end
 
+  it "registers the core gem's deprecator with the app" do
+    expect(Rails.application.deprecators[:dynamic_active_model]).to equal(DynamicActiveModel.deprecator)
+  end
+
   it 'watches db/ so schema changes trigger a reload' do
     expect(Rails.application.config.watchable_dirs).to include(Rails.root.join('db').to_s => %i[rb sql])
   end
