@@ -48,8 +48,8 @@ Dynamic Active Model automatically discovers database schemas and creates Active
 ### Model Creation Flow
 
 1. **Entry** - User calls `Explorer.explore()`, includes `Setup` module, or runs CLI
-2. **Database** - Filters tables, iterates through schema
-3. **Factory** - Creates abstract base class with isolated DB connection
+2. **Database** - Filters tables (always skipping ActiveRecord's internal tables unless explicitly included), iterates through schema
+3. **Factory** - Creates abstract base class, with an isolated DB connection or one inherited from `parent_class`
 4. **Factory** - Creates model class for each table, includes `DangerousAttributesPatch`
 5. **Associations** - Analyzes column names for foreign key patterns (`*_id`)
 6. **Associations** - Checks unique indexes to distinguish `has_one` vs `has_many`
@@ -64,7 +64,10 @@ Dynamic Active Model automatically discovers database schemas and creates Active
 ## Key Design Decisions
 
 ### Isolated Database Connection
-Factory creates a `DynamicAbstractBase` abstract class per namespace. This isolates dynamic models from the application's `ActiveRecord::Base`, allowing different databases and preventing connection conflicts.
+Factory creates a `DynamicAbstractBase` abstract class per namespace. This isolates dynamic models from the application's `ActiveRecord::Base`, allowing different databases and preventing connection conflicts. When a `parent_class` (e.g. `ApplicationRecord`) is given without connection options, the base class subclasses it and shares its connection pool instead of opening its own.
+
+### Rebuilding
+`Database#reset!` removes the generated model constants, and the base class when the factory defined it, so `create_models!` can rebuild against a changed schema. A reloader uses this to pick up migrations without restarting the process.
 
 ### Automatic Relationship Detection
 Associations uses column naming conventions (`*_id`) combined with database indexes to infer relationships:

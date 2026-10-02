@@ -196,11 +196,22 @@ module DynamicActiveModel
       !skip_table?(table_name) && include_table?(table_name) && get_model(table_name).nil?
     end
 
-    # Checks if a table should be skipped
+    # Checks if a table is one of ActiveRecord's bookkeeping tables
+    # (schema_migrations, ar_internal_metadata)
+    # @param table_name [String] Name of the table
+    # @return [Boolean] Whether the table is internal to ActiveRecord
+    def internal_table?(table_name)
+      base_class = @factory.base_class
+      [base_class.schema_migrations_table_name, base_class.internal_metadata_table_name].include?(table_name)
+    end
+
+    # Checks if a table should be skipped. ActiveRecord's internal tables are
+    # skipped unless included by exact name.
     # @param table_name [String] Name of the table
     # @return [Boolean] Whether the table should be skipped
     def skip_table?(table_name)
-      @skip_tables.include?(table_name.to_s) ||
+      (internal_table?(table_name) && !@include_tables.include?(table_name)) ||
+        @skip_tables.include?(table_name.to_s) ||
         @skip_table_matchers.any? { |r| r.match(table_name) }
     end
 

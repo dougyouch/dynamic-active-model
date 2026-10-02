@@ -88,14 +88,17 @@ end
 module DB
   include DynamicActiveModel::Setup
 
-  # Use the primary database connection from database.yml
-  connection_options 'primary'
+  # Share ApplicationRecord's connection pool
+  parent_class ApplicationRecord
+  # or connect to another database from database.yml:
+  # connection_options 'secondary'
 
   # Set the path for auto-loading extension files
   extensions_path 'app/models/db'
 
   # Optionally skip tables you don't want to model
-  skip_tables ['schema_migrations', 'ar_internal_metadata']
+  # (schema_migrations and ar_internal_metadata are skipped automatically)
+  skip_tables ['versions']
 
   # Create all models
   create_models!
@@ -198,6 +201,8 @@ db.include_tables ['orders', 'products']
 db.create_models!
 ```
 
+ActiveRecord's internal tables (`schema_migrations`, `ar_internal_metadata`) are always skipped unless you name them in `include_table`. A whitelist pattern doesn't pull them in.
+
 With `Explorer.explore` and the `Setup` DSL, `skip_tables` also accepts `*` wildcards that match whole table names (`'stats_*'`, `'*_backup'`).
 
 ### Custom Class Names
@@ -266,6 +271,21 @@ The gem supports all ActiveRecord database adapters:
   password: 'your_password',
   port: 5432
 }
+```
+
+To share an existing connection pool instead of opening a new one, pass a `parent_class`. The generated abstract base class subclasses it and inherits its connection when no connection options are given:
+
+```ruby
+DynamicActiveModel::Explorer.explore(DB, nil, parent_class: ApplicationRecord)
+```
+
+### Rebuilding Models
+
+After a schema change, `reset!` removes the generated model constants (and the base class, if the gem defined it) so the models can be rebuilt:
+
+```ruby
+db.reset!
+db.create_models!
 ```
 
 ## Documentation
