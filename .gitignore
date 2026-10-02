@@ -53,4 +53,7 @@ pkg
 # the Rails gem pins the core gem's version, so a committed lockfile would go stale on every release
 dynamic-active-model-rails/Gemfile.lock
 
+# CI matrix gemfiles resolve fresh on every run
+*.gemfile.lock
+
 *.db

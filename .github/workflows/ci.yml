@@ -27,19 +27,32 @@ jobs:
           bundler-cache: true
       - run: bundle exec rubocop --format github
 
+  # Supported range: Ruby 3.2-4.0 x ActiveRecord/Rails 7.1-8.1. 8.1 runs on the default
+  # Gemfiles (and the committed Gemfile.lock); older versions use gemfiles/*.gemfile.
   test:
-    name: Tests
+    name: Tests (Ruby ${{ matrix.ruby }}, ActiveRecord ${{ matrix.activerecord }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ['3.2', '3.3', '3.4', '4.0']
+        activerecord: ['7.1', '7.2', '8.0', '8.1']
+    env:
+      BUNDLE_GEMFILE: >-
+        ${{ matrix.activerecord == '8.1' && format('{0}/Gemfile', github.workspace)
+        || format('{0}/gemfiles/activerecord_{1}.gemfile', github.workspace, matrix.activerecord) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
-          ruby-version: '4.0'
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - run: bundle exec rspec
+      # one job's report feeds the coverage badge
       - name: Upload coverage report
+        if: matrix.ruby == '4.0' && matrix.activerecord == '8.1'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage
@@ -49,8 +62,17 @@ jobs:
           retention-days: 14
 
   test-rails:
-    name: Rails gem tests
+    name: Rails gem tests (Ruby ${{ matrix.ruby }}, Rails ${{ matrix.rails }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ['3.2', '3.3', '3.4', '4.0']
+        rails: ['7.1', '7.2', '8.0', '8.1']
+    env:
+      BUNDLE_GEMFILE: >-
+        ${{ matrix.rails == '8.1' && format('{0}/dynamic-active-model-rails/Gemfile', github.workspace)
+        || format('{0}/dynamic-active-model-rails/gemfiles/rails_{1}.gemfile', github.workspace, matrix.rails) }}
     defaults:
       run:
         working-directory: dynamic-active-model-rails
@@ -60,7 +82,7 @@ jobs:
           persist-credentials: false
       - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
-          ruby-version: '4.0'
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
           working-directory: dynamic-active-model-rails
       - run: bundle exec rspec
