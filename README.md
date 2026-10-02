@@ -78,27 +78,22 @@ end
 
 See its [README](dynamic-active-model-rails/README.md) for details. To wire things up by hand with the `Setup` DSL instead:
 
-1. Configure Rails to handle the `DB` namespace correctly in `config/initializers/inflections.rb`:
-
-```ruby
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.acronym 'DB'
-end
-```
-
-2. Ignore the DB namespace for eager loading in `config/application.rb`:
+1. In `config/application.rb`, map `app/models/db.rb` to `DB` and keep the autoloader out of the extension files:
 
 ```ruby
 module YourApp
   class Application < Rails::Application
-    Rails.autoloaders.main.ignore(
-      "#{config.root}/app/models/db"
-    )
+    # Zeitwerk would expect app/models/db.rb to define Db; scoping the inflection
+    # to the autoloader leaves 'db_config'.camelize etc. unchanged elsewhere
+    Rails.autoloaders.main.inflector.inflect('db' => 'DB')
+
+    # .ext.rb files are applied by DynamicActiveModel, not autoloaded
+    Rails.autoloaders.main.ignore("#{config.root}/app/models/db")
   end
 end
 ```
 
-3. Create a base module file in `app/models/db.rb`:
+2. Create the namespace in `app/models/db.rb`. Because the autoloader loads it, models are built on first reference to `DB` and rebuilt when the app reloads:
 
 ```ruby
 module DB
@@ -109,8 +104,9 @@ module DB
   # or connect to another database from database.yml:
   # connection_options 'secondary'
 
-  # Set the path for auto-loading extension files
-  extensions_path 'app/models/db'
+  # Directory of extension files; use an absolute path, since a relative one
+  # resolves against the process's working directory, not Rails.root
+  extensions_path File.expand_path('db', __dir__)
 
   # Optionally skip tables you don't want to model
   # (schema_migrations and ar_internal_metadata are skipped automatically)
@@ -121,7 +117,9 @@ module DB
 end
 ```
 
-4. Extend specific models with `.ext.rb` files in `app/models/db/`:
+> **Note:** With this manual setup, tables created by a migration aren't visible until the app reloads or restarts. That matters for `db:prepare` followed by seeds in one process. `dynamic-active-model-rails` rebuilds models after migrations automatically.
+
+3. Extend specific models with `.ext.rb` files in `app/models/db/`:
 
 ```ruby
 # app/models/db/users.ext.rb
@@ -138,7 +136,7 @@ end
 
 > **Note:** Extension files are based on the table name, not the model name. For a table named `user_profiles`, use `user_profiles.ext.rb`.
 
-5. Use your models throughout the Rails application:
+4. Use your models throughout the Rails application:
 
 ```ruby
 class UsersController < ApplicationController
