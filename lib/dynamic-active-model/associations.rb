@@ -36,7 +36,8 @@ module DynamicActiveModel
       @foreign_keys = {}
       database.models.each do |model|
         @foreign_keys[model.table_name] = ForeignKey.new(model)
-        @table_indexes[model.table_name] = model.connection.indexes(model.table_name)
+        # through the schema cache, so a Rails schema cache dump spares one query per table
+        @table_indexes[model.table_name] = model.connection.schema_cache.indexes(model.table_name)
         @join_tables << model if join_table?(model)
       end
     end

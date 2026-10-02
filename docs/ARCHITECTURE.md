@@ -59,7 +59,7 @@ The companion gem lives in `dynamic-active-model-rails/`. It shares this repo's 
 | Railtie | Registers eager loading, reset on code reload, and a watch on `db/` |
 | Generators | `dynamic_active_model:install`, `:database`, `:extension`; naming comes from DatabaseDefinition, and `:extension` reads the app's configuration |
 
-Lifecycle: `configure` (from an initializer) defines each namespace module and configures the autoloader before Zeitwerk is set up. Models are built on first constant reference, or at boot when eager loading. Code reloads and schema changes call `reset!` (`Database#reset!`), and the next reference rebuilds models against the current schema and the reloaded `ApplicationRecord`.
+Lifecycle: `configure` (from an initializer) defines each namespace module and configures the autoloader before Zeitwerk is set up. Models are built on first constant reference, or at boot when eager loading. Code reloads and schema changes call `reset!`, which clears the database pool's schema cache and calls `Database#reset!`. The next reference rebuilds models against the current schema and the reloaded `ApplicationRecord`.
 
 ## Data Flow
 
@@ -88,7 +88,7 @@ Factory creates a `DynamicAbstractBase` abstract class per namespace. This isola
 `Database#reset!` removes the generated model constants, and the base class when the factory defined it, so `create_models!` can rebuild against a changed schema. A reloader uses this to pick up migrations without restarting the process.
 
 ### Automatic Relationship Detection
-Associations uses column naming conventions (`*_id`) combined with database indexes to infer relationships:
+Associations uses column naming conventions (`*_id`) combined with database indexes to infer relationships. It reads indexes through `connection.schema_cache`, so a Rails schema cache dump serves them without a query per table:
 - Foreign key column → `belongs_to`
 - Unique index on FK → `has_one` (1:1 relationship)
 - No unique index on FK → `has_many` (1:N relationship)

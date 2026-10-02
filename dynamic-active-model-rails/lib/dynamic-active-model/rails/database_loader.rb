@@ -40,11 +40,15 @@ module DynamicActiveModel
         !@database.nil?
       end
 
-      # Removes the built models so the next #load! rebuilds them
+      # Removes the built models, and the schema cache their columns and indexes
+      # came from, so the next #load! rebuilds them against the current schema
       # @return [void]
       def reset!
         @monitor.synchronize do
-          @database&.reset!
+          if @database
+            clear_schema_cache
+            @database.reset!
+          end
           @database = nil
         end
       end
@@ -63,6 +67,13 @@ module DynamicActiveModel
       rescue StandardError
         reset!
         raise
+      end
+
+      # Clears the schema cache of the pool the models use. Rails clears only the
+      # primary pool on code reload, and nothing on schema changes outside migrations.
+      # @return [void]
+      def clear_schema_cache
+        @database.models.map(&:connection_pool).uniq.each { |pool| pool.schema_cache.clear! }
       end
 
       # @return [DynamicActiveModel::Database] A database configured from the definition

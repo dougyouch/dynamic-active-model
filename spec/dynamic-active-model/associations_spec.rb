@@ -148,6 +148,33 @@ describe DynamicActiveModel::Associations do
     end
   end
 
+  describe 'index lookups' do
+    def index_queries(&block)
+      queries = []
+      callback = ->(*, payload) { queries << payload[:sql] if payload[:sql].include?('index_list') }
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record', &block)
+      queries
+    end
+
+    it 'reads indexes through the schema cache' do
+      database.create_models!
+      described_class.new(database)
+      expect(index_queries { described_class.new(database) }).to be_empty
+    end
+
+    it 'sees a new index once the schema cache is cleared' do
+      relations
+      model = database.get_model!(:users)
+      model.connection.add_index(:users, :name, name: 'index_users_on_name_for_spec')
+      expect(described_class.new(database).table_indexes['users'].map(&:name)).not_to include('index_users_on_name_for_spec')
+
+      model.connection.schema_cache.clear!
+      expect(described_class.new(database).table_indexes['users'].map(&:name)).to include('index_users_on_name_for_spec')
+    ensure
+      model&.connection&.remove_index(:users, name: 'index_users_on_name_for_spec')
+    end
+  end
+
   describe '#table_indexes' do
     subject { relations.table_indexes }
 

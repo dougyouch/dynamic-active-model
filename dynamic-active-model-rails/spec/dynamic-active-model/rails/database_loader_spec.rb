@@ -104,6 +104,17 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseLoader do
       expect(AppDB::User).not_to equal(user)
     end
 
+    it 'clears the schema cache so rebuilt models see schema changes' do
+      expect(AppDB::User.reflect_on_association(:posts)).to be_present
+      # made outside a migration, so Rails' own schema cache clearing doesn't run
+      DummySchema.execute(:primary, 'CREATE UNIQUE INDEX index_posts_on_user_id ON posts (user_id)')
+      loader.reset!
+      expect(AppDB::User.reflect_on_association(:post).macro).to eq(:has_one)
+    ensure
+      DummySchema.execute(:primary, 'DROP INDEX IF EXISTS index_posts_on_user_id')
+      loader.reset!
+    end
+
     it 'does nothing when not loaded' do
       expect { loader.reset! }.not_to raise_error
     end
