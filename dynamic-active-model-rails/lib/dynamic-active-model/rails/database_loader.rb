@@ -27,6 +27,14 @@ module DynamicActiveModel
         @database
       end
 
+      # The class that owns the database's connection, for role and shard switching:
+      # the generated base class, or the parent class when sharing its connection
+      # @return [Class]
+      def connection_class
+        base_class = load!.factory.base_class
+        definition.own_connection? ? base_class : base_class.superclass
+      end
+
       # @return [Boolean] Whether models are built (or being built)
       def loaded?
         !@database.nil?
@@ -60,6 +68,7 @@ module DynamicActiveModel
       # @return [DynamicActiveModel::Database] A database configured from the definition
       def new_database
         Database.new(namespace, definition.connection, parent_class: parent_class).tap do |database|
+          database.factory.base_class.connects_to(**definition.connects_to) if definition.connects_to
           definition.skipped_tables.each { |table| database.skip_table(Explorer.skip_table_matcher(table)) }
           definition.included_tables.each { |table| database.include_table(Explorer.skip_table_matcher(table)) }
           definition.table_class_names.each { |table, class_name| database.table_class_name(table, class_name) }

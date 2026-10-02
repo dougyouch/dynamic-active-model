@@ -19,6 +19,7 @@ gem 'dynamic-active-model-rails'
 bin/rails generate dynamic_active_model:install                        # DB, app/models/db/
 bin/rails generate dynamic_active_model:install grant_db               # GrantDB, app/models/grant_db/
 bin/rails generate dynamic_active_model:database cars --connection cars
+bin/rails generate dynamic_active_model:database cars --connection cars --replica cars_replica
 bin/rails generate dynamic_active_model:extension grant_db users       # app/models/grant_db/users.ext.rb
 ```
 
@@ -26,7 +27,7 @@ bin/rails generate dynamic_active_model:extension grant_db users       # app/mod
 - **`database NAME`** adds another `add_database` line to the initializer and creates the folder. It refuses a namespace the app already declares.
 - **`extension DATABASE TABLE`** creates an extension file. `DATABASE` can be a name (`grant_db`) or a namespace (`GrantDB`). The generator uses the app's configuration, so a custom `extensions_path:` or `extensions_suffix:` is respected.
 
-`--connection NAME` points the database at a `database.yml` entry. The generators warn if the current environment has no such entry. Without `--connection`, the database shares `ApplicationRecord`'s connection.
+`--connection NAME` points the database at a `database.yml` entry. `--replica NAME` adds a reading role through `connects_to` and requires `--connection`. The generators warn if the current environment has no such entry. Without `--connection`, the database shares `ApplicationRecord`'s connection.
 
 ## Configuration
 
@@ -76,8 +77,40 @@ The `cars_db` → `CarsDB` mapping is registered with the Rails autoloader only,
 | `connection` (2nd argument) | `nil` | `nil` shares the parent class's connection. Otherwise it's passed to `establish_connection`: a database.yml entry name (Symbol), URL or hash. |
 | `module_name:` | `"<Name>DB"` | Namespace override. |
 | `parent_class:` | `'ApplicationRecord'` | Superclass of the generated abstract base class, given as a name so it can be reloaded. |
+| `connects_to:` | `nil` | Roles for Rails multi-database support, such as `{ writing: :cars, reading: :cars_replica }`, or `connects_to`'s own arguments (`{ database: ..., shards: ... }`). Can't be combined with a `connection`. |
 | `extensions_path:` | `app/models/<folder>` | Directory of extension files, absolute or relative to `Rails.root`. The default folder may be absent; a configured path must exist. |
 | `extensions_suffix:` | `'.ext.rb'` | Suffix of extension files. The autoloader ignores files with this suffix. |
+
+## Read Replicas
+
+`connects_to:` registers the database's roles with Rails' multi-database support:
+
+```ruby
+config.add_database :cars, connects_to: { writing: :cars, reading: :cars_replica }
+```
+
+```yaml
+# config/database.yml
+production:
+  cars:
+    <<: *default
+    database: cars
+  cars_replica:
+    <<: *default
+    database: cars
+    replica: true
+```
+
+Switch roles for one database through its namespace, or for every database with ActiveRecord:
+
+```ruby
+CarsDB.connected_to(role: :reading) { CarsDB::Car.count }       # only CarsDB
+ActiveRecord::Base.connected_to(role: :reading) { ... }          # all databases with roles
+```
+
+Writes inside the reading role raise `ActiveRecord::ReadOnlyError`. Rails' automatic role switching (`config.active_record.database_selector`) works too. Shards pass through as well: `connects_to: { shards: { one: { writing: :cars_one } } }`.
+
+A database that shares `ApplicationRecord`'s connection follows `ApplicationRecord`'s roles. `GrantDB.connected_to(...)` switches `ApplicationRecord`.
 
 ## Extending Models
 

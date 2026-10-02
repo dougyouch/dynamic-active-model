@@ -20,6 +20,11 @@ RSpec.describe DynamicActiveModel::Generators::DatabaseGenerator, type: :generat
       expect(generated?('app/models/inventory_db/.keep')).to be(true)
     end
 
+    it 'adds a database with a replica' do
+      run_generator(described_class, %w[inventory --connection cars --replica cars_replica])
+      expect(initializer).to include('config.add_database :inventory, connects_to: { writing: :cars, reading: :cars_replica }')
+    end
+
     it 'refuses a namespace the app already declares' do
       expect { run_generator(described_class, ['cars']) }.to raise_error(Thor::Error, 'CarsDB is already declared')
     end

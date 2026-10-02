@@ -22,7 +22,7 @@ RSpec.describe DynamicActiveModel::Generators::ExtensionGenerator, type: :genera
 
   it 'raises for a database the app does not declare' do
     expect { run_generator(described_class, %w[nope users]) }
-      .to raise_error(Thor::Error, 'no database nope is declared (declared: AppDB, CarsDB)')
+      .to raise_error(Thor::Error, 'no database nope is declared (declared: AppDB, CarsDB, FleetDB)')
   end
 
   context 'with a custom extensions path, suffix and class name' do

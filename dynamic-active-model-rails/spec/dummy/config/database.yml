@@ -5,3 +5,7 @@ test:
   cars:
     adapter: sqlite3
     database: tmp/cars.sqlite3
+  cars_replica:
+    adapter: sqlite3
+    database: tmp/cars.sqlite3
+    replica: true

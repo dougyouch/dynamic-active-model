@@ -5,6 +5,8 @@ DynamicActiveModel::Rails.configure do |config|
     db.skip_tables 'audit_*'
   end
   config.add_database :cars, :cars
+  # the cars database again, with a read replica
+  config.add_database :fleet, connects_to: { writing: :cars, reading: :cars_replica }
 end
 
 # runs after every build of AppDB's models, with the Database as self

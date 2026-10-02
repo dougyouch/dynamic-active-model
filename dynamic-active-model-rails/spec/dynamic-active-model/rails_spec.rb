@@ -4,7 +4,7 @@ RSpec.describe DynamicActiveModel::Rails do
   describe '.configure' do
     it 'registers each database once' do
       expect { described_class.configure { |config| config } }.not_to(change { described_class.loaders.size })
-      expect(described_class.loaders.map { |loader| loader.definition.module_name }).to eq(%w[AppDB CarsDB])
+      expect(described_class.loaders.map { |loader| loader.definition.module_name }).to eq(%w[AppDB CarsDB FleetDB])
     end
   end
 
