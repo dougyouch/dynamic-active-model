@@ -212,7 +212,7 @@ If your app followed the core gem's [manual setup](../docs/manual-rails-setup.md
    | Setup DSL | Rails gem |
    |---|---|
    | `parent_class ApplicationRecord` | default (omit) |
-   | `connection_options 'secondary'` | `add_database :db, :secondary` |
+   | `connection_options :secondary` (or the deprecated `'secondary'`) | `add_database :db, :secondary` |
    | `extensions_path '...'` | default for `app/models/db/`; otherwise `extensions_path:` |
    | `extensions_suffix '.x.rb'` | `extensions_suffix:` |
    | `skip_tables [...]` / `skip_table` | `db.skip_tables` |

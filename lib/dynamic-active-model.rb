@@ -46,6 +46,16 @@ module DynamicActiveModel
   # Manages the setup process and configuration
   autoload :Setup, 'dynamic-active-model/setup'
 
+  # Deprecation warnings for this gem; dynamic-active-model-rails registers it in
+  # Rails.application.deprecators so the app's deprecation settings apply
+  # @return [ActiveSupport::Deprecation]
+  def self.deprecator
+    @deprecator ||= begin
+      require 'active_support/deprecation'
+      ActiveSupport::Deprecation.new('1.0', 'dynamic-active-model')
+    end
+  end
+
   # Base class for errors raised by DynamicActiveModel
   class Error < StandardError; end
 
