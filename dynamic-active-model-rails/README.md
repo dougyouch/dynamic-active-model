@@ -172,7 +172,9 @@ bin/rails db:schema:cache:dump   # db/schema_cache.yml, db/<name>_schema_cache.y
 | Dump, Rails defaults | 4 |
 | Dump, `config.active_record.check_schema_cache_dump_version = false` | 2 |
 
-The table list is always one live query. By default, Rails also checks the dump's schema version against the database, and ignores a stale dump.
+The table list is always one live query. The dump holds each table's indexes (name, uniqueness, columns), so associations come out the same as from live queries, including `has_one` from unique indexes and join tables.
+
+A dump is only as fresh as the last `db:schema:cache:dump`. By default, Rails compares the dump's schema version with the database, and ignores the dump after a migration. That version only tracks migrations, though. For a database whose schema changes outside Rails migrations, such as a legacy or externally managed database, regenerate the dump on every deploy or don't use one. Otherwise new columns, indexes and associations are missed. With `check_schema_cache_dump_version = false`, any stale dump is used.
 
 When models are reset after a code reload or schema change, the gem clears the database's schema cache too. That matters because Rails only clears the primary database's cache on reload.
 
