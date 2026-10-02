@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.10.0...v0.11.0) (2026-10-02)
+
+
+### Features
+
+* **rails:** add dynamic-active-model-rails companion gem ([ab93200](https://github.com/dougyouch/dynamic-active-model/commit/ab93200141350e6d6c749d3acba7d5da68fd6438))
+
 ## [0.10.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.9.1...v0.10.0) (2026-10-02)
 
 
