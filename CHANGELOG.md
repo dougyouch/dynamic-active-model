@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.12.0...v0.13.0) (2026-10-02)
+
+
+### Features
+
+* **rails:** add include_tables and extensions_path/suffix options ([209e8fb](https://github.com/dougyouch/dynamic-active-model/commit/209e8fb330dad9e9b64127e76d1cecee9a3cdfdb))
+* **rails:** setup DSL parity and move manual Rails setup out of the README ([a3113a3](https://github.com/dougyouch/dynamic-active-model/commit/a3113a33a94632b6932121a74b0aee5332c6466c))
+
+
+### Bug Fixes
+
+* **rails:** map add_database :db to DB instead of DbDB ([1e4fdcf](https://github.com/dougyouch/dynamic-active-model/commit/1e4fdcf70fe24f3c60988575bee653fb28f5fd5c))
+
 ## [0.12.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.11.0...v0.12.0) (2026-10-02)
 
 
