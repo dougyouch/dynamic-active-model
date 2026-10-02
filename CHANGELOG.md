@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.0](https://github.com/dougyouch/dynamic-active-model/compare/v0.16.1...v1.0.0) (2026-10-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **setup:** connection_options no longer accepts a database.yml name as a String; pass a Symbol (connection_options :secondary), which establish_connection resolves for the current environment.
+* dynamic-active-model now requires Ruby 3.2 or newer and ActiveRecord 7.1 or newer.
+
+### Features
+
+* require Ruby 3.2+ and ActiveRecord 7.1+ ([78c6be8](https://github.com/dougyouch/dynamic-active-model/commit/78c6be8fab81db15fe688deb35ecfb3127a97bff))
+* **setup:** remove connection_options with a String database.yml name ([c0ac9e0](https://github.com/dougyouch/dynamic-active-model/commit/c0ac9e09e8d33a143a1b96a8b109fca8090352e7))
+
 ## [0.16.1](https://github.com/dougyouch/dynamic-active-model/compare/v0.16.0...v0.16.1) (2026-10-02)
 
 
