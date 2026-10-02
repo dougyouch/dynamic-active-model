@@ -48,6 +48,23 @@ jobs:
           include-hidden-files: true
           retention-days: 14
 
+  test-rails:
+    name: Rails gem tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dynamic-active-model-rails
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
+          working-directory: dynamic-active-model-rails
+      - run: bundle exec rspec
+
   # Publishes coverage.svg to the orphan `badges` branch; the README badge points at it.
   # Skipped when called from release.yml (github.workflow is the caller's name there).
   coverage-badge:
