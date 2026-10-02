@@ -86,6 +86,19 @@ module CarsDB
 end
 ```
 
+## Load Hooks
+
+Configuration that touches models at boot, like `has_paper_trail`, must be reapplied whenever the models are rebuilt. After every build, the gem runs an ActiveSupport load hook named after the database's folder. The block runs with the `DynamicActiveModel::Database` as `self`:
+
+```ruby
+# config/initializers/paper_trail.rb
+ActiveSupport.on_load(:grant_db) do
+  %w[users organizations].each { |table| get_model!(table).has_paper_trail }
+end
+```
+
+Avoid `Rails.application.config.after_initialize { GrantDB.database... }`. It runs once, so models rebuilt after a reload or migration would lose that setup.
+
 ## Lifecycle
 
 - **Lazy loading.** Nothing touches the database at boot. The first reference to a constant in a namespace builds that database's models. That's why `db:create`, `db:migrate` and `assets:precompile` don't need models to exist.

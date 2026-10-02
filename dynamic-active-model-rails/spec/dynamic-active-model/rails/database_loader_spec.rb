@@ -37,6 +37,14 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseLoader do
     end
   end
 
+  describe 'load hooks' do
+    it 'runs the database load hook on every build' do
+      expect(AppDB::User.load_hook_ran?).to be(true)
+      AppDB.dynamic_active_model_loader.reset!
+      expect(AppDB::User.load_hook_ran?).to be(true)
+    end
+  end
+
   describe '#reset!' do
     let(:loader) { AppDB.dynamic_active_model_loader }
 

@@ -44,6 +44,11 @@ module DynamicActiveModel
         module_name.underscore
       end
 
+      # @return [Symbol] ActiveSupport load hook run after each build, e.g. :cars_db
+      def load_hook
+        folder.to_sym
+      end
+
       # @param root [Pathname, String] Application root
       # @return [String] Directory holding this database's .ext.rb files
       def extensions_path(root)
