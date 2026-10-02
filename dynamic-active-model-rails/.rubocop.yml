@@ -8,3 +8,8 @@ AllCops:
 Naming/FileName:
   Exclude:
     - 'lib/dynamic-active-model-rails.rb'
+
+# same exemption as the root config; its spec/ glob doesn't reach this directory
+Layout/LineLength:
+  Exclude:
+    - 'spec/**/*'

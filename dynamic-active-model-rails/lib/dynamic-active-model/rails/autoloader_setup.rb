@@ -3,8 +3,8 @@
 module DynamicActiveModel
   module Rails
     # Teaches the Rails autoloader about a database's folder: cars_db/ maps to
-    # CarsDB (only in Zeitwerk, not the global inflector), and .ext.rb files are
-    # left to DynamicActiveModel instead of being autoloaded.
+    # CarsDB (only in Zeitwerk, not the global inflector), and extension files
+    # (*.ext.rb by default) are left to DynamicActiveModel instead of being autoloaded.
     class AutoloaderSetup
       # @param autoloaders [Rails::Autoloaders]
       # @param definition [DatabaseDefinition]
@@ -26,7 +26,7 @@ module DynamicActiveModel
 
       # @return [String] Glob matching the database's extension files
       def extension_glob
-        File.join(@definition.extensions_path(@root), '*.ext.rb')
+        File.join(@definition.extensions_path(@root), "*#{@definition.extensions_suffix}")
       end
     end
   end
