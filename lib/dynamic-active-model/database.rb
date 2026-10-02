@@ -45,8 +45,9 @@ module DynamicActiveModel
     # @param base_module [Module] The namespace for created models
     # @param connection_options [Hash] Database connection options
     # @param base_class_name [String, nil] Optional base class name for models
-    def initialize(base_module, connection_options, base_class_name = nil)
-      @factory = Factory.new(base_module, connection_options, base_class_name)
+    # @param parent_class [Class, nil] Optional superclass for the base class (see Factory)
+    def initialize(base_module, connection_options, base_class_name = nil, parent_class: nil)
+      @factory = Factory.new(base_module, connection_options, base_class_name, parent_class: parent_class)
       @table_class_names = {}
       @skip_tables = []
       @skip_table_matchers = []

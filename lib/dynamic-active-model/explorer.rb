@@ -29,10 +29,13 @@ module DynamicActiveModel
     # @param skip_tables [Array<String, Regexp>] Tables to exclude from model creation
     # @param relationships [Hash] Custom foreign key relationships to add
     # @param table_class_names [Hash] Custom class names by table name
+    # @param parent_class [Class, nil] Optional superclass for the base class (see Factory)
     # @return [Database] The configured database instance
     # @raise [ClassNameConflict] If two tables map to the same class name
-    def self.explore(base_module, connection_options, skip_tables = [], relationships = {}, table_class_names = {})
-      database = create_models!(base_module, connection_options, skip_tables, table_class_names)
+    def self.explore(base_module, connection_options, skip_tables = [], relationships = {}, table_class_names = {},
+                     parent_class: nil)
+      database = create_models!(base_module, connection_options, skip_tables, table_class_names,
+                                parent_class: parent_class)
       build_relationships!(database, relationships)
       database
     end
@@ -42,9 +45,10 @@ module DynamicActiveModel
     # @param connection_options [Hash] Database connection options
     # @param skip_tables [Array<String, Regexp>] Tables to exclude from model creation
     # @param table_class_names [Hash] Custom class names by table name
+    # @param parent_class [Class, nil] Optional superclass for the base class (see Factory)
     # @return [Database] The configured database instance
-    def self.create_models!(base_module, connection_options, skip_tables, table_class_names = {})
-      database = Database.new(base_module, connection_options)
+    def self.create_models!(base_module, connection_options, skip_tables, table_class_names = {}, parent_class: nil)
+      database = Database.new(base_module, connection_options, parent_class: parent_class)
       skip_tables.each { |table| database.skip_table(skip_table_matcher(table)) }
       table_class_names.each { |table_name, class_name| database.table_class_name(table_name, class_name) }
       database.create_models!

@@ -20,6 +20,10 @@ Metrics/MethodLength:
 Metrics/AbcSize:
   Max: 35
 
+# Keyword options are how signatures grow without breaking positional callers
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
 Metrics/ClassLength:
   Max: 200
 

@@ -70,6 +70,41 @@ describe DynamicActiveModel::Factory do
     end
   end
 
+  describe '#base_class with a parent class' do
+    subject { factory.base_class }
+
+    let(:factory) { described_class.new(base_module, connection_options, nil, parent_class: parent_class) }
+    let(:parent_class) do
+      base_module.const_set(:Parent, Class.new(ActiveRecord::Base) { self.abstract_class = true })
+      base_module::Parent.tap { |kls| kls.establish_connection(DB_CONFIG) }
+    end
+
+    context 'without connection options' do
+      let(:connection_options) { nil }
+
+      it 'subclasses the parent class' do
+        expect(subject.superclass).to eq(parent_class)
+      end
+
+      it "shares the parent class's connection pool" do
+        expect(subject.connection_pool).to equal(parent_class.connection_pool)
+      end
+
+      it 'creates models that read through the shared connection' do
+        expect(factory.create('users').column_names).to include('name')
+      end
+    end
+
+    context 'with connection options' do
+      let(:connection_options) { create_sqlite_database('CREATE TABLE widgets (id INTEGER PRIMARY KEY);') }
+
+      it 'establishes its own connection' do
+        expect(subject.connection_pool).not_to equal(parent_class.connection_pool)
+        expect(subject.connection.tables).to eq(['widgets'])
+      end
+    end
+  end
+
   describe '#base_class=' do
     subject { factory.base_class }
 

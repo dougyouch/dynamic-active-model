@@ -28,6 +28,41 @@ describe DynamicActiveModel::Setup do
     end
   end
 
+  describe '#parent_class' do
+    subject { db_module.parent_class }
+
+    it 'default is nil' do
+      expect(subject).to be_nil
+    end
+
+    describe 'with #parent_class=' do
+      before do
+        db_module.parent_class(ActiveRecord::Base)
+      end
+
+      it 'set to the class' do
+        expect(subject).to eq(ActiveRecord::Base)
+      end
+    end
+  end
+
+  describe '#create_models! with a parent class' do
+    let(:parent_class) do
+      base_module.const_set(:Parent, Class.new(ActiveRecord::Base) { self.abstract_class = true })
+      base_module::Parent.tap { |kls| kls.establish_connection(DB_CONFIG) }
+    end
+
+    before do
+      db_module.parent_class(parent_class)
+      db_module.create_models!
+    end
+
+    it 'builds models that inherit from the parent class' do
+      expect(db_module::User.ancestors).to include(parent_class)
+      expect(db_module::User.connection_pool).to equal(parent_class.connection_pool)
+    end
+  end
+
   describe '#extensions_path' do
     subject { db_module.extensions_path }
 
