@@ -23,6 +23,14 @@ bundle exec rspec spec/dynamic-active-model/database_spec.rb:42
 BUNDLE_GEMFILE=gemfiles/activerecord_7.1.gemfile bundle install
 BUNDLE_GEMFILE=gemfiles/activerecord_7.1.gemfile bundle exec rspec
 
+# Run the core specs against PostgreSQL or MySQL (default is SQLite). The drivers are
+# in an optional Bundler group; DATABASE_HOST/PORT/USERNAME/PASSWORD locate the server.
+bundle config set --local with databases && bundle install
+docker run -d --rm --name dam-pg -e POSTGRES_PASSWORD=postgres -p 55432:5432 postgres:17
+DATABASE_ADAPTER=postgresql DATABASE_PORT=55432 DATABASE_PASSWORD=postgres bundle exec rspec
+docker run -d --rm --name dam-mysql -e MYSQL_ROOT_PASSWORD=root -p 3307:3306 mysql:8.4
+DATABASE_ADAPTER=trilogy DATABASE_PORT=3307 DATABASE_PASSWORD=root bundle exec rspec
+
 # Run linter
 bundle exec rubocop
 
@@ -79,7 +87,7 @@ Rubocop runs from the repo root and covers both gems.
 
 ### Test Environment
 
-Tests use SQLite with schema defined in `spec/support/db/schema.rb`. The shared context 'database' in `spec/spec_helper.rb` creates isolated modules for each test to avoid constant collision.
+Tests use SQLite by default, and also run against PostgreSQL and MySQL in CI (`DATABASE_ADAPTER`, via `spec/support/test_database.rb`). The shared schema is in `spec/support/db/schema.rb`; specs needing their own schema use `create_test_database(sql)` with SQL portable across all three. The shared context 'database' in `spec/spec_helper.rb` creates isolated modules for each test to avoid constant collision.
 
 ## Releases
 
