@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# CI matrix: the core gem against ActiveRecord 8.0 (8.1 uses the root Gemfile and its lockfile)
+# CI matrix: the core gem against ActiveRecord 8.0 (Ruby 4.0 + 8.1 uses the root Gemfile and its lockfile)
 source 'https://rubygems.org'
 
 gemspec path: '..'

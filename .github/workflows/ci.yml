@@ -27,8 +27,9 @@ jobs:
           bundler-cache: true
       - run: bundle exec rubocop --format github
 
-  # Supported range: Ruby 3.2-4.0 x ActiveRecord/Rails 7.1-8.1. 8.1 runs on the default
-  # Gemfiles (and the committed Gemfile.lock); older versions use gemfiles/*.gemfile.
+  # Supported range: Ruby 3.2-4.0 x ActiveRecord/Rails 7.1-8.1. The root Gemfile.lock is a
+  # Ruby 4.0 development lockfile (its tooling needs Ruby 3.3+), so only Ruby 4.0 + 8.1 uses it;
+  # every other combination resolves gemfiles/activerecord_X.gemfile fresh.
   test:
     name: Tests (Ruby ${{ matrix.ruby }}, ActiveRecord ${{ matrix.activerecord }})
     runs-on: ubuntu-latest
@@ -39,7 +40,7 @@ jobs:
         activerecord: ['7.1', '7.2', '8.0', '8.1']
     env:
       BUNDLE_GEMFILE: >-
-        ${{ matrix.activerecord == '8.1' && format('{0}/Gemfile', github.workspace)
+        ${{ matrix.ruby == '4.0' && matrix.activerecord == '8.1' && format('{0}/Gemfile', github.workspace)
         || format('{0}/gemfiles/activerecord_{1}.gemfile', github.workspace, matrix.activerecord) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

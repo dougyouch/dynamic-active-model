@@ -18,7 +18,8 @@ bundle exec rspec spec/dynamic-active-model/database_spec.rb
 bundle exec rspec spec/dynamic-active-model/database_spec.rb:42
 
 # Run the specs against another ActiveRecord version (CI runs Ruby 3.2-4.0 x 7.1-8.1;
-# 8.1 uses the default Gemfile, older versions use gemfiles/, the Rails gem dynamic-active-model-rails/gemfiles/)
+# only Ruby 4.0 + 8.1 uses the default Gemfile.lock, the rest use gemfiles/ and, for the
+# Rails gem, dynamic-active-model-rails/gemfiles/)
 BUNDLE_GEMFILE=gemfiles/activerecord_7.1.gemfile bundle install
 BUNDLE_GEMFILE=gemfiles/activerecord_7.1.gemfile bundle exec rspec
 
