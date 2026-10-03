@@ -3,7 +3,16 @@ name: CI
 on:
   push:
     branches: [master]
+  # release-please PRs change only these files. Their runs are triggered by
+  # github-actions[bot], which GitHub holds for approval until they expire as
+  # failures; release.yml runs this workflow before publishing anyway. A PR is
+  # skipped only if every file it changes is listed here.
   pull_request:
+    paths-ignore:
+      - CHANGELOG.md
+      - .release-please-manifest.json
+      - Gemfile.lock
+      - lib/dynamic-active-model/version.rb
   workflow_call:
 
 permissions:
