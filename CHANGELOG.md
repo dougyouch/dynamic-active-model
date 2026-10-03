@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/dougyouch/dynamic-active-model/compare/v1.2.0...v1.3.0) (2026-10-03)
+
+
+### Features
+
+* **rails:** add dynamic_active_model:models and :export rake tasks ([e80f9d5](https://github.com/dougyouch/dynamic-active-model/commit/e80f9d5d60bb282751d283356ec70a88891de91a))
+* **rails:** add dynamic_active_model:models and :export rake tasks ([34145bd](https://github.com/dougyouch/dynamic-active-model/commit/34145bd1af86f57848aca58d9ca862d3a8ecbbee))
+
 ## [1.2.0](https://github.com/dougyouch/dynamic-active-model/compare/v1.1.0...v1.2.0) (2026-10-03)
 
 
