@@ -223,6 +223,23 @@ describe DynamicActiveModel::Associations do
     end
   end
 
+  describe '#use_has_many_through!' do
+    let(:connection_options) { create_test_database(HAS_MANY_THROUGH_SCHEMA) }
+
+    before { database.create_models! }
+
+    it 'is off by default' do
+      relations.build!
+      expect(database.get_model!(:users).reflect_on_association(:roles)).to be_nil
+    end
+
+    it 'adds has_many :through when in use' do
+      relations.use_has_many_through!
+      relations.build!
+      expect(database.get_model!(:users).reflect_on_association(:roles).options[:through]).to eq(:user_roles)
+    end
+  end
+
   describe 'index lookups' do
     def queries_during(&block)
       queries = []

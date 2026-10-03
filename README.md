@@ -122,6 +122,25 @@ class Movie < ActiveRecord::Base
 end
 ```
 
+### has_many :through
+
+Turn on `has_many_through` to add `has_many :through` associations across join models:
+
+```ruby
+DynamicActiveModel::Explorer.explore(DB, database_config, has_many_through: true)
+# Setup DSL: has_many_through true
+# CLI:       dynamic-db-explorer --has-many-through ...
+```
+
+A join model is a table with a primary key and a **unique index on exactly two columns**, each a `belongs_to` to a different model. That's how Rails apps usually mark one: `add_index :user_roles, [:user_id, :role_id], unique: true`. Other columns, such as timestamps, `created_by_id` or extra data, don't matter. For `user_roles`:
+
+```ruby
+User has_many :roles, through: :user_roles, source: :role
+Role has_many :users, through: :user_roles, source: :user
+```
+
+The `has_many :user_roles` side already comes from the foreign keys. A name that's already taken on the model by an association, method or column is skipped. Tables without a primary key stay `has_and_belongs_to_many` join tables. Nested chains such as `User → roles → permissions` aren't generated; add those in an extension file.
+
 ### Foreign Key Constraints
 
 By default, relationships come from column naming conventions (`user_id` → `users`). Turn on `foreign_key_constraints` to also use the database's foreign key constraints:

@@ -57,6 +57,8 @@ Dynamic Active Model is a Ruby gem that automatically discovers database schemas
 
 **ForeignKey** (`lib/dynamic-active-model/foreign_key.rb`) - Tracks foreign key columns and their relationship names. Default suffix is `_id` but can be customized via `ForeignKey.id_suffix=`.
 
+**HasManyThrough** (`lib/dynamic-active-model/has_many_through.rb`) - Opt-in (`has_many_through: true`): finds join models (a primary key plus a unique index on exactly two belongs_to columns) and adds `has_many :through` both ways.
+
 **ForeignKeyConstraints** (`lib/dynamic-active-model/foreign_key_constraints.rb`) - Opt-in (`foreign_key_constraints: true`): resolves the database's foreign key constraints to models. Associations then relates a constrained column through its constraint instead of by naming convention.
 
 **Setup** (`lib/dynamic-active-model/setup.rb`) - DSL module for declarative configuration. Include in a module to get `connection_options`, `skip_tables`, `extensions_path`, and `create_models!` methods.

@@ -54,6 +54,7 @@ module DynamicActiveModel
           connection_options: nil,
           parent_class: nil,
           foreign_key_constraints: false,
+          has_many_through: false,
           skip_tables: [],
           relationships: {},
           table_class_names: {},
@@ -92,6 +93,15 @@ module DynamicActiveModel
       def foreign_key_constraints(enabled = nil)
         update_config(:foreign_key_constraints, enabled) unless enabled.nil?
         dynamic_active_model_config[:foreign_key_constraints]
+      end
+
+      # Sets or gets whether has_many :through associations are added across join
+      # models (see HasManyThrough)
+      # @param enabled [Boolean, nil]
+      # @return [Boolean] The current setting
+      def has_many_through(enabled = nil) # rubocop:disable Naming/PredicatePrefix -- DSL setter/getter
+        update_config(:has_many_through, enabled) unless enabled.nil?
+        dynamic_active_model_config[:has_many_through]
       end
 
       # Sets or gets the list of tables to skip
@@ -176,7 +186,8 @@ module DynamicActiveModel
             relationships,
             table_class_names,
             parent_class: parent_class,
-            foreign_key_constraints: foreign_key_constraints
+            foreign_key_constraints: foreign_key_constraints,
+            has_many_through: has_many_through
           )
         )
         database.update_all_models(extensions_path, extensions_suffix) if extensions_path

@@ -70,6 +70,10 @@ OptionParser.new do |opts|
     options[:foreign_key_constraints] = true
   end
 
+  opts.on('--has-many-through', 'Also add has_many :through across join models') do
+    options[:has_many_through] = true
+  end
+
   opts.on('-c', '--config FILE', "config file, default #{DEFAULT_CONFIG_FILE}") do |v|
     options[:config_file] = v
   end
@@ -96,6 +100,7 @@ if options[:config_file]
   options[:skip_tables] = config.delete('skip_tables') || []
   options[:relationships] = config.delete('relationships') || {}
   options[:foreign_key_constraints] ||= config.delete('foreign_key_constraints') || false
+  options[:has_many_through] ||= config.delete('has_many_through') || false
   if (module_name = config.delete('module'))
     raise ArgumentError, "Invalid module name: #{module_name}" unless module_name.match?(/\A[A-Z][A-Za-z0-9_]*\z/)
 
@@ -110,7 +115,8 @@ DYNAMIC_DATABASE = DynamicActiveModel::Explorer.explore(
   options[:connection_options],
   options[:skip_tables],
   options[:relationships],
-  foreign_key_constraints: options[:foreign_key_constraints] || false
+  foreign_key_constraints: options[:foreign_key_constraints] || false,
+  has_many_through: options[:has_many_through] || false
 )
 
 if options[:class_files_dir]
