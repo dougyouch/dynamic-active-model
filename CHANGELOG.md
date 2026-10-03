@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/dougyouch/dynamic-active-model/compare/v1.1.0...v1.2.0) (2026-10-03)
+
+
+### Features
+
+* **associations:** opt-in has_many :through across join models ([5c3ce3e](https://github.com/dougyouch/dynamic-active-model/commit/5c3ce3e245838d983ff4a9cad7b592263d823f71))
+* opt-in has_many :through across join models ([5914ebe](https://github.com/dougyouch/dynamic-active-model/commit/5914ebe5785c1a61d04b07e4afe9c2627be3ecf2))
+* **rails:** add_database has_many_through: option ([c1a9f76](https://github.com/dougyouch/dynamic-active-model/commit/c1a9f76864f1dfc4fc8bd4fb49935d9eecbd2132))
+
+
+### Bug Fixes
+
+* create the namespace directory for --create-class-files ([54e987f](https://github.com/dougyouch/dynamic-active-model/commit/54e987f9c14a682c67e1532e1ce82162fa15249c))
+* **template:** create the namespace directory for class files ([9c970c1](https://github.com/dougyouch/dynamic-active-model/commit/9c970c13482b404b7dc5d6b99f6a2e0ce33a9576))
+
 ## [1.1.0](https://github.com/dougyouch/dynamic-active-model/compare/v1.0.0...v1.1.0) (2026-10-02)
 
 
