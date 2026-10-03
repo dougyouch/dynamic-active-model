@@ -175,6 +175,20 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseDefinition do
     end
   end
 
+  describe '#has_many_through' do
+    it 'defaults to false' do
+      expect(definition.has_many_through).to be(false)
+    end
+
+    context 'when enabled' do
+      let(:options) { { has_many_through: true } }
+
+      it 'is true' do
+        expect(definition.has_many_through).to be(true)
+      end
+    end
+  end
+
   describe '#own_connection?' do
     it 'is false when sharing the parent class connection' do
       expect(definition.own_connection?).to be(false)

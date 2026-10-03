@@ -62,7 +62,8 @@ module DynamicActiveModel
         @database = new_database
         @database.create_models!
         Explorer.build_relationships!(@database, definition.relationships,
-                                      foreign_key_constraints: definition.foreign_key_constraints)
+                                      foreign_key_constraints: definition.foreign_key_constraints,
+                                      has_many_through: definition.has_many_through)
         load_extensions
         ActiveSupport.run_load_hooks(definition.load_hook, @database)
       rescue StandardError

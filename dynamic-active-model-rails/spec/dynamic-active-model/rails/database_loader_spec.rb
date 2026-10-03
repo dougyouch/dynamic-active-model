@@ -78,6 +78,27 @@ RSpec.describe DynamicActiveModel::Rails::DatabaseLoader do
       end
     end
 
+    context 'with has_many_through' do
+      let(:definition) do
+        DynamicActiveModel::Rails::DatabaseDefinition.new(:plain, has_many_through: true)
+                                                     .tap { |db| db.include_tables 'users', 'posts', 'post_editors' }
+      end
+
+      before do
+        DummySchema.execute(:primary, <<~SQL)
+          CREATE TABLE post_editors (id INTEGER PRIMARY KEY, post_id INTEGER, user_id INTEGER);
+          CREATE UNIQUE INDEX index_post_editors_on_post_id_and_user_id ON post_editors (post_id, user_id);
+        SQL
+      end
+
+      after { DummySchema.execute(:primary, 'DROP TABLE IF EXISTS post_editors') }
+
+      it 'adds has_many :through across join models' do
+        loader.load!
+        expect(PlainDB::Post.reflect_on_association(:users).options).to eq(through: :post_editors, source: :user)
+      end
+    end
+
     context 'with a custom extensions_path and suffix' do
       let(:definition) do
         DynamicActiveModel::Rails::DatabaseDefinition.new(:plain, extensions_path: 'ext', extensions_suffix: '.model.rb')
