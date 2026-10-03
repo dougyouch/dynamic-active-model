@@ -29,16 +29,13 @@ describe DynamicActiveModel::TemplateClassFile do
     end
 
     it 'creates a Ruby file in the specified directory' do
-      # Create nested directory for namespaced model
       file_path = "#{temp_dir}/#{model.name.underscore}.rb"
-      FileUtils.mkdir_p(File.dirname(file_path))
       template_class_file.create_template!(temp_dir)
       expect(File.exist?(file_path)).to be(true)
     end
 
     it 'writes the correct content to the file' do
       file_path = "#{temp_dir}/#{model.name.underscore}.rb"
-      FileUtils.mkdir_p(File.dirname(file_path))
       template_class_file.create_template!(temp_dir)
       content = File.read(file_path)
       expect(content).to include("class #{model.name}")
@@ -48,9 +45,8 @@ describe DynamicActiveModel::TemplateClassFile do
     context 'with nested module name' do
       let(:model_name) { :Employment }
 
-      it 'creates the file with underscored path' do
+      it 'creates the namespace directory and the file with underscored path' do
         file_path = "#{temp_dir}/#{model.name.underscore}.rb"
-        FileUtils.mkdir_p(File.dirname(file_path))
         template_class_file.create_template!(temp_dir)
         expect(File.exist?(file_path)).to be(true)
       end

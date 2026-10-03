@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'fileutils'
+
 module DynamicActiveModel
   # The TemplateClassFile class generates Ruby source files for ActiveRecord models.
   # It creates properly formatted class definitions that include:
@@ -26,11 +28,13 @@ module DynamicActiveModel
       @model = model
     end
 
-    # Creates a Ruby source file for the model
+    # Creates a Ruby source file for the model, at dir/<namespace>/<model>.rb
     # @param dir [String] Directory to create the file in
     # @return [void]
     def create_template!(dir)
       file = "#{dir}/#{@model.name.underscore}.rb"
+      # the namespace directory (e.g. db/ for DB::User) may not exist yet
+      FileUtils.mkdir_p(File.dirname(file))
       File.binwrite(file, to_s)
     end
 
