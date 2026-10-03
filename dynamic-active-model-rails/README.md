@@ -29,6 +29,24 @@ bin/rails generate dynamic_active_model:extension grant_db users       # app/mod
 
 `--connection NAME` points the database at a `database.yml` entry. `--replica NAME` adds a reading role through `connects_to` and requires `--connection`. The generators warn if the current environment has no such entry. Without `--connection`, the database shares `ApplicationRecord`'s connection.
 
+## Rake Tasks
+
+```bash
+bin/rails dynamic_active_model:models                 # each database with its models and associations
+bin/rails dynamic_active_model:export DIR=tmp/models  # a class file per model (default tmp/dynamic_active_model)
+```
+
+`models` shows what the gem generated, without opening a console:
+
+```
+GrantDB (shares ApplicationRecord's connection), 31 models
+  GrantDB::Role (roles)
+    has_many :user_roles -> GrantDB::UserRole
+    has_many :users -> GrantDB::User, through: :user_roles
+```
+
+Connections given as a URL or config hash are shown as "custom connection", so credentials never appear in the output. `export` writes `DIR/<namespace>/<model>.rb` for every model. Use it to read the generated associations, or as a starting point when a table needs a hand-written model.
+
 ## Configuration
 
 ```ruby
