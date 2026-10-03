@@ -21,6 +21,8 @@ module DynamicActiveModel
     autoload :DatabaseDefinition, 'dynamic-active-model/rails/database_definition'
     autoload :DatabaseLoader, 'dynamic-active-model/rails/database_loader'
     autoload :LazyNamespace, 'dynamic-active-model/rails/lazy_namespace'
+    autoload :ModelExport, 'dynamic-active-model/rails/model_export'
+    autoload :ModelReport, 'dynamic-active-model/rails/model_report'
     autoload :SchemaChangeHook, 'dynamic-active-model/rails/schema_change_hook'
 
     class << self

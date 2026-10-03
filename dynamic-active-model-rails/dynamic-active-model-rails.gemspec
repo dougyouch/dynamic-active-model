@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Doug Youch']
   s.email       = 'dougyouch@gmail.com'
   s.homepage    = 'https://github.com/dougyouch/dynamic-active-model/tree/master/dynamic-active-model-rails'
-  s.files       = Dir.glob('lib/**/*.{rb,tt}') + ['README.md']
+  s.files       = Dir.glob('lib/**/*.{rb,rake,tt}') + ['README.md']
   s.required_ruby_version = '>= 3.2'
 
   s.add_dependency 'activerecord', '>= 7.1'

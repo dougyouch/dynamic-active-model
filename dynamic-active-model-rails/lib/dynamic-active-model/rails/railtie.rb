@@ -7,6 +7,10 @@ module DynamicActiveModel
     class Railtie < ::Rails::Railtie
       config.eager_load_namespaces << DynamicActiveModel::Rails
 
+      rake_tasks do
+        load File.expand_path('tasks/dynamic_active_model.rake', __dir__)
+      end
+
       # so config.active_support.deprecation (log, raise in tests, ...) applies
       initializer 'dynamic_active_model.deprecator' do |app|
         app.deprecators[:dynamic_active_model] = DynamicActiveModel.deprecator

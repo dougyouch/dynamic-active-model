@@ -57,6 +57,7 @@ The companion gem lives in `dynamic-active-model-rails/`. It shares this repo's 
 | AutoloaderSetup | Zeitwerk-only `cars_db` → `CarsDB` inflection; ignores `.ext.rb` files |
 | SchemaChangeHook | Prepended to `Migrator#migrate`/`#run` and `DatabaseTasks.load_schema` to reset models |
 | Railtie | Registers eager loading, reset on code reload, and a watch on `db/` |
+| ModelReport / ModelExport | Back the `dynamic_active_model:models` and `:export` rake tasks: a text listing of databases, models and associations (credentials not printed), and class files via TemplateClassFile |
 | Generators | `dynamic_active_model:install`, `:database`, `:extension`; naming comes from DatabaseDefinition, and `:extension` reads the app's configuration |
 
 Lifecycle: `configure` (from an initializer) defines each namespace module and configures the autoloader before Zeitwerk is set up. Models are built on first constant reference, or at boot when eager loading. Code reloads and schema changes call `reset!`, which clears the database pool's schema cache and calls `Database#reset!`. The next reference rebuilds models against the current schema and the reloaded `ApplicationRecord`.
