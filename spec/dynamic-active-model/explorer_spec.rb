@@ -107,6 +107,17 @@ describe DynamicActiveModel::Explorer do
       end
     end
 
+    context 'with has_many_through' do
+      subject { described_class.explore(base_module, connection_options, [], {}, {}, has_many_through: true) }
+
+      let(:connection_options) { create_test_database(HAS_MANY_THROUGH_SCHEMA) }
+
+      it 'adds has_many :through across join models' do
+        subject
+        expect(base_module::Role.reflect_on_association(:users).options[:through]).to eq(:user_roles)
+      end
+    end
+
     context 'with foreign key constraints' do
       subject do
         described_class.explore(base_module, connection_options, ['archivists'], {}, {}, foreign_key_constraints: true)

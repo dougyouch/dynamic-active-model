@@ -94,6 +94,8 @@ Associations uses column naming conventions (`*_id`) combined with database inde
 - No unique index on FK → `has_many` (1:N relationship)
 - Join table pattern → `has_and_belongs_to_many`
 
+With `has_many_through` on (`Associations#use_has_many_through!`), `HasManyThrough` runs after the other associations are built. It treats a table with a primary key and a unique index on exactly two `belongs_to` columns, referencing different models, as a join model. It then gives each side a `has_many :through` the other, skipping names already taken by an association, method or column.
+
 With `foreign_key_constraints` on (`Associations#use_foreign_key_constraints!`), `ForeignKeyConstraints` reads `connection.foreign_keys` for every model and resolves each constraint to a model. A column with a constraint is related through it: its referenced model and primary key, self-references included. Other columns keep the naming convention. Composite constraints, columns without the id suffix, and constraints referencing a table without a model are skipped. Foreign keys aren't in Rails' schema cache, so this costs one query per table.
 
 ### Dangerous Attribute Protection
@@ -112,6 +114,7 @@ Extensions use `.ext.rb` suffix and `update_model` DSL. File names match table n
 | Associations | Relationship detection and creation |
 | ForeignKey | FK naming conventions, custom mappings |
 | ForeignKeyConstraints | Resolves the database's foreign key constraints to models (opt-in) |
+| HasManyThrough | Adds `has_many :through` across join models found by unique two-column indexes (opt-in) |
 | DangerousAttributesPatch | Column conflict prevention |
 | TemplateClassFile | Static file generation |
 | Setup | Declarative DSL for module configuration |

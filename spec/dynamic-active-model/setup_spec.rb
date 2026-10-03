@@ -83,6 +83,25 @@ describe DynamicActiveModel::Setup do
     end
   end
 
+  describe '#has_many_through' do
+    it 'defaults to false' do
+      expect(db_module.has_many_through).to be(false)
+    end
+
+    context 'when enabled' do
+      before do
+        db_module.connection_options(create_test_database(HAS_MANY_THROUGH_SCHEMA))
+        db_module.has_many_through true
+        db_module.create_models!
+      end
+
+      it 'adds has_many :through across join models' do
+        expect(db_module.has_many_through).to be(true)
+        expect(db_module::User.reflect_on_association(:roles).options[:through]).to eq(:user_roles)
+      end
+    end
+  end
+
   describe '#extensions_path' do
     subject { db_module.extensions_path }
 

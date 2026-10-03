@@ -57,6 +57,20 @@ describe DynamicActiveModel::TemplateClassFile do
     end
   end
 
+  describe '#to_s with has_many :through' do
+    let(:connection_options) { create_test_database(HAS_MANY_THROUGH_SCHEMA) }
+
+    before { DynamicActiveModel::HasManyThrough.new(database.models, relations.table_indexes).build! }
+
+    it 'writes the through association with symbol options' do
+      source = template_class_file.to_s
+      expect(source).to include("  has_many :roles, through: :user_roles, source: :role\n")
+      # declared after the association it goes through
+      expect(source.index('has_many :roles,')).to be > source.index('has_many :user_roles,')
+      expect(RubyVM::InstructionSequence.compile(source)).to be_a(RubyVM::InstructionSequence)
+    end
+  end
+
   describe '#to_s' do
     subject { template_class_file.to_s }
 

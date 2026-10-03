@@ -30,6 +30,7 @@ require 'dynamic-active-model'
 require 'support/test_database'
 require 'support/test_database_helpers'
 require 'support/foreign_key_constraints_schema'
+require 'support/has_many_through_schema'
 
 DB_CONFIG = TestDatabase.recreate('dynamic_active_model_test').freeze
 ActiveRecord::Base.establish_connection(DB_CONFIG)

@@ -44,6 +44,7 @@ module DynamicActiveModel
       all_has_many_relationships.each do |assoc|
         append_association!(str, 'has_many', assoc, has_many_association_options(assoc))
       end
+      all_has_many_through_relationships.each { |assoc| append_through_association!(str, assoc) }
       all_belongs_to_relationships.each do |assoc|
         append_association!(str, 'belongs_to', assoc, belongs_to_association_options(assoc))
       end
@@ -66,6 +67,12 @@ module DynamicActiveModel
       @model.reflect_on_all_associations.grep(ActiveRecord::Reflection::HasManyReflection)
     end
 
+    # Gets all has_many :through relationships for the model
+    # @return [Array] List of has_many :through associations
+    def all_has_many_through_relationships
+      @model.reflect_on_all_associations(:has_many).grep(ActiveRecord::Reflection::ThroughReflection)
+    end
+
     # Gets all belongs_to relationships for the model
     # @return [Array<ActiveRecord::Reflection::BelongsToReflection>]
     def all_belongs_to_relationships
@@ -82,6 +89,14 @@ module DynamicActiveModel
     # @return [Array<ActiveRecord::Reflection::HasAndBelongsToManyReflection>]
     def all_has_and_belongs_to_many_relationships
       @model.reflect_on_all_associations.grep(ActiveRecord::Reflection::HasAndBelongsToManyReflection)
+    end
+
+    # Appends a has_many :through declaration; through and source are symbols
+    # @param str [String] The source string being built
+    # @param assoc [ActiveRecord::Reflection::ThroughReflection] The association to add
+    def append_through_association!(str, assoc)
+      str << "  has_many #{assoc.name.inspect}, through: #{assoc.options[:through].to_sym.inspect}, " \
+             "source: #{assoc.options[:source].to_sym.inspect}\n"
     end
 
     # Appends an association definition to the source string

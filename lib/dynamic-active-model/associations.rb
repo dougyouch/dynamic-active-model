@@ -60,6 +60,12 @@ module DynamicActiveModel
       @constraints = ForeignKeyConstraints.new(@database)
     end
 
+    # Also adds has_many :through associations across join models (see HasManyThrough)
+    # @return [void]
+    def use_has_many_through!
+      @has_many_through = true
+    end
+
     # Builds all relationships between models based on foreign keys and constraints
     # This method:
     # 1. Maps foreign keys to their corresponding models
@@ -80,6 +86,8 @@ module DynamicActiveModel
         end.compact
         add_has_and_belongs_to_many(join_table_model, models) if models.size == 2
       end
+
+      HasManyThrough.new(@database.models, table_indexes).build! if @has_many_through
     end
 
     private

@@ -14,8 +14,9 @@ module DynamicActiveModel
   #   skip_tables = ['temporary_data', 'audit_logs']
   #   DynamicActiveModel::Explorer.explore(DB, database_config, skip_tables)
   #
-  # @example With Foreign Key Constraints
-  #   DynamicActiveModel::Explorer.explore(DB, database_config, foreign_key_constraints: true)
+  # @example With Foreign Key Constraints and has_many :through
+  #   DynamicActiveModel::Explorer.explore(DB, database_config, foreign_key_constraints: true,
+  #                                                             has_many_through: true)
   #
   # @example With Custom Relationships
   #   relationships = {
@@ -35,13 +36,16 @@ module DynamicActiveModel
     # @param parent_class [Class, nil] Optional superclass for the base class (see Factory)
     # @param foreign_key_constraints [Boolean] Also relate columns through the database's
     #   foreign key constraints (see ForeignKeyConstraints)
+    # @param has_many_through [Boolean] Also add has_many :through across join models
+    #   (see HasManyThrough)
     # @return [Database] The configured database instance
     # @raise [ClassNameConflict] If two tables map to the same class name
     def self.explore(base_module, connection_options, skip_tables = [], relationships = {}, table_class_names = {},
-                     parent_class: nil, foreign_key_constraints: false)
+                     parent_class: nil, foreign_key_constraints: false, has_many_through: false)
       database = create_models!(base_module, connection_options, skip_tables, table_class_names,
                                 parent_class: parent_class)
-      build_relationships!(database, relationships, foreign_key_constraints: foreign_key_constraints)
+      build_relationships!(database, relationships, foreign_key_constraints: foreign_key_constraints,
+                                                    has_many_through: has_many_through)
       database
     end
 
@@ -73,10 +77,12 @@ module DynamicActiveModel
     # @param database [Database] The database instance containing the models
     # @param relationships [Hash] Custom foreign key relationships to add
     # @param foreign_key_constraints [Boolean] Also relate columns through foreign key constraints
+    # @param has_many_through [Boolean] Also add has_many :through across join models
     # @return [void]
-    def self.build_relationships!(database, relationships, foreign_key_constraints: false)
+    def self.build_relationships!(database, relationships, foreign_key_constraints: false, has_many_through: false)
       relations = Associations.new(database)
       relations.use_foreign_key_constraints! if foreign_key_constraints
+      relations.use_has_many_through! if has_many_through
       relationships.each do |table_name, foreign_keys|
         foreign_keys.each do |foreign_key, relationship_name|
           relations.add_foreign_key(table_name, foreign_key, relationship_name)
