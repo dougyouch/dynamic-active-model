@@ -115,9 +115,7 @@ module DynamicActiveModel
       # Adds a single table to the skip list
       # @param table [String] Table to skip
       def skip_table(table)
-        config = dynamic_active_model_config
-        config[:skip_tables] << table
-        redefine_class_method(:dynamic_active_model_config, config)
+        update_config(:skip_tables, skip_tables + [table])
       end
 
       # Sets or gets the custom relationships
@@ -133,20 +131,15 @@ module DynamicActiveModel
       # @param foreign_key [String] Name of the foreign key column
       # @param relationship_name [String] Name for the relationship
       def foreign_key(table_name, foreign_key, relationship_name)
-        config = dynamic_active_model_config
-        current_relationships = config[:relationships]
-        current_relationships[table_name] ||= {}
-        current_relationships[table_name][foreign_key] = relationship_name
-        redefine_class_method(:dynamic_active_model_config, config)
+        table_relationships = relationships.fetch(table_name, {}).merge(foreign_key => relationship_name)
+        update_config(:relationships, relationships.merge(table_name => table_relationships))
       end
 
       # Sets a custom class name for a table
       # @param table_name [String] Name of the table
       # @param class_name [String] Class name to use for the table's model
       def table_class_name(table_name, class_name)
-        config = dynamic_active_model_config
-        config[:table_class_names][table_name.to_s] = class_name
-        redefine_class_method(:dynamic_active_model_config, config)
+        update_config(:table_class_names, table_class_names.merge(table_name.to_s => class_name))
       end
 
       # Gets the custom class names by table name
@@ -208,13 +201,12 @@ module DynamicActiveModel
               "pass a Symbol instead (connection_options #{options.to_sym.inspect})"
       end
 
-      # Stores a single configuration value
+      # Stores a single configuration value in a new config hash. The current hash (and
+      # any nested values) may be shared with a parent class, so it is never changed.
       # @param key [Symbol] Configuration key
       # @param value [Object] Configuration value
       def update_config(key, value)
-        config = dynamic_active_model_config
-        config[key] = value
-        redefine_class_method(:dynamic_active_model_config, config)
+        redefine_class_method(:dynamic_active_model_config, dynamic_active_model_config.merge(key => value))
       end
     end
   end

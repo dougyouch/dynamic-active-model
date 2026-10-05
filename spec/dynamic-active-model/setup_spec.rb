@@ -325,4 +325,54 @@ describe DynamicActiveModel::Setup do
       expect(base_module.database.nil?).to be(false)
     end
   end
+
+  describe 'configuration in a subclass' do
+    let(:base_class) do
+      Class.new do
+        include DynamicActiveModel::Setup
+
+        skip_table 'parent_skip'
+        foreign_key 'users', 'parent_id', 'parent'
+        table_class_name 'people', 'Person'
+        extensions_suffix '.parent.rb'
+      end
+    end
+
+    let!(:child_class) do
+      Class.new(base_class) do
+        skip_table 'child_skip'
+        foreign_key 'users', 'child_id', 'child'
+        foreign_key 'posts', 'author_id', 'author'
+        table_class_name 'geese', 'Goose'
+        extensions_suffix '.child.rb'
+      end
+    end
+
+    it 'does not change the parent class configuration' do
+      expect(base_class.skip_tables).to eq(['parent_skip'])
+      expect(base_class.relationships).to eq('users' => { 'parent_id' => 'parent' })
+      expect(base_class.table_class_names).to eq('people' => 'Person')
+      expect(base_class.extensions_suffix).to eq('.parent.rb')
+    end
+
+    it 'builds on the parent class configuration' do
+      expect(child_class.skip_tables).to eq(%w[parent_skip child_skip])
+      expect(child_class.relationships).to eq(
+        'users' => { 'parent_id' => 'parent', 'child_id' => 'child' },
+        'posts' => { 'author_id' => 'author' }
+      )
+      expect(child_class.table_class_names).to eq('people' => 'Person', 'geese' => 'Goose')
+      expect(child_class.extensions_suffix).to eq('.child.rb')
+    end
+  end
+
+  describe '#skip_table after #skip_tables' do
+    it 'does not change the array passed to #skip_tables' do
+      tables = ['first']
+      db_module.skip_tables(tables)
+      db_module.skip_table('second')
+      expect(tables).to eq(['first'])
+      expect(db_module.skip_tables).to eq(%w[first second])
+    end
+  end
 end
