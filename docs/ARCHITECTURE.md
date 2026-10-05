@@ -90,7 +90,7 @@ Factory creates a `DynamicAbstractBase` abstract class per namespace. This isola
 
 ### Automatic Relationship Detection
 Associations uses column naming conventions (`*_id`) combined with database indexes to infer relationships. It reads indexes through `connection.schema_cache`, so a Rails schema cache dump serves them without a query per table:
-- Foreign key column → `belongs_to`
+- Foreign key column → `belongs_to` (`optional: true` if the column is nullable, required if NOT NULL)
 - Unique index on FK → `has_one` (1:1 relationship)
 - No unique index on FK → `has_many` (1:N relationship)
 - Join table pattern → `has_and_belongs_to_many`

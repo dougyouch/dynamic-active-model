@@ -111,7 +111,7 @@ module DynamicActiveModel
     def append_association!(str, assoc_type, assoc, association_options)
       str << "  #{assoc_type} #{assoc.name.inspect}"
       association_options.compact.each do |name, value|
-        str << ", #{name}: '#{value}'"
+        str << ", #{name}: #{value.is_a?(String) ? "'#{value}'" : value.inspect}"
       end
       str << "\n"
     end
@@ -141,6 +141,7 @@ module DynamicActiveModel
           assoc.options[:foreign_key]
       end
       options[:primary_key] = assoc.options[:primary_key] unless assoc.options[:primary_key] == 'id'
+      options[:optional] = true if assoc.options[:optional]
       options
     end
 
