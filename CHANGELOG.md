@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/dougyouch/dynamic-active-model/compare/v1.3.0...v1.3.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* **setup:** copy the config before changing it ([848ac15](https://github.com/dougyouch/dynamic-active-model/commit/848ac15f31cf20d0e7ad14c4616044b2f16a8624))
+* **setup:** copy the config before changing it ([87d3e10](https://github.com/dougyouch/dynamic-active-model/commit/87d3e1004ec658418c96c24b55986a65bb0b9cec))
+
 ## [1.3.0](https://github.com/dougyouch/dynamic-active-model/compare/v1.2.0...v1.3.0) (2026-10-03)
 
 
