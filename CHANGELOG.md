@@ -5,8 +5,11 @@
 
 ### Bug Fixes
 
-* **setup:** copy the config before changing it ([848ac15](https://github.com/dougyouch/dynamic-active-model/commit/848ac15f31cf20d0e7ad14c4616044b2f16a8624))
 * **setup:** copy the config before changing it ([87d3e10](https://github.com/dougyouch/dynamic-active-model/commit/87d3e1004ec658418c96c24b55986a65bb0b9cec))
+
+### Build System
+
+* **gem:** require ruby 3.3 ([14f23ed](https://github.com/dougyouch/dynamic-active-model/commit/14f23edf888ef6971057781af349cc62c9bfe4b6)). Ruby 3.2 reached end of life in March 2026; RubyGems keeps 1.3.0 for Ruby 3.2.
 
 ## [1.3.0](https://github.com/dougyouch/dynamic-active-model/compare/v1.2.0...v1.3.0) (2026-10-03)
 
