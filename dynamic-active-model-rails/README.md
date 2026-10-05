@@ -2,7 +2,7 @@
 
 Rails integration for [dynamic-active-model](https://github.com/dougyouch/dynamic-active-model). Declare your databases in one initializer, and their tables become ActiveRecord models in a `<Name>DB` namespace. Models are built on first use, rebuilt after migrations, and reloaded with the rest of the app in development.
 
-Requires Rails 7.1+ and Ruby 3.2+.
+Requires Rails 7.1+ and Ruby 3.3+.
 
 ## Installation
 

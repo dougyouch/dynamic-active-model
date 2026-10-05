@@ -36,7 +36,7 @@ jobs:
           bundler-cache: true
       - run: bundle exec rubocop --format github
 
-  # Supported range: Ruby 3.2-4.0 x ActiveRecord/Rails 7.1-8.1. The root Gemfile.lock is a
+  # Supported range: Ruby 3.3-4.0 x ActiveRecord/Rails 7.1-8.1. The root Gemfile.lock is a
   # Ruby 4.0 development lockfile (its tooling needs Ruby 3.3+), so only Ruby 4.0 + 8.1 uses it;
   # every other combination resolves gemfiles/activerecord_X.gemfile fresh.
   test:
@@ -45,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['3.2', '3.3', '3.4', '4.0']
+        ruby: ['3.3', '3.4', '4.0']
         activerecord: ['7.1', '7.2', '8.0', '8.1']
     env:
       BUNDLE_GEMFILE: >-
@@ -125,7 +125,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['3.2', '3.3', '3.4', '4.0']
+        ruby: ['3.3', '3.4', '4.0']
         rails: ['7.1', '7.2', '8.0', '8.1']
     env:
       BUNDLE_GEMFILE: >-

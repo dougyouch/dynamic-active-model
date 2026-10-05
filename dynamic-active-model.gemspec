@@ -18,9 +18,9 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob('lib/**/*.rb') + Dir.glob('bin/*')
   s.bindir      = 'bin'
   s.executables << 'dynamic-db-explorer'
-  s.required_ruby_version = '>= 3.2'
+  s.required_ruby_version = '>= 3.3'
 
   s.add_dependency 'activerecord', '>= 7.1'
-  s.add_dependency 'inheritance-helper', '~> 0.2'
+  s.add_dependency 'inheritance-helper', '>= 0.2', '< 2'
   s.metadata['rubygems_mfa_required'] = 'true'
 end
