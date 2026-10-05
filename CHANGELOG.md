@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/dougyouch/dynamic-active-model/compare/v1.3.1...v1.3.2) (2026-10-05)
+
+
+### Bug Fixes
+
+* **associations:** make belongs_to optional when the foreign key is nullable ([4551dfb](https://github.com/dougyouch/dynamic-active-model/commit/4551dfbc0768af22dff9409dd1020a9cde7e0a25))
+
 ## [1.3.1](https://github.com/dougyouch/dynamic-active-model/compare/v1.3.0...v1.3.1) (2026-10-05)
 
 
