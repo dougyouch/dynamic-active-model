@@ -96,6 +96,18 @@ describe DynamicActiveModel::Associations do
       expect(assoc.options[:class_name]).to include('User')
     end
 
+    it 'makes belongs_to optional when the foreign key is nullable, and required when it is NOT NULL' do
+      subject
+      expect(get_association(base_module.const_get('Employment'), :user).options[:optional]).to be(true)
+      expect(get_association(base_module.const_get('UserRollup'), :user).options[:optional]).to be(false)
+    end
+
+    it 'validates required belongs_to and skips optional ones' do
+      subject
+      expect(base_module.const_get('Employment').new.tap(&:valid?).errors[:user]).to be_empty
+      expect(base_module.const_get('UserRollup').new.tap(&:valid?).errors[:user]).to eq(['must exist'])
+    end
+
     it 'sets correct foreign_key on belongs_to' do
       subject
       employment_model = base_module.const_get('Employment')

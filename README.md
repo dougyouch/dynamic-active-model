@@ -99,7 +99,7 @@ Dynamic Active Model automatically detects and creates four types of relationshi
 
 | Relationship | Detection |
 |--------------|-----------|
-| `belongs_to` | Foreign key column exists |
+| `belongs_to` | Foreign key column exists; `optional: true` when the column is nullable, required when it's `NOT NULL` |
 | `has_many` | Another table references this table |
 | `has_one` | Foreign key has a unique constraint |
 | `has_and_belongs_to_many` | Join table with exactly two FK columns and no primary key |

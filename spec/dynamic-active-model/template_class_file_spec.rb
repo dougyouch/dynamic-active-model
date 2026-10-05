@@ -128,7 +128,7 @@ describe DynamicActiveModel::TemplateClassFile do
 
     it 'verify Employment relationships' do
       expect(subject.include?('has_many :stats_employment_durations')).to be(true)
-      expect(subject.include?('belongs_to :user')).to be(true)
+      expect(subject).to match(/belongs_to :user, .*optional: true$/)
       expect(subject.include?('belongs_to :job')).to be(true)
       expect(subject.include?('belongs_to :company')).to be(true)
     end
@@ -220,9 +220,10 @@ describe DynamicActiveModel::TemplateClassFile do
     context 'user rollup model' do
       let(:model_name) { :UserRollup }
 
-      it 'includes belongs_to relationship' do
+      it 'includes belongs_to relationship, required since user_id is NOT NULL' do
         output = template_class_file.to_s
-        expect(output).to include('belongs_to :user')
+        expect(output).to match(/belongs_to :user\b/)
+        expect(output).not_to include('optional')
       end
     end
   end

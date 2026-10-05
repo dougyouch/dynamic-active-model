@@ -154,8 +154,18 @@ module DynamicActiveModel
         relationship_name.singularize.to_sym,
         class_name: belongs_to_model.name,
         foreign_key: foreign_key,
-        primary_key: primary_key
+        primary_key: primary_key,
+        optional: nullable_column?(model, foreign_key)
       )
+    end
+
+    # A nullable foreign key makes the belongs_to optional; NOT NULL makes it required,
+    # whatever belongs_to_required_by_default is set to.
+    # @param model [Class]
+    # @param column_name [String]
+    # @return [Boolean]
+    def nullable_column?(model, column_name)
+      model.columns_hash.fetch(column_name.to_s).null
     end
 
     # Adds a has_many relationship to a model

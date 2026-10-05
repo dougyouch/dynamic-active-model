@@ -51,7 +51,7 @@ Dynamic Active Model is a Ruby gem that automatically discovers database schemas
 **Factory** (`lib/dynamic-active-model/factory.rb`) - Creates ActiveRecord model classes. Generates an abstract base class (`DynamicAbstractBase`) with its own database connection, keeping dynamic models isolated from the main `ActiveRecord::Base`.
 
 **Associations** (`lib/dynamic-active-model/associations.rb`) - Automatically detects and creates relationships:
-- `belongs_to` from foreign key columns
+- `belongs_to` from foreign key columns, optional when the column is nullable and required when it's NOT NULL
 - `has_many` / `has_one` based on unique index presence
 - `has_and_belongs_to_many` for join tables (2 columns, both foreign keys, no primary key)
 
