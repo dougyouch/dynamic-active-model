@@ -21,7 +21,7 @@ A Ruby gem that automatically discovers your database schema and creates corresp
 
 ## Installation
 
-Requires Ruby 3.2+ and ActiveRecord 7.1+. Tested in CI against Ruby 3.2–4.0 and ActiveRecord 7.1–8.1.
+Requires Ruby 3.3+ and ActiveRecord 7.1+. Tested in CI against Ruby 3.3–4.0 and ActiveRecord 7.1–8.1.
 
 Add this line to your application's Gemfile:
 

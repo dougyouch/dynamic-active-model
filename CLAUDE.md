@@ -17,7 +17,7 @@ bundle exec rspec spec/dynamic-active-model/database_spec.rb
 # Run a specific test by line number
 bundle exec rspec spec/dynamic-active-model/database_spec.rb:42
 
-# Run the specs against another ActiveRecord version (CI runs Ruby 3.2-4.0 x 7.1-8.1;
+# Run the specs against another ActiveRecord version (CI runs Ruby 3.3-4.0 x 7.1-8.1;
 # only Ruby 4.0 + 8.1 uses the default Gemfile.lock, the rest use gemfiles/ and, for the
 # Rails gem, dynamic-active-model-rails/gemfiles/)
 BUNDLE_GEMFILE=gemfiles/activerecord_7.1.gemfile bundle install
@@ -40,7 +40,7 @@ bundle exec rubocop -a
 
 ## Architecture Overview
 
-Dynamic Active Model is a Ruby gem that automatically discovers database schemas and creates ActiveRecord models with relationships. It requires Ruby 3.2+ and ActiveRecord 7.1+ (the range CI tests; see `.github/workflows/ci.yml`).
+Dynamic Active Model is a Ruby gem that automatically discovers database schemas and creates ActiveRecord models with relationships. It requires Ruby 3.3+ and ActiveRecord 7.1+ (the range CI tests; see `.github/workflows/ci.yml`).
 
 ### Core Components
 
